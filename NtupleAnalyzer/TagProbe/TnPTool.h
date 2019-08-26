@@ -1,5 +1,6 @@
 #include <Include/MuonHLTTool.h>
 #include <Include/SimplePlotTools.h>
+#include "TEfficiency.h"
 
 namespace MuonHLT
 {
