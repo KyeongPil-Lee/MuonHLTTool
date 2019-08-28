@@ -38,14 +38,20 @@ public:
         MuonHLT::dRMatching_L1Muon(probe_.vecP, ntuple_, 22, 0.3) )
       flag = kTRUE;
 
+    // if( flag )
+    //   cout << "Probe is found" << endl;
+
     return flag;
   }
 
   Bool_t IsPassingProbe()
   {
     Bool_t flag = kFALSE;
-    if( MuonHLT::dRMatching_MYHLTObj(tag_.vecP, ntuple_, "hltL3crIsoL1sMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p09::MYHLT", 0.1) )
+    if( MuonHLT::dRMatching_MYHLTObj(probe_.vecP, ntuple_, "hltL3crIsoL1sMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p09::MYHLT", 0.1) )
       flag = kTRUE;
+
+    // if( flag )
+    //   cout << "Passing probe is found" << endl;
 
     return flag;
   }
@@ -76,6 +82,8 @@ public:
       chain->Add(dataPath);
 
     MuonHLT::NtupleHandle* ntuple = new MuonHLT::NtupleHandle( chain );
+    ntuple->TurnOnBranches_Muon();
+    ntuple->TurnOnBranches_HLTMuon();
 
     MuonHLT::TnPHistProducer* tnpHist = new MuonHLT::TnPHistProducer(minPt_);
 
@@ -150,8 +158,8 @@ private:
     Double_t realTime = timer_.RealTime();
 
     cout << "************************************************" << endl;
-    cout << "Total real time: " << realTime << " (seconds)" << endl;
-    cout << "Total CPU time:  " << cpuTime << " (seconds)" << endl;
+    cout << "Total real time: " << realTime / 60.0 << " (mins) " <<  endl;
+    cout << "Total CPU time:  " << cpuTime / 60.0 << " (mins)" << endl;
     cout << "  CPU time / real time = " << cpuTime / realTime << endl;
     cout << "************************************************" << endl;
   }
