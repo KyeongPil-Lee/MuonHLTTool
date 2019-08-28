@@ -166,7 +166,7 @@ private:
 };
 
 
-void MakeHist_IsoMu24overL1()
+void MakeHist_L3overL1()
 {
   HistProducer* histProducer = new HistProducer();
   histProducer->Set_OutputFileName("ROOTFile_TnPHist_L3overL1.root");
