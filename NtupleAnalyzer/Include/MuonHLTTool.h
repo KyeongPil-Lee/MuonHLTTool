@@ -69,6 +69,19 @@ vector<MuonHLT::L2Muon> GetAllL2Muon(NtupleHandle* ntuple, Double_t minPt = -1 )
   return vec_muon;
 }
 
+vector<MuonHLT::L3Muon> GetAllL3Muon(NtupleHandle* ntuple, Double_t minPt = -1 )
+{
+  vector<MuonHLT::L3Muon> vec_muon;
+  for(Int_t i_obj=0; i_obj<ntuple->nL3Muon; i_obj++)
+  {
+    MuonHLT::L3Muon mu(ntuple, i_obj);
+    if( mu.pt > minPt )
+      vec_muon.push_back( mu );
+  }
+
+  return vec_muon;
+}
+
 Bool_t dRMatching( TLorentzVector vecP_ref, vector<TLorentzVector> vec_vecP, Double_t minDR )
 {
   bool flag = kFALSE;
@@ -95,6 +108,26 @@ Bool_t dRMatching_L1Muon( TLorentzVector vecP_ref, NtupleHandle* ntuple, Double_
     vec_vecP_L1Muon.push_back( L1Muon.vecP );
 
   return MuonHLT::dRMatching( vecP_ref, vec_vecP_L1Muon, minDR );
+}
+
+Bool_t dRMatching_L2Muon( TLorentzVector vecP_ref, NtupleHandle* ntuple, Double_t minPt, Double_t minDR )
+{
+  vector<MuonHLT::L2Muon> vec_L2Muon = MuonHLT::GetAllL2Muon( ntuple, minPt );
+  vector<TLorentzVector> vec_vecP_L2Muon;
+  for(const auto& L2Muon : vec_L2Muon )
+    vec_vecP_L2Muon.push_back( L2Muon.vecP );
+
+  return MuonHLT::dRMatching( vecP_ref, vec_vecP_L2Muon, minDR );
+}
+
+Bool_t dRMatching_L3Muon( TLorentzVector vecP_ref, NtupleHandle* ntuple, Double_t minPt, Double_t minDR )
+{
+  vector<MuonHLT::L3Muon> vec_L3Muon = MuonHLT::GetAllL3Muon( ntuple, minPt );
+  vector<TLorentzVector> vec_vecP_L3Muon;
+  for(const auto& L3Muon : vec_L3Muon )
+    vec_vecP_L3Muon.push_back( L3Muon.vecP );
+
+  return MuonHLT::dRMatching( vecP_ref, vec_vecP_L3Muon, minDR );
 }
 
 Bool_t dRMatching_HLTObj( TLorentzVector vecP_ref, MuonHLT::NtupleHandle* ntuple, TString filterName, Double_t minDR )
