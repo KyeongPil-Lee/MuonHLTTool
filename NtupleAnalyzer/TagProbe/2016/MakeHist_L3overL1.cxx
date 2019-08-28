@@ -1,4 +1,4 @@
-#include <TagProbe/TnPTool.h>
+#include <TagProbe/TnPTool_v2.h>
 #include "TEfficiency.h"
 #include "TStopwatch.h"
 
@@ -178,7 +178,7 @@ void MakeHist_L3overL1()
   histProducer->AddDataPath("/scratch/kplee/MuonHLTNtuple/crab_MuonHLTNtuple_SingleMuon_Run2016H_RunAfter283052/190319_175354/0004/*.root");
   histProducer->AddDataPath("/scratch/kplee/MuonHLTNtuple/crab_MuonHLTNtuple_SingleMuon_Run2016H_RunAfter283052/190319_175354/0005/*.root");
 
-  histProducer->Set_minPt( 26 ); // -- min pT applied for eta, phi and vtx
+  histProducer->Set_minPt( 20 ); // -- min pT applied for eta, phi and vtx
 
   histProducer->Produce();
 }
