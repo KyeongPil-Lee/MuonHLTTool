@@ -84,7 +84,7 @@ vector<MuonHLT::L3Muon> GetAllL3Muon(NtupleHandle* ntuple, Double_t minPt = -1 )
 
 Bool_t dRMatching( TLorentzVector vecP_ref, vector<TLorentzVector> vec_vecP, Double_t minDR )
 {
-  bool flag = kFALSE;
+  Bool_t flag = kFALSE;
 
   Int_t nObj = (Int_t)vec_vecP.size();
   for(const auto& vecP_target: vec_vecP )
@@ -100,12 +100,15 @@ Bool_t dRMatching( TLorentzVector vecP_ref, vector<TLorentzVector> vec_vecP, Dou
   return flag;
 }
 
-Bool_t dRMatching_L1Muon( TLorentzVector vecP_ref, NtupleHandle* ntuple, Double_t minPt, Double_t minDR )
+Bool_t dRMatching_L1Muon( TLorentzVector vecP_ref, NtupleHandle* ntuple, Double_t minPt, Double_t minQ, Double_t minDR )
 {
   vector<MuonHLT::L1Muon> vec_L1Muon = MuonHLT::GetAllL1Muon( ntuple, minPt );
   vector<TLorentzVector> vec_vecP_L1Muon;
   for(const auto& L1Muon : vec_L1Muon )
-    vec_vecP_L1Muon.push_back( L1Muon.vecP );
+  {
+    if( L1Muon.quality >= minQ )
+      vec_vecP_L1Muon.push_back( L1Muon.vecP );
+  }
 
   return MuonHLT::dRMatching( vecP_ref, vec_vecP_L1Muon, minDR );
 }

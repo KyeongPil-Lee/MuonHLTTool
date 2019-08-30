@@ -35,7 +35,7 @@ public:
 
     if( probe_.isTight && 
         probe_.relPFIso_dBeta < 0.15 && 
-        MuonHLT::dRMatching_L1Muon(probe_.vecP, ntuple_, 22, 0.3) )
+        MuonHLT::dRMatching_L1Muon(probe_.vecP, ntuple_, 22, 12, 0.3) )
       flag = kTRUE;
 
     // if( flag )
