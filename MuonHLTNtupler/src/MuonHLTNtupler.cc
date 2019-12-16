@@ -1191,8 +1191,16 @@ void MuonHLTNtupler::Fill_IterL3(const edm::Event &iEvent)
 
       // -- trigger loose ID variables
       iterL3MuonNoID_TMOST_[_nIterL3MuonNoID] = muon::isGoodMuon(muon, muon::TMOneStationTight);
-      iterL3MuonNoID_nTrackerLayer_[_nIterL3MuonNoID] = muon.innerTrack()->hitPattern().trackerLayersWithMeasurement();
-      iterL3MuonNoID_nPixelLayer_  [_nIterL3MuonNoID] = muon.innerTrack()->hitPattern().pixelLayersWithMeasurement();
+      if( muon.innerTrack().isNonNull() )
+      {
+        iterL3MuonNoID_nTrackerLayer_[_nIterL3MuonNoID] = muon.innerTrack()->hitPattern().trackerLayersWithMeasurement();
+        iterL3MuonNoID_nPixelLayer_  [_nIterL3MuonNoID] = muon.innerTrack()->hitPattern().pixelLayersWithMeasurement();
+      }
+      else
+      {
+        iterL3MuonNoID_nTrackerLayer_[_nIterL3MuonNoID] = 0;
+        iterL3MuonNoID_nPixelLayer_  [_nIterL3MuonNoID] = 0;
+      }
 
       iterL3MuonNoID_expectedNMatchedStation_[_nIterL3MuonNoID] = muon.expectedNnumberOfMatchedStations();
       iterL3MuonNoID_nMatchedStation_[_nIterL3MuonNoID]         = muon.numberOfMatchedStations();
