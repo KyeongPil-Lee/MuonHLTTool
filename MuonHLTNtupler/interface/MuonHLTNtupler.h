@@ -329,4 +329,10 @@ private:
   int iterL3MuonNoID_isGLB_[arrSize_];
   int iterL3MuonNoID_isSTA_[arrSize_];
   int iterL3MuonNoID_isTRK_[arrSize_];
+
+  int iterL3MuonNoID_TMOST_[arrSize_];
+  int iterL3MuonNoID_nTrackerLayer_[arrSize_];
+  int iterL3MuonNoID_nPixelLayer_[arrSize_];
+  int iterL3MuonNoID_expectedNMatchedStation_[arrSize_];
+  int iterL3MuonNoID_nMatchedStation_[arrSize_];
 };

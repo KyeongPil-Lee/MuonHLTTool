@@ -421,6 +421,12 @@ void MuonHLTNtupler::Init()
     iterL3MuonNoID_isGLB_[i] = 0;
     iterL3MuonNoID_isSTA_[i] = 0;
     iterL3MuonNoID_isTRK_[i] = 0;
+
+    iterL3MuonNoID_TMOST_[i] = 0;
+    iterL3MuonNoID_nTrackerLayer_[i] = 0;
+    iterL3MuonNoID_nPixelLayer_[i] = 0;
+    iterL3MuonNoID_expectedNMatchedStation_[i] = 0;
+    iterL3MuonNoID_nMatchedStation_[i] = 0;
   }
 }
 
@@ -620,6 +626,12 @@ void MuonHLTNtupler::Make_Branch()
   ntuple_->Branch("iterL3MuonNoID_isGLB",  &iterL3MuonNoID_isGLB_,  "iterL3MuonNoID_isGLB[nIterL3MuonNoID]/I");
   ntuple_->Branch("iterL3MuonNoID_isSTA",  &iterL3MuonNoID_isSTA_,  "iterL3MuonNoID_isSTA[nIterL3MuonNoID]/I");
   ntuple_->Branch("iterL3MuonNoID_isTRK",  &iterL3MuonNoID_isTRK_,  "iterL3MuonNoID_isTRK[nIterL3MuonNoID]/I");
+
+  ntuple_->Branch("iterL3MuonNoID_TMOST",         &iterL3MuonNoID_TMOST_,         "iterL3MuonNoID_TMOST[nIterL3MuonNoID]/I");
+  ntuple_->Branch("iterL3MuonNoID_nTrackerLayer", &iterL3MuonNoID_nTrackerLayer_, "iterL3MuonNoID_nTrackerLayer[nIterL3MuonNoID]/I");
+  ntuple_->Branch("iterL3MuonNoID_nPixelLayer",   &iterL3MuonNoID_nPixelLayer_,   "iterL3MuonNoID_nPixelLayer[nIterL3MuonNoID]/I");
+  ntuple_->Branch("iterL3MuonNoID_expectedNMatchedStation", &iterL3MuonNoID_expectedNMatchedStation_, "iterL3MuonNoID_expectedNMatchedStation[nIterL3MuonNoID]/I");
+  ntuple_->Branch("iterL3MuonNoID_nMatchedStation",         &iterL3MuonNoID_nMatchedStation_,         "iterL3MuonNoID_nMatchedStation[nIterL3MuonNoID]/I");
 }
 
 void MuonHLTNtupler::Fill_Muon(const edm::Event &iEvent)
@@ -1176,6 +1188,14 @@ void MuonHLTNtupler::Fill_IterL3(const edm::Event &iEvent)
       if( muon.isGlobalMuon() )     iterL3MuonNoID_isGLB_[_nIterL3MuonNoID] = 1;
       if( muon.isStandAloneMuon() ) iterL3MuonNoID_isSTA_[_nIterL3MuonNoID] = 1;
       if( muon.isTrackerMuon() )    iterL3MuonNoID_isTRK_[_nIterL3MuonNoID] = 1;
+
+      // -- trigger loose ID variables
+      iterL3MuonNoID_TMOST_[_nIterL3MuonNoID] = muon::isGoodMuon(muon, TMOneStationTight);
+      iterL3MuonNoID_nTrackerLayer_[_nIterL3MuonNoID] = muon.innerTrack()->hitPattern().trackerLayersWithMeasurement();
+      iterL3MuonNoID_nPixelLayer_  [_nIterL3MuonNoID] = muon.innerTrack()->hitPattern().pixelLayersWithMeasurement();
+
+      iterL3MuonNoID_expectedNMatchedStation_[_nIterL3MuonNoID] = muon.expectedNnumberOfMatchedStations();
+      iterL3MuonNoID_nMatchedStation_[_nIterL3MuonNoID]         = muon.numberOfMatchedStations();
 
       _nIterL3MuonNoID++;
     } // -- end of muon iteration
