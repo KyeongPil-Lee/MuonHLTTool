@@ -219,6 +219,12 @@ public:
   Int_t           iterL3MuonNoID_isSTA[ArrSize];
   Int_t           iterL3MuonNoID_isTRK[ArrSize];
 
+  Int_t iterL3MuonNoID_TMOST[ArrSize];
+  Int_t iterL3MuonNoID_nTrackerLayer[ArrSize];
+  Int_t iterL3MuonNoID_nPixelLayer[ArrSize];
+  Int_t iterL3MuonNoID_expectedNMatchedStation[ArrSize];
+  Int_t iterL3MuonNoID_nMatchedStation[ArrSize];
+
 
   NtupleHandle()
   {
@@ -785,7 +791,22 @@ public:
     chain_->SetBranchAddress("iterL3MuonNoID_isSTA", &iterL3MuonNoID_isSTA);
 
     chain_->SetBranchStatus("iterL3MuonNoID_isTRK", 1);
-    chain_->SetBranchAddress("iterL3MuonNoID_isTRK", &iterL3MuonNoID_isTRK);    
+    chain_->SetBranchAddress("iterL3MuonNoID_isTRK", &iterL3MuonNoID_isTRK);
+
+    chain_->SetBranchStatus("iterL3MuonNoID_TMOST", 1);
+    chain_->SetBranchAddress("iterL3MuonNoID_TMOST", &iterL3MuonNoID_TMOST);
+
+    chain_->SetBranchStatus("iterL3MuonNoID_nTrackerLayer", 1);
+    chain_->SetBranchAddress("iterL3MuonNoID_nTrackerLayer", &iterL3MuonNoID_nTrackerLayer);
+
+    chain_->SetBranchStatus("iterL3MuonNoID_nPixelLayer", 1);
+    chain_->SetBranchAddress("iterL3MuonNoID_nPixelLayer", &iterL3MuonNoID_nPixelLayer);
+
+    chain_->SetBranchStatus("iterL3MuonNoID_expectedNMatchedStation", 1);
+    chain_->SetBranchAddress("iterL3MuonNoID_expectedNMatchedStation", &iterL3MuonNoID_expectedNMatchedStation);
+
+    chain_->SetBranchStatus("iterL3MuonNoID_nMatchedStation", 1);
+    chain_->SetBranchAddress("iterL3MuonNoID_nMatchedStation", &iterL3MuonNoID_nMatchedStation);    
   }
 };
 
