@@ -1,6 +1,9 @@
 #include <Include/MuonHLTTool.h>
 #include <Include/SimplePlotTools.h>
 
+#include <TStopwatch.h>
+#include <TEfficiency.h>
+
 namespace MuonHLT
 {
 
