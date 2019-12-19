@@ -57,12 +57,40 @@ Bool_t MuonID_N_minus_match( MuonHLT::IterL3MuonNoID muon )
   return layer_requirements;
 }
 
+Bool_t MuonID_N_minus_nTrackerLayer( MuonHLT::IterL3MuonNoID muon )
+{
+  Bool_t flag = kFALSE;
+
+  if( !muon.TMOST ) return flag;
+
+  // Bool_t layer_requirements = (muon.nTrackerLayer > 5 && muon.nPixelLayer > 0);
+  Bool_t layer_requirements = muon.nPixelLayer > 0;
+  Bool_t match_requirements = (muon.expectedNMatchedStation < 2 || muon.nMatchedStation > 1 || muon.pt < 8 );
+
+  return layer_requirements && match_requirements;
+}
+
+Bool_t MuonID_N_minus_nPixelLayer( MuonHLT::IterL3MuonNoID muon )
+{
+  Bool_t flag = kFALSE;
+
+  if( !muon.TMOST ) return flag;
+
+  // Bool_t layer_requirements = (muon.nTrackerLayer > 5 && muon.nPixelLayer > 0);
+  Bool_t layer_requirements = muon.nTrackerLayer > 5;
+  Bool_t match_requirements = (muon.expectedNMatchedStation < 2 || muon.nMatchedStation > 1 || muon.pt < 8 );
+
+  return layer_requirements && match_requirements;
+}
+
 Bool_t MuonID( TString type, MuonHLT::IterL3MuonNoID muon )
 {
-  if( type == "N" )                  return MuonID_N( muon );
-  else if( type == "N_minus_TMOST" ) return MuonID_N_minus_TMOST( muon );
-  else if( type == "N_minus_layer" ) return MuonID_N_minus_layer( muon );
-  else if( type == "N_minus_match" ) return MuonID_N_minus_match( muon );
+  if( type == "N" )                          return MuonID_N( muon );
+  else if( type == "N_minus_TMOST" )         return MuonID_N_minus_TMOST( muon );
+  else if( type == "N_minus_layer" )         return MuonID_N_minus_layer( muon );
+  else if( type == "N_minus_match" )         return MuonID_N_minus_match( muon );
+  else if( type == "N_minus_nTrackerLayer" ) return MuonID_N_minus_nTrackerLayer( muon );
+  else if( type == "N_minus_nPixelLayer" )   return MuonID_N_minus_nPixelLayer( muon );
   else
   {
     cout << "type = " << type << "is not recognizable ... return false" << endl;
