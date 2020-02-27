@@ -122,6 +122,8 @@ public:
 
   vector< TString > vec_Offline_selection;
 
+  Bool_t applyL2PtCut_ = kFALSE;
+
   TriggerPurityTool( Double_t _EtaLo, Double_t _EtaUp )
   {
     this->maxEvents = -1;
@@ -178,6 +180,12 @@ public:
         return;
       }
     }
+  }
+
+  // -- apply L2 > 10 GeV cut (to synchronize 2016 and 2018 results)
+  void Set_ApplyL2PtCut( Bool_t flag = kTRUE )
+  {
+    applyL2PtCut_ = flag;
   }
 
   void Analyze()
@@ -269,6 +277,11 @@ public:
           for(Int_t ifilter = 0; ifilter<(Int_t)filters.size(); ++ifilter) {
             vector<Double_t> eta_filled_tmp = {};
             vector<Double_t> phi_filled_tmp = {};
+
+            Bool_t isL2 = kFALSE;
+            if( filters[ifilter].Contains("hltL2fL1sMu22L1f0L2Filtered10Q") || filters[ifilter].Contains("hltL2fL1sSingleMu22L1f0L2Filtered10Q") )
+              isL2 = kTRUE;
+
             for(size_t i_hlt=0; i_hlt<ntuple->vec_filterName->size(); i_hlt++)
             {
 
@@ -297,9 +310,22 @@ public:
                       Bool_t isPass = this->offSelection( ntuple, HLTObj, strSel );
 
                       if(isPass) {
-                        (vec_HistContainer[i_sel])->Fill( ntuple, HLTObj );
-                        eta_filled_tmp.push_back(HLTObj->eta);
-                        phi_filled_tmp.push_back(HLTObj->phi);
+                        
+                        if( isL2 && applyL2PtCut_ ) // -- only when L2 muons & require L2 pt cut: check pt
+                        {
+                          if( HLTObj->pt > 10 )
+                          {
+                            (vec_HistContainer[i_sel])->Fill( ntuple, HLTObj );
+                            eta_filled_tmp.push_back(HLTObj->eta);
+                            phi_filled_tmp.push_back(HLTObj->phi);
+                          }
+                        }
+                        else // -- the other case: no check on pt; just fill
+                        {
+                          (vec_HistContainer[i_sel])->Fill( ntuple, HLTObj );
+                          eta_filled_tmp.push_back(HLTObj->eta);
+                          phi_filled_tmp.push_back(HLTObj->phi);
+                        }
                       }
                     }
                   }

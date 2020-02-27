@@ -123,6 +123,7 @@ void MuonTriggerPurity( TString Trigger, TString Dataset, TString Version, Doubl
   tool->Set_RunNumRange( vec_RunNum );
   tool->Set_Trigger( Filter );
   tool->Set_Output( f_output );
+  tool->Set_ApplyL2PtCut();
   tool->Analyze();
   delete tool;
 
