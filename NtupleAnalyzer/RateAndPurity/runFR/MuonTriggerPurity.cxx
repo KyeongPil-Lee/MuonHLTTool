@@ -1,10 +1,14 @@
 #define nDataset (1)
 #include <RateAndPurity/TriggerPurityTool.h>
 
-void MuonTriggerPurity( TString Trigger, TString Dataset, TString Version, Double_t EtaLo = 0.0, Double_t EtaUp = 5.0,
+void MuonTriggerPurity( TString Trigger = "", TString Dataset = "", TString Version = "", Double_t EtaLo = 0.0, Double_t EtaUp = 5.0,
                         TString JobId = "", vector< TString > vec_Dataset = {} )
 {
   vector< TString > vec_Data = vec_Dataset;
+
+  if( Trigger == "" ) Trigger = "hltL2fL1sMu22L1f0L2Filtered10Q";
+  if( Dataset == "" ) Dataset = "TTSemiLep102X";
+  if( Version == "" ) Version = "TEST";
 
   if(vec_Dataset.size()==0) {
     vec_Data = {"../ntuple_77.root"};  // {"../ntuple_2001.root"};
