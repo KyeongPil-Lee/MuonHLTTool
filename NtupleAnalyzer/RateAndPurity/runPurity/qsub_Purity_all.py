@@ -43,7 +43,7 @@ def jobSpritting( paths, nfiles ):
 
 
 
-VER = "v23"
+VER = "v02"
 Datasets = [  # HERE
   ('Data2016H', 'SingleMuon/crab_HLTNtuplev2_AOD-Run2016Hv1_20190401/190401_140650/0000/', 5),
   ('Data2018D', 'SingleMuon/crab_HLTNtuplev2_AOD-Run2018Dv2_20190401/190401_140733/0000/', 5)
@@ -64,7 +64,9 @@ script = "script_purity_batch.sh"
 macro  = "MuonTriggerPurity.cxx"
 
 PWD = os.getcwd()
-scratch = "/d3/scratch/msoh"
+# scratch = "/d3/scratch/msoh"
+scratch = "/d0/scratch/kplee"
+
 WorkingDir = scratch+"/BatchDir_"+VER
 if not os.path.isdir(WorkingDir):
   os.makedirs(WorkingDir)

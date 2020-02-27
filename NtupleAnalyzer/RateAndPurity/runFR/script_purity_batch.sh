@@ -45,6 +45,7 @@ echo ""
 
 cd $PBS_O_WORKDIR
 
+# export MUONHLT_ANALYZER_PATH=/u/user/msoh/MuonHLT/MuonHLTPaper/CMSSW_10_2_6/src/MuonHLTTool/NtupleAnalyzer
 export MUONHLT_ANALYZER_PATH=/u/user/kplee/scratch/ServiceWork/MuonHLTTool/RateAndPurity/NtupleAnalyzer
 export ROOT_INCLUDE_PATH=${MUONHLT_ANALYZER_PATH}:${ROOT_INCLUDE_PATH}
 export PYTHONPATH=${MUONHLT_ANALYZER_PATH}:${PYTHONPATH}

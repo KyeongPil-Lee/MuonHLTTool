@@ -10,7 +10,8 @@ import gc
 def jobSpritting( paths, nfiles ):
   str_dcap  = "dcap://cluster142.knu.ac.kr/"
   # base_path = "/pnfs/knu.ac.kr/data/cms/store/user/jskim/"
-  base_path = "/pnfs/knu.ac.kr/data/cms/store/user/moh/"
+  # base_path = "/pnfs/knu.ac.kr/data/cms/store/user/moh/"
+  base_path = "/pnfs/knu.ac.kr/data/cms/store/user/moh/HLTNtuplev2/v20190401/"
   out = []
 
   lines = glob.glob(base_path+paths+"/ntuple_*.root")
@@ -42,22 +43,22 @@ def jobSpritting( paths, nfiles ):
 
 
 
-VER = "v01"
+VER = "v02"
 Datasets = [  # HERE
-  ('TTSemiLep80X',  'TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/crab_MuonHLTNtuple_SimMatchingInfo_2016_TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/191124_074512/0000/', 1),
-  ('TTSemiLep102X', 'TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/crab_MuonHLTNtuple_SimMatchingInfo_2018_TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/191124_074614/0000/', 1)
+  ('Data2016H', 'SingleMuon/crab_HLTNtuplev2_AOD-Run2016Hv1_20190401/190401_140650/0000/', 5),
+  ('Data2018D', 'SingleMuon/crab_HLTNtuplev2_AOD-Run2018Dv2_20190401/190401_140733/0000/', 5)
 ]
 Triggers = [  # HERE
-  'hltL1fL1sMu22L1Filtered0',
-  'hltL2fL1sMu22L1f0L2Filtered10Q',
+  # 'HLT_IsoMu24_v',
+  # 'HLT_Mu50_v',
+  # 'hltL1fL1sMu22L1Filtered0',
+  'hltL2fL1sMu22L1f0L2Filtered10Q'
 
-  'HLT_IsoMu24_v',
-  'HLT_Mu50_v',
-  'HLT_Mu24_v',
+  # 'HLT_IsoTkMu24_v',
+  # 'HLT_TkMu50_v',
 
-  'HLT_IsoTkMu24_v',
-  'HLT_TkMu50_v',
-  'HLT_TkMu24_v'
+  # 'HLT_IsoMu24_v_Or_HLT_IsoTkMu24_v',
+  # 'HLT_Mu50_v_Or_HLT_TkMu50_v'
 ]
 script = "script_purity_batch.sh"
 macro  = "MuonTriggerPurity.cxx"
@@ -97,7 +98,7 @@ for dataset, paths, nfiles in Datasets:
     if( "80X" not in dataset and "TkMu" in trig ):
       continue
 
-    if "102X" in dataset and trig == "hltL2fL1sMu22L1f0L2Filtered10Q":
+    if "Data2018" in dataset and trig == "hltL2fL1sMu22L1f0L2Filtered10Q":
       trig = "hltL2fL1sSingleMu22L1f0L2Filtered10Q"
 
 
