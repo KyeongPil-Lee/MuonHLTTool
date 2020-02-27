@@ -313,11 +313,18 @@ public:
                         
                         if( isL2 && applyL2PtCut_ ) // -- only when L2 muons & require L2 pt cut: check pt
                         {
+                          if(debug) cout << "It is the L2 filter = " << filters[ifilter] << endl;
+                          if(debug) cout << "   ---> L2 pt: " << HLTObj->pt << endl;
                           if( HLTObj->pt > 10 )
                           {
+                            if(debug) cout << "   ---> pass" << endl;
                             (vec_HistContainer[i_sel])->Fill( ntuple, HLTObj );
                             eta_filled_tmp.push_back(HLTObj->eta);
                             phi_filled_tmp.push_back(HLTObj->phi);
+                          }
+                          else
+                          {
+                            if(debug) cout << "L2 muon is rejected due to its low pT" << endl;
                           }
                         }
                         else // -- the other case: no check on pt; just fill

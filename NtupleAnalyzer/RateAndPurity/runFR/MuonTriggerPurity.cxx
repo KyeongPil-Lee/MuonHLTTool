@@ -6,7 +6,7 @@ void MuonTriggerPurity( TString Trigger = "", TString Dataset = "", TString Vers
 {
   vector< TString > vec_Data = vec_Dataset;
 
-  if( Trigger == "" ) Trigger = "hltL2fL1sMu22L1f0L2Filtered10Q";
+  if( Trigger == "" ) Trigger = "hltL2fL1sSingleMu22L1f0L2Filtered10Q";
   if( Dataset == "" ) Dataset = "TTSemiLep102X";
   if( Version == "" ) Version = "TEST";
 
@@ -118,7 +118,8 @@ void MuonTriggerPurity( TString Trigger = "", TString Dataset = "", TString Vers
   TriggerPurityTool* tool = new TriggerPurityTool(EtaLo, EtaUp);
   if(Version.Contains("TEST")) {
     // tool->debug = kTRUE;
-    tool->Set_MaxEvents(1000);
+    // tool->Set_MaxEvents(10000);
+    tool->Set_MaxEvents(10000);
   }
   if( Version.Contains("Dimuon") )
     tool->doDimuon = kTRUE;
@@ -128,6 +129,7 @@ void MuonTriggerPurity( TString Trigger = "", TString Dataset = "", TString Vers
   tool->Set_Trigger( Filter );
   tool->Set_Output( f_output );
   tool->Set_ApplyL2PtCut();
+  // tool->debug = kTRUE;
   tool->Analyze();
   delete tool;
 
