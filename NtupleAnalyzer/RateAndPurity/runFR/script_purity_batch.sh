@@ -36,7 +36,8 @@ echo '------------------------------------------------------'
 #PBS -j oe
 
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-cd /u/user/msoh/MuonHLT/MuonHLTPaper/CMSSW_10_2_6/src
+# cd /u/user/msoh/MuonHLT/MuonHLTPaper/CMSSW_10_2_6/src
+cd /d0/scratch/kplee/MuonPOGTnP/CMSSW_10_2_5/src
 eval `scramv1 runtime -sh`
 which cmsRun
 which root
@@ -44,7 +45,7 @@ echo ""
 
 cd $PBS_O_WORKDIR
 
-export MUONHLT_ANALYZER_PATH=/u/user/msoh/MuonHLT/MuonHLTPaper/CMSSW_10_2_6/src/MuonHLTTool/NtupleAnalyzer
+export MUONHLT_ANALYZER_PATH=/u/user/kplee/scratch/ServiceWork/MuonHLTTool/RateAndPurity/NtupleAnalyzer
 export ROOT_INCLUDE_PATH=${MUONHLT_ANALYZER_PATH}:${ROOT_INCLUDE_PATH}
 export PYTHONPATH=${MUONHLT_ANALYZER_PATH}:${PYTHONPATH}
 
