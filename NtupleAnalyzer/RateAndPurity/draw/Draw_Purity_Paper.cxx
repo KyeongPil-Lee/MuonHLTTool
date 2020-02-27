@@ -1,4 +1,5 @@
-#include <PlotTools.h>
+// #include <PlotTools.h>
+#include "PlotTools.h"
 
 vector<TString> vec_Sel = {
   // "Mat1_IdPfOrTrkOrGlb_IsoNo_SimNo_HLT"
@@ -236,7 +237,7 @@ private:
     // vec_Marker = { 20, 25, 22, 32 };
 
     const Int_t n_tag = (Int_t)vec_Tag.size();
-    TH1F* Purity[n_tag];
+    TH1D* Purity[n_tag];
 
     // -- Canvas -- //
     TCanvas *c;
@@ -246,7 +247,7 @@ private:
     SetCanvas_Square( c, canvasName, isLogX, 0 );
     c->cd();
 
-    TH1F *h_Frame = new TH1F("h_Frame", "", 1, minX, maxX);
+    TH1D *h_Frame = new TH1D("h_Frame", "", 1, minX, maxX);
     h_Frame->SetStats(kFALSE);
     h_Frame->SetLineWidth(0);
     h_Frame->SetMarkerSize(0);
@@ -267,14 +268,14 @@ private:
       if( this->Trigger.Contains("hltL2fL1sMu22L1f0L2Filtered10Q") && vec_Tag[i].Contains("Data2018"))
         FileNameTemp.ReplaceAll("hltL2fL1sMu22L1f0L2Filtered10Q","hltL2fL1sSingleMu22L1f0L2Filtered10Q");
 
-      TH1F *h_Num = Get_Hist("./Outputs/"+FileNameTemp, NumName_Purity, "h_Num");
-      TH1F *h_Den = Get_Hist("./Outputs/"+FileNameTemp, DenName_Purity, "h_Den");
+      TH1D *h_Num = Get_Hist("./Outputs/"+FileNameTemp, NumName_Purity, "h_Num");
+      TH1D *h_Den = Get_Hist("./Outputs/"+FileNameTemp, DenName_Purity, "h_Den");
       Double_t nNum = (Double_t)(h_Num->Integral());
       Double_t nDen = (Double_t)(h_Den->Integral());
       printf("\n\t[%s, %s, %s] (nNum, nDen, Purity) = (%.6f, %.6f, %.6f)\n",
                 (vec_Tag[i]).Data(), Selection.Data(), Var.Data(), nNum, nDen, (nNum/nDen) );
 
-      Purity[i] = (TH1F*)h_Num->Clone("Purity_"+vec_Tag[i]);
+      Purity[i] = (TH1D*)h_Num->Clone("Purity_"+vec_Tag[i]);
 
       for(Int_t iB=1; iB<=h_Num->GetNbinsX(); ++iB) {
         Double_t nPass = h_Num->GetBinContent(iB);
@@ -405,7 +406,7 @@ private:
 
 
     const Int_t n_tag = (this->Trigger).Contains("IsoMu") ? (Int_t)vec_Seq.size() : (Int_t)vec_Seq.size() - 2 ;
-    TH1F* Purity[n_tag];
+    TH1D* Purity[n_tag];
 
     // -- Canvas -- //
     TCanvas *c;
@@ -415,7 +416,7 @@ private:
     SetCanvas_Square( c, canvasName, isLogX, 0 );
     c->cd();
 
-    TH1F *h_Frame = new TH1F("h_Frame", "", 1, minX, maxX);
+    TH1D *h_Frame = new TH1D("h_Frame", "", 1, minX, maxX);
     h_Frame->SetStats(kFALSE);
     h_Frame->SetLineWidth(0);
     h_Frame->SetMarkerSize(0);
@@ -436,14 +437,14 @@ private:
 
       TString FileNameTemp = this->FileName;
 
-      TH1F *h_Num = Get_Hist("./Outputs/"+FileNameTemp, NumName_Purity, "h_Num");
-      TH1F *h_Den = Get_Hist("./Outputs/"+FileNameTemp, DenName_Purity, "h_Den");
+      TH1D *h_Num = Get_Hist("./Outputs/"+FileNameTemp, NumName_Purity, "h_Num");
+      TH1D *h_Den = Get_Hist("./Outputs/"+FileNameTemp, DenName_Purity, "h_Den");
       Double_t nNum = (Double_t)(h_Num->Integral());
       Double_t nDen = (Double_t)(h_Den->Integral());
       printf("\n\t[%s, %s, %s] (nNum, nDen, Purity) = (%.6f, %.6f, %.6f)\n",
                 (strSeq).Data(), strSeq.Data(), Var.Data(), nNum, nDen, (nNum/nDen) );
 
-      Purity[i] = (TH1F*)h_Num->Clone("Purity_"+strSeq);
+      Purity[i] = (TH1D*)h_Num->Clone("Purity_"+strSeq);
 
       for(Int_t iB=1; iB<=h_Num->GetNbinsX(); ++iB) {
         Double_t nPass = h_Num->GetBinContent(iB);

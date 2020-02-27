@@ -1220,3 +1220,47 @@ public:
 		this->c->SaveAs(".pdf");
 	}
 };
+
+Double_t Get_NonZeroMin( TH1D* h, Double_t minX, Double_t maxX )
+{
+	Double_t min_global = 1e30;
+
+	Int_t nBin = h->GetNbinsX();
+	for(Int_t i=0; i<nBin; i++)
+	{
+		Int_t i_bin = i+1;
+
+		Double_t lowerEdge = h->GetBinLowEdge(i_bin);
+		Double_t upperEdge = h->GetBinContent(i_bin+1);
+
+		if( minX <= lowerEdge && upperEdge <= maxX )
+		{
+			Double_t binContent = h->GetBinContent(i_bin);
+			if( binContent < min_global ) min_global = binContent; // --update the value
+		}
+	}
+
+	return min_global;
+}
+
+Double_t Get_MaxInRange( TH1D* h, Double_t minX, Double_t maxX, Double_t threshold )
+{
+	Double_t max_global = -1e30;
+
+	Int_t nBin = h->GetNbinsX();
+	for(Int_t i=0; i<nBin; i++)
+	{
+		Int_t i_bin = i+1;
+
+		Double_t lowerEdge = h->GetBinLowEdge(i_bin);
+		Double_t upperEdge = h->GetBinContent(i_bin+1);
+
+		if( minX <= lowerEdge && upperEdge <= maxX )
+		{
+			Double_t binContent = h->GetBinContent(i_bin);
+			if( binContent > max_global ) max_global = binContent; // --update the value
+		}
+	}
+
+	return max_global;
+}
