@@ -1,4 +1,4 @@
-#include <PlotTools.h>
+#include "PlotTools.h"
 
 //-- Setting Purity Seq --//
 
@@ -185,7 +185,7 @@ private:
 
       vector<TString> vec_Seq = vec_Stack;
       const Int_t n_tag = (Int_t)vec_Seq.size();
-      TH1F* Purity[n_tag];
+      TH1D* Purity[n_tag];
 
     //--- Output file
       TString Dir = "./Plots_Stack_"+this->Version+"/FR/"+Dataset+"/"+this->Trigger;
@@ -200,7 +200,7 @@ private:
     SetCanvas_Square( c, canvasName, isLogX, isLogY );
     c->cd();
 
-    TH1F *h_Frame = new TH1F("h_Frame", "", 1, minX, maxX);
+    TH1D *h_Frame = new TH1D("h_Frame", "", 1, minX, maxX);
     h_Frame->SetStats(kFALSE);
     h_Frame->SetLineWidth(0);
     h_Frame->SetLineColor(kBlack);
@@ -225,15 +225,15 @@ private:
 
       TString FileNameTemp = this->FileName;
 
-      TH1F *h_Num = Get_Hist("./Outputs/"+FileNameTemp, NumName_Purity, "h_Num");
-      TH1F *h_Den = Get_Hist("./Outputs/"+FileNameTemp, DenName_Purity, "h_Den");
+      TH1D *h_Num = Get_Hist("./Outputs/"+FileNameTemp, NumName_Purity, "h_Num");
+      TH1D *h_Den = Get_Hist("./Outputs/"+FileNameTemp, DenName_Purity, "h_Den");
       Double_t nNum = (Double_t)(h_Den->Integral()) - (Double_t)(h_Num->Integral());
       nDen = (Double_t)(h_Den->Integral());
       printf("\n\t[%s, %s, %s] (nNum, nDen, Purity) = (%.6f, %.6f, %.6f)\n",
                 (strSeq).Data(), strSeq.Data(), Var.Data(), nNum, nDen, (nNum/nDen) );
       count.push_back(nNum);
 
-      Purity[i] = (TH1F*)h_Num->Clone("Purity_"+strSeq);
+      Purity[i] = (TH1D*)h_Num->Clone("Purity_"+strSeq);
 
       for(Int_t iB=1; iB<=h_Num->GetNbinsX(); ++iB) {
         Double_t nPass = h_Num->GetBinContent(iB);
@@ -268,7 +268,7 @@ private:
       Purity[i]->Scale(100.);
     }
 
-    TH1F *Prompt = (TH1F*)Purity[0]->Clone("Prompt");
+    TH1D *Prompt = (TH1D*)Purity[0]->Clone("Prompt");
     Prompt->SetFillColor( kAzure-9 );
     for(int ip = 0; ip <= Prompt->GetNbinsX()+1; ++ip) {
       if(Prompt->GetBinContent(ip) != 0.) {
@@ -287,7 +287,7 @@ private:
     }
 
     TLegend *legend;
-    SetLegend( legend, 0.15, 0.72, 0.90, 0.86, 0 );
+    SetLegend( legend, 0.15, 0.72, 0.90, 0.86);
     legend->AddEntry( Prompt, "#bf{Prompt muon"+TString::Format(" (%.1f%%)}", 100.*(nDen - count[0])/nDen), "f" );
     legend->AddEntry( Purity[0], "#bf{Non-prompt muon"+TString::Format(" (%.1f%%)}", 100.*(count[0] - count[1])/nDen), "f" );
     legend->AddEntry( Purity[1], "#bf{Non-muon"+TString::Format(" (%.1f%%)}", 100.*(count[1])/nDen), "f" );
