@@ -22,4 +22,4 @@ def RunHadd(dataset, version, trigger, etaMin = "0.0", etaMax = "5.0"):
 
 if __name__ == '__main__':
     RunHadd( "TTSemiLep80X", "v01", "hltL2fL1sMu22L1f0L2Filtered10Q" )
-    RunHadd( "TTSemiLep102X", "v01", "hltL2fL1sMu22L1f0L2Filtered10Q" )
+    RunHadd( "TTSemiLep102X", "v01", "hltL2fL1sSingleMu22L1f0L2Filtered10Q" )
