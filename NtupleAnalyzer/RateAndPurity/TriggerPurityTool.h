@@ -491,6 +491,14 @@ private:
     else if(Sim == "SimPromptHadPunGho")
       return (fabs(Mu->simType) == 4 || fabs(Mu->simType) == 3 || fabs(Mu->simType) == 2 || fabs(Mu->simType) == 1);
 
+    // -- added by KP: for sim-hit matching study
+    else if(Sim == "SimPromptMuon")
+      return (fabs(Mu->simType) == 4); // -- MatchedPrimaryMuon || GhostPrimaryMuon
+
+    else if(Sim == "SimNonPromptMuon")
+      return (fabs(Mu->simType) == 2 || fabs(Mu->simType) == 3); // -- MatchedMuonFromHeavyFlavour || MatchedMuonFromLightFlavour ||  GhostMuonFromHeavyFlavour || GhostMuonFromLightFlavour
+
+
     else if(Sim == "SimGen") {
       //-- Find matched gen
       Double_t max_dR = 0.1;
