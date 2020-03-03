@@ -45,7 +45,7 @@ def jobSpritting( dataset, paths, nfiles ):
 
 
 
-VER = "v100"
+VER = "v101"
 Datasets = [  # HERE
   # ('TTSemiLep80X',  'TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/crab_MuonHLTNtuple_SimMatchingInfo_2016_TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/191124_074512/0000/', 1),
   ('TTSemiLep102X',       'TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/crab_MuonHLTNtuple_SimMatchingInfo_2018_TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/191124_074614/0000/', 5),
