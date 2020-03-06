@@ -1,3 +1,26 @@
+#include <TChain.h>
+#include <TFile.h>
+#include <TH1D.h>
+#include <TH2D.h>
+#include <TGraph.h>
+#include <TLorentzVector.h>
+#include <TStopwatch.h>
+#include <TTimeStamp.h>
+#include <TString.h>
+#include <TLegend.h>
+#include <THStack.h>
+#include <TPad.h>
+#include <TCanvas.h>
+#include <TColor.h>
+#include <TAttMarker.h>
+#include <TF1.h>
+#include <TStyle.h>
+#include <TROOT.h>
+#include <TApplication.h>
+#include <vector>
+#include <TMath.h>
+#include <TSystem.h>
+
 #include <Include/NtupleHandle.h>
 #include <Include/Object.h>
 
