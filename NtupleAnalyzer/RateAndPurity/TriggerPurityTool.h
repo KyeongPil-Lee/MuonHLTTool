@@ -258,6 +258,8 @@ public:
     {
       if( debug ) printf("\n ** event %d **\n", i_ev);
       ntuple->GetEvent( i_ev );
+      loadBar(i_ev+1, nEvent, 100, 100);
+
       if( i_ev !=0 && i_ev % 70001 == 0 )  printMemory("\t");
 
       if(ntuple->runNum >= this->RunMin && ntuple->runNum <= this->RunMax)

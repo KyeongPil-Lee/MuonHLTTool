@@ -21,14 +21,14 @@ def RunHadd(dataset, version, trigger, etaMin = "0.0", etaMax = "5.0"):
 
 
 if __name__ == '__main__':
-    RunHadd( "TTSemiLep102X", "v100", "hltL1fL1sMu22L1Filtered0" )
-    RunHadd( "TTSemiLep102X", "v100", "hltL2fL1sSingleMu22L1f0L2Filtered10Q" )
-    RunHadd( "TTSemiLep102X", "v100", "HLT_IsoMu24_v" )
-    RunHadd( "TTSemiLep102X", "v100", "HLT_Mu50_v" )
-    RunHadd( "TTSemiLep102X", "v100", "HLT_Mu24_v" )
+    RunHadd( "TTSemiLep102X", "v101", "hltL1fL1sMu22L1Filtered0" )
+    RunHadd( "TTSemiLep102X", "v101", "hltL2fL1sSingleMu22L1f0L2Filtered10Q" )
+    RunHadd( "TTSemiLep102X", "v101", "HLT_IsoMu24_v" )
+    RunHadd( "TTSemiLep102X", "v101", "HLT_Mu50_v" )
+    RunHadd( "TTSemiLep102X", "v101", "HLT_Mu24_v" )
 
-    RunHadd( "TTSemiLep102XMUOVal", "v100", "hltL1fL1sMu22L1Filtered0" )
-    RunHadd( "TTSemiLep102XMUOVal", "v100", "hltL2fL1sSingleMu22L1f0L2Filtered10Q" )
-    RunHadd( "TTSemiLep102XMUOVal", "v100", "HLT_IsoMu24_v" )
-    RunHadd( "TTSemiLep102XMUOVal", "v100", "HLT_Mu50_v" )
-    RunHadd( "TTSemiLep102XMUOVal", "v100", "HLT_Mu24_v" )
+    # RunHadd( "TTSemiLep102XMUOVal", "v100", "hltL1fL1sMu22L1Filtered0" )
+    # RunHadd( "TTSemiLep102XMUOVal", "v100", "hltL2fL1sSingleMu22L1f0L2Filtered10Q" )
+    # RunHadd( "TTSemiLep102XMUOVal", "v100", "HLT_IsoMu24_v" )
+    # RunHadd( "TTSemiLep102XMUOVal", "v100", "HLT_Mu50_v" )
+    # RunHadd( "TTSemiLep102XMUOVal", "v100", "HLT_Mu24_v" )
