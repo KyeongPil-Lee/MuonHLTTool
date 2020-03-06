@@ -13,7 +13,7 @@ public:
 
   vector<TString> vec_dataPath_;
 
-  Bool_t verbose_;
+  Bool_t verbose_ = kFALSE;
 
   HistProducer( TString type )
   {
@@ -29,7 +29,7 @@ public:
     StartTimer();
 
     // -- histogram to be filled
-    TH1D* h_truePU = new TH1D("h_truePU", "", 100, 0, 100);
+    TH1D* h_truePU = new TH1D("h_truePU", "", 100, 0, 200);
 
     TChain *chain = new TChain("ntupler/ntuple");
     for(auto &dataPath : vec_dataPath_ )
