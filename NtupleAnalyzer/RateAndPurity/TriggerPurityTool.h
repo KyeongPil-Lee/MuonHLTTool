@@ -287,8 +287,8 @@ public:
 
       if( i_ev !=0 && i_ev % 70001 == 0 )  printMemory("\t");
 
-      Int_t truePU = ntuple->truePU;
-      if( truePU != 50 ) continue;
+      // Int_t truePU = ntuple->truePU;
+      // if( truePU != 50 ) continue;
 
       Double_t weight = 1.0;
       if( doPUReweighting_ )
