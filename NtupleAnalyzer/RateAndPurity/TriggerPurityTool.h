@@ -193,9 +193,9 @@ public:
   }
 
   // -- do PU reweighting (MUOVal PU -> Flat PU)
-  void Set_PUReweighting( Bool_t flag = kTRUE, TString fileName, TString histName )
+  void Set_PUReweighting( Bool_t flag, TString fileName, TString histName )
   {
-    doPUReweighting_ = kTRUE;
+    doPUReweighting_ = flag;
     fileName_PUWeight_ = fileName;
     histName_PUWeight_ = histName;
   }
