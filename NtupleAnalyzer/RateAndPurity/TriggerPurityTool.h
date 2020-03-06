@@ -124,6 +124,10 @@ public:
 
   Bool_t applyL2PtCut_ = kFALSE;
 
+  Bool_t doPUReweighting_ = kFALSE;
+  TString fileName_PUWeight_ = "";
+  TString histName_PUWeight_ = "";
+
   TriggerPurityTool( Double_t _EtaLo, Double_t _EtaUp )
   {
     this->maxEvents = -1;
@@ -186,6 +190,14 @@ public:
   void Set_ApplyL2PtCut( Bool_t flag = kTRUE )
   {
     applyL2PtCut_ = flag;
+  }
+
+  // -- do PU reweighting (MUOVal PU -> Flat PU)
+  void Set_PUReweighting( Bool_t flag = kTRUE, TString fileName, TString histName )
+  {
+    doPUReweighting_ = kTRUE;
+    fileName_PUWeight_ = fileName;
+    histName_PUWeight_ = histName;
   }
 
   void Analyze()
@@ -254,6 +266,19 @@ public:
     ntuple->TurnOnBranches_Trigger();
     ntuple->TurnOnBranches_GenParticle();
 
+    TH1D* h_PUWeight = nullptr;
+    if( doPUReweighting_ )
+    {
+      TFile *f_PU = TFile::Open(fileName_PUWeight_);
+      if( !f_PU )
+        h_PUWeight = (TH1D*)f_PU->Get(histName_PUWeight_)->Clone();
+      else
+      {
+        cout << fileName_PUWeight_ << " does not exist!" << endl;
+        return;
+      }
+    }
+
     for(Int_t i_ev=0; i_ev<nEvent; i_ev++)
     {
       if( debug ) printf("\n ** event %d **\n", i_ev);
@@ -261,6 +286,19 @@ public:
       loadBar(i_ev+1, nEvent, 100, 100);
 
       if( i_ev !=0 && i_ev % 70001 == 0 )  printMemory("\t");
+
+      Int_t truePU = ntuple->truePU;
+      if( truePU != 50 ) continue;
+
+      Double_t weight = 1.0;
+      if( doPUReweighting_ )
+      {
+        Int_t truePU = ntuple->truePU;
+
+        // -- PU == 0 -> corresponding bin in PU weight histogram = 1
+        // -- PU == 1 -> corresponding bin in PU weight histogram = i+1;
+        weight = h_PUWeight->GetBinContent(truePU+1);
+      }
 
       if(ntuple->runNum >= this->RunMin && ntuple->runNum <= this->RunMax)
       {
@@ -320,7 +358,7 @@ public:
                           if( HLTObj->pt > 10 )
                           {
                             if(debug) cout << "   ---> pass" << endl;
-                            (vec_HistContainer[i_sel])->Fill( ntuple, HLTObj );
+                            (vec_HistContainer[i_sel])->Fill( ntuple, HLTObj, weight );
                             eta_filled_tmp.push_back(HLTObj->eta);
                             phi_filled_tmp.push_back(HLTObj->phi);
                           }
@@ -331,7 +369,7 @@ public:
                         }
                         else // -- the other case: no check on pt; just fill
                         {
-                          (vec_HistContainer[i_sel])->Fill( ntuple, HLTObj );
+                          (vec_HistContainer[i_sel])->Fill( ntuple, HLTObj, weight );
                           eta_filled_tmp.push_back(HLTObj->eta);
                           phi_filled_tmp.push_back(HLTObj->phi);
                         }
