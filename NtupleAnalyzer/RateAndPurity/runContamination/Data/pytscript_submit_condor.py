@@ -6,7 +6,7 @@ baseJobDir = "/data9/Users/kplee/MUO19001Jobs"
 cwd = os.getcwd()
 
 generator = JobGenerator()
-generator.rootMacro = cwd+"/MuonTriggerPurity.cxx"
+generator.rootMacro = cwd+"/MuonTriggerPurity_Data.cxx"
 generator.shellScript = cwd+"/script_runMacro_forCondor.sh"
 generator.baseJobDir = baseJobDir
 generator.trigger = "HLT_IsoMu24_v"

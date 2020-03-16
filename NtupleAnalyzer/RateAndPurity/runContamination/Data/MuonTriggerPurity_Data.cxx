@@ -1,7 +1,7 @@
 #define nDataset (1)
 #include <RateAndPurity/TriggerPurityTool.h>
 
-void MuonTriggerPurity( TString Trigger = "", TString Dataset = "", TString Version = "", Double_t EtaLo = 0.0, Double_t EtaUp = 5.0,
+void MuonTriggerPurity_Data( TString Trigger = "", TString Dataset = "", TString Version = "", Double_t EtaLo = 0.0, Double_t EtaUp = 5.0,
                         TString JobId = "", vector< TString > vec_Dataset = {} )
 {
   vector< TString > vec_Data = vec_Dataset;
@@ -19,19 +19,24 @@ void MuonTriggerPurity( TString Trigger = "", TString Dataset = "", TString Vers
   vector< TString > vec_Sel = {
     "Mat0_IdNo_IsoNo_SimNo_HLT", // -- all muons
 
-    // -- gen-flag matching
-    "Mat1_IdNo_IsoNo_SimNo_HLT",
-    "Mat1_IdNo_IsoNo_SimGen_HLT", // -- prompt + non-prompt muons
-    "Mat1_IdNo_IsoNo_SimGenHard_HLT", // -- prompt muon only
+    "Mat0_IdNo_IsoNo_SimNo_HLT",
 
-    // -- sim-hit matching
-    "Mat1_IdNo_IsoNo_SimPromptMuon_HLT", // -- prompt
-    "Mat1_IdNo_IsoNo_SimNonPromptMuon_HLT" // -- non-prompt
+    "Mat1_IdNo_IsoNo_SimNo_HLT",
+
+    "Mat1_IdPfOrTrkOrGlb_IsoNo_SimNo_HLT",
+
+    "Mat1_IdTight_IsoNo_SimNo_HLT",
+    "Mat1_IdTight_IsoTkLoose_SimNo_HLT",
+    "Mat1_IdTight_IsoPFTight_SimNo_HLT",
+
+    "Mat1_IdHighPt_IsoNo_SimNo_HLT",
+    "Mat1_IdHighPt_IsoTkLoose_SimNo_HLT",
+    "Mat1_IdHighPt_IsoPFTight_SimNo_HLT"
   };
 
 
 
-  vector< Int_t > vec_RunNum = { 1, 1 };
+  vector< Int_t > vec_RunNum = { 0, 999999 };
   TString outDir = ".";
   TString fileName = TString::Format("%s/Output-MuonTriggerPurity-%s-%s-%s-%.1f-%.1f.root", outDir.Data(), Dataset.Data(), Version.Data(), Trigger.Data(), EtaLo, EtaUp );
   if(JobId != "")
