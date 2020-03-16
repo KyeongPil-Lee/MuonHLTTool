@@ -62,8 +62,8 @@ class JobGenerator:
             cmd_cp_rootMarco   = "cp %s %s" % (self.rootMacro, subWSPath)
             cmd_cp_shellScript = "cp %s %s" % (self.shellScript, subWSPath)
 
-            os.system(cmd_cp_rootMarco)
-            os.system(cmd_cp_shellScript)
+            # os.system(cmd_cp_rootMarco)
+            # os.system(cmd_cp_shellScript)
 
             # -- get list of ntuples for i-th job
             list_ntuplePath_iJob = self.GetNtupleListPerJob(i)
@@ -84,13 +84,13 @@ class JobGenerator:
 
     def GenerateCondorScript(self, subWSPath, i_job, list_ntuplePath_iJob):
         vec_ntuplePath = self.GetCppVector_ntuplePath(list_ntuplePath_iJob)
-        scriptNameToRun = self.shellScript.split("/")[-1]
+        # scriptNameToRun = self.shellScript.split("/")[-1]
         jobID = "Job"+str(i_job)
 
         f_script = open("%s/%s" % (subWSPath, self.condorScriptName), "w")
         f_script.write(
 """
-executable = {path_}/{scriptNameToRun_}
+executable = {shellScript_}
 universe   = vanilla
 Arguments  = {trigger_} {dataset_} {version_} {etaMin_} {etaMax_} {jobID_} {vec_ntuplePath_}
 getenv     = True
@@ -105,7 +105,7 @@ transfer_input_files={rootMacro_}
 transfer_output_remaps = "Output-MuonTriggerPurity-{dataset_}-{version_}-{trigger_}-{etaMin_:0.1f}-{etaMax_:0.1f}--{jobID_}.root = {cwd_}/Output-MuonTriggerPurity-{dataset_}-{version_}-{trigger_}-{etaMin_}-{etaMax_}--{jobID_}.root"
 
 queue 1
-""".format(path_=subWSPath, scriptNameToRun_=scriptNameToRun, rootMacro_=self.rootMacro,
+""".format(path_=subWSPath, shellScript_=self.shellScript, rootMacro_=self.rootMacro,
            dataset_=self.dataset, version_=self.version, trigger_=self.trigger, vec_ntuplePath_=vec_ntuplePath,
            etaMin_=self.etaMin, etaMax_=self.etaMax, jobID_=jobID, cwd_=self.currentDir))
 
