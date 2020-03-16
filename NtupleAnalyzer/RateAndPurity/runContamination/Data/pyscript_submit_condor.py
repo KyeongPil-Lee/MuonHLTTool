@@ -44,7 +44,7 @@ for theDataset in dic_dataset_trigger.keys():
         generator.trigger = theTrigger
         generator.dataset = theDataset
         generator.version = theVersion
-        generator.nJob = 50
+        generator.nJob = 20
 
         generator.Generate()
 

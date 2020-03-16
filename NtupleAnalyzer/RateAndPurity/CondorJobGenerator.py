@@ -35,9 +35,9 @@ class JobGenerator:
         self.list_ntuplePath = self.GetList_NtuplePath(baseNtupleDir)
 
         self.WSPath = "%s/RateAndPurity_%s/%s/%s" % (self.baseJobDir, self.version, self.dataset, self.trigger)
-        if "RateAndPurity_%s" % self.version in os.listdir(self.baseJobDir):
-            print "RateAndPurity_%s already exists under %s" % (self.version, self.baseJobDir)
-            print "change the version ..."
+        if os.path.isdir(self.WSPath):
+            print "%s already exists!" % (self.WSPath)
+            print "change the arguments (e.g. version) ..."
             sys.exit()
         else:
             os.makedirs(self.WSPath)
