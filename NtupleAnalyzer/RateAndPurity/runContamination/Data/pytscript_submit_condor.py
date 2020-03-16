@@ -1,5 +1,5 @@
 import os
-from NtupleAnalyzer.RateAndPurity.CondorJobGenerator import *
+from RateAndPurity.CondorJobGenerator import *
 
 baseJobDir = "/data9/Users/kplee/MUO19001Jobs"
 
