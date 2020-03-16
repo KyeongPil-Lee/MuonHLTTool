@@ -12,7 +12,7 @@ generator.baseJobDir = baseJobDir
 generator.trigger = "HLT_IsoMu24_v"
 generator.dataset = "Run2016H"
 generator.version = "v200"
-generator.nJob = 50
+generator.nJob = 1
 
 generator.Generate()
 
