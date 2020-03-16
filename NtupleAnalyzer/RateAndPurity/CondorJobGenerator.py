@@ -23,6 +23,7 @@ class JobGenerator:
         self.currentDir = os.getcwd()
         self.WSPath = ""
         self.list_ntuplePath = []
+        self.nFilePerJob = 0
         self.condorScriptName = "condorScript_submit.jds"
 
     def Generate(self):
@@ -34,7 +35,12 @@ class JobGenerator:
         self.list_ntuplePath = self.GetList_NtuplePath(baseNtupleDir)
 
         self.WSPath = "%s/RateAndPurity_%s/%s" % (self.baseJobDir, self.version, self.dataset)
-        os.makedirs(self.WSPath)
+        if "RateAndPurity_%s" % self.version in os.listdir(self.baseJobDir):
+            print "RateAndPurity_%s already exists under %s" % (self.version, self.baseJobDir)
+            print "change the version ..."
+            sys.exit()
+        else:
+            os.makedirs(self.WSPath)
 
 
     def CreateSubWorkSpaces(self):
@@ -43,7 +49,7 @@ class JobGenerator:
             print "nJob > nFile -> nJob is set as nFile"
             self.nJob = nFile
 
-        self.c = int( float(nFile) / float(self.nJob) )
+        self.nFilePerJob = int( float(nFile) / float(self.nJob) )
         print "nJob = %d, nFile = %d -> nFilePerJob = %d\n" % (self.nJob, nFile, self.nFilePerJob)
 
         for i in range(0, self.nJob):
@@ -65,9 +71,9 @@ class JobGenerator:
             # -- generate condor script for i-th job
             self.GenerateCondorScript(subWSPath, i, list_ntuplePath_iJob)
 
-            cmd_submit = "condor_submit %s" % condorScriptName
+            cmd_submit = "condor_submit %s" % self.condorScriptName
 
-            print "subWSPath = %s" subWSPath
+            print "subWSPath = %s" % subWSPath
             print cmd_submit
             
             # os.chdir(subWSPath)
@@ -76,33 +82,35 @@ class JobGenerator:
         os.chdir(self.currentDir)
 
 
-    def GenerateCondorScript(subWSPath, i_job, list_ntuplePath_iJob):
-        vec_ntuplePath = GetCppVector_ntuplePath(list_ntuplePath_iJob)
+    def GenerateCondorScript(self, subWSPath, i_job, list_ntuplePath_iJob):
+        vec_ntuplePath = self.GetCppVector_ntuplePath(list_ntuplePath_iJob)
         scriptNameToRun = self.shellScript.split("/")[-1]
-        jobID = Job+str(i_job)
+        jobID = "Job"+str(i_job)
 
         f_script = open("%s/%s" % (subWSPath, self.condorScriptName), "w")
         f_script.write(
 """
 executable = {path_}/{scriptNameToRun_}
 universe   = vanilla
-Arguments  = {trigger_} {dataset_} {version_} {etaMin_} {etaMax_} {jobID_} {vec_ntuplePath}
-log        = condor_{jobID_}.log
+Arguments  = {trigger_} {dataset_} {version_} {etaMin_} {etaMax_} {jobID_} {vec_ntuplePath_}
 getenv     = True
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
+initialdir={path_}
+log        = condor_{jobID_}.log
 output = condor_output_{jobID_}.log
 error  = condor_error_{jobID_}.log
 accounting_group=group_cms
+transfer_input_files={rootMacro_}
 transfer_output_remaps = "Output-MuonTriggerPurity-{dataset_}-{version_}-{trigger_}-{etaMin_:0.1f}-{etaMax_:0.1f}--{jobID_}.root = {cwd_}/Output-MuonTriggerPurity-{dataset_}-{version_}-{trigger_}-{etaMin_}-{etaMax_}--{jobID_}.root"
 
 queue 1
-""".format(path_=subWSPath, scriptNameToRun_=scriptNameToRun, 
-           dataset_=self.dataset, version_=self.version, trigger_=self.trigger, 
+""".format(path_=subWSPath, scriptNameToRun_=scriptNameToRun, rootMacro_=self.rootMacro,
+           dataset_=self.dataset, version_=self.version, trigger_=self.trigger, vec_ntuplePath_=vec_ntuplePath,
            etaMin_=self.etaMin, etaMax_=self.etaMax, jobID_=jobID, cwd_=self.currentDir))
 
-
         f_script.close()
+
 
 
     def GetCppVector_ntuplePath(self, list_ntuplePath):
@@ -110,11 +118,11 @@ queue 1
 
         for ntuplePath in list_ntuplePath:
             if ntuplePath == list_ntuplePath[-1]: # -- if it is the last one
-                 vec_cpp = vec_cpp + ', "%s"}'
-            else if ntuplePath == list_ntuplePath[1]: # -- if it is the first one
-                vec_cpp = vec_cpp + '{"%s"'
+                 vec_cpp = vec_cpp + ',\\"%s\\"}' % ntuplePath
+            elif ntuplePath == list_ntuplePath[0]: # -- if it is the first one
+                vec_cpp = vec_cpp + '{\\"%s\\"' % ntuplePath
             else:
-                vec_cpp = vec_cpp + ', "%s"'
+                vec_cpp = vec_cpp + ',\\"%s\\"' % ntuplePath
 
         return vec_cpp
 
@@ -125,6 +133,8 @@ queue 1
             list_filePerJob = self.list_ntuplePath[int(i_job*self.nFilePerJob):]
         else:
             list_filePerJob = self.list_ntuplePath[int(i_job*self.nFilePerJob):int((i_job+1)*self.nFilePerJob)]
+
+        return list_filePerJob
 
 
     def GetList_NtuplePath(self, baseNtupleDir):
