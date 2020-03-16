@@ -19,19 +19,15 @@ void MuonTriggerPurity( TString Trigger = "", TString Dataset = "", TString Vers
   vector< TString > vec_Sel = {
     "Mat0_IdNo_IsoNo_SimNo_HLT", // -- all muons
 
-    "Mat0_IdNo_IsoNo_SimNo_HLT",
-
-    "Mat1_IdNo_IsoNo_SimNo_HLT",
-
-    "Mat1_IdPfOrTrkOrGlb_IsoNo_SimNo_HLT",
-
+    // -- only ID
+    "Mat1_IdLoose_IsoNo_SimNo_HLT",
+    "Mat1_IdMedium_IsoNo_SimNo_HLT",
     "Mat1_IdTight_IsoNo_SimNo_HLT",
-    "Mat1_IdTight_IsoTkLoose_SimNo_HLT",
-    "Mat1_IdTight_IsoPFTight_SimNo_HLT",
 
-    "Mat1_IdHighPt_IsoNo_SimNo_HLT",
-    "Mat1_IdHighPt_IsoTkLoose_SimNo_HLT",
-    "Mat1_IdHighPt_IsoPFTight_SimNo_HLT"
+    // -- both ID and isolation
+    "Mat1_IdLoose_IsoPFTight_SimNo_HLT",
+    "Mat1_IdMedium_IsoPFTight_SimNo_HLT",
+    "Mat1_IdTight_IsoPFTight_SimNo_HLT"
   };
 
 

@@ -76,8 +76,8 @@ class JobGenerator:
             print "subWSPath = %s" % subWSPath
             print cmd_submit
             
-            # os.chdir(subWSPath)
-            # os.system(cmd_submit)
+            os.chdir(subWSPath)
+            os.system(cmd_submit)
 
         os.chdir(self.currentDir)
 

@@ -454,6 +454,8 @@ private:
 
     else if(Id == "IdLoose")
       return Mu->isLoose;
+    else if(Id == "IdMedium")
+      return Mu->isMedium;
     else if(Id == "IdTight")
       return Mu->isTight;
     else if(Id == "IdHighPt")
