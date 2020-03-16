@@ -1,7 +1,7 @@
 #define nDataset (1)
 #include <RateAndPurity/TriggerPurityTool.h>
 
-void MuonTriggerPurity_Data( TString Trigger = "", TString Dataset = "", TString Version = "", Double_t EtaLo = 0.0, Double_t EtaUp = 5.0,
+void MuonTriggerPurity( TString Trigger = "", TString Dataset = "", TString Version = "", Double_t EtaLo = 0.0, Double_t EtaUp = 5.0,
                         TString JobId = "", vector< TString > vec_Dataset = {} )
 {
   vector< TString > vec_Data = vec_Dataset;
