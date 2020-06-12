@@ -106,6 +106,10 @@ private:
   bool isMiniAOD_;
   edm::EDGetTokenT< std::vector<pat::TriggerObjectStandAlone> > t_triggerObject_miniAOD_;
 
+  HLTConfigProvider hltConfig_;
+  HLTConfigProvider myHLTConfig_;
+
+
 
   TTree *ntuple_;
   static const int arrSize_ = 2000;
@@ -162,12 +166,14 @@ private:
 
   // -- trigger info.
   vector< std::string > vec_firedTrigger_;
+  vector< double > vec_prescale_;
   vector< std::string > vec_filterName_;
   vector< double > vec_HLTObj_pt_;
   vector< double > vec_HLTObj_eta_;
   vector< double > vec_HLTObj_phi_;
 
   vector< std::string > vec_myFiredTrigger_;
+  vector< double > vec_myPrescale_;
   vector< std::string > vec_myFilterName_;
   vector< double > vec_myHLTObj_pt_;
   vector< double > vec_myHLTObj_eta_;

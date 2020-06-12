@@ -81,7 +81,7 @@ t_genEventInfo_      ( consumes< GenEventInfoProduct >                    (iConf
 t_genParticle_       ( consumes< reco::GenParticleCollection >            (iConfig.getUntrackedParameter<edm::InputTag>("genParticle"       )) ),
 
 isMiniAOD_               ( iConfig.existsAs<bool>("isMiniAOD") ? iConfig.getParameter<bool>("isMiniAOD") : false),
-t_triggerObject_miniAOD_ ( consumes< std::vector<pat::TriggerObjectStandAlone> > (iConfig.getUntrackedParameter<edm::InputTag>("triggerObject_miniAOD")))
+t_triggerObject_miniAOD_ ( mayConsume< std::vector<pat::TriggerObjectStandAlone> > (iConfig.getUntrackedParameter<edm::InputTag>("triggerObject_miniAOD")) ) // -- not used in AOD case
 {
   cout << "isMiniAOD_ = " << isMiniAOD_ << endl;
 }
@@ -232,6 +232,7 @@ void MuonHLTNtupler::Init()
 
   // -- original trigger objects- - //
   vec_firedTrigger_.clear();
+  vec_prescale_.clear();
   vec_filterName_.clear();
   vec_HLTObj_pt_.clear();
   vec_HLTObj_eta_.clear();
@@ -239,6 +240,7 @@ void MuonHLTNtupler::Init()
 
   // -- HLT rerun objects -- //
   vec_myFiredTrigger_.clear();
+  vec_myPrescale_.clear();
   vec_myFilterName_.clear();
   vec_myHLTObj_pt_.clear();
   vec_myHLTObj_eta_.clear();
@@ -471,12 +473,14 @@ void MuonHLTNtupler::Make_Branch()
   ntuple_->Branch("genParticle_isMostlyLikePythia6Status3", &genParticle_isMostlyLikePythia6Status3_, "genParticle_isMostlyLikePythia6Status3[nGenParticle]/I");
 
   ntuple_->Branch("vec_firedTrigger", &vec_firedTrigger_);
+  ntuple_->Branch("vec_prescale", &vec_prescale_);
   ntuple_->Branch("vec_filterName", &vec_filterName_);
   ntuple_->Branch("vec_HLTObj_pt", &vec_HLTObj_pt_);
   ntuple_->Branch("vec_HLTObj_eta", &vec_HLTObj_eta_);
   ntuple_->Branch("vec_HLTObj_phi", &vec_HLTObj_phi_);
 
   ntuple_->Branch("vec_myFiredTrigger", &vec_myFiredTrigger_);
+  ntuple_->Branch("vec_myPrescale", &vec_myPrescale_);
   ntuple_->Branch("vec_myFilterName", &vec_myFilterName_);
   ntuple_->Branch("vec_myHLTObj_pt", &vec_myHLTObj_pt_);
   ntuple_->Branch("vec_myHLTObj_eta", &vec_myHLTObj_eta_);
@@ -741,8 +745,16 @@ void MuonHLTNtupler::Fill_HLT(const edm::Event &iEvent, bool isMYHLT)
       std::string pathName = triggerNames.triggerName(itrig);
       if( SavedTriggerCondition(pathName) )
       {
-        if( isMYHLT ) vec_myFiredTrigger_.push_back( pathName );
-        else          vec_firedTrigger_.push_back( pathName );
+        if( isMYHLT )
+        {
+          vec_myFiredTrigger_.push_back( pathName );
+          vec_myPrescale_.push_back( myHLTConfig_.prescaleValue(0, pathName) );
+        }
+        else
+        {
+          vec_firedTrigger_.push_back( pathName );
+          vec_prescale_.push_back( hltConfig_.prescaleValue(0, pathName) );
+        }
       }
     } // -- end of if fired -- //
 
@@ -1187,7 +1199,21 @@ bool MuonHLTNtupler::isNewHighPtMuon(const reco::Muon& muon, const reco::Vertex&
 
 
 void MuonHLTNtupler::endJob() {}
-void MuonHLTNtupler::beginRun(const edm::Run &iRun, const edm::EventSetup &iSetup) {}
+void MuonHLTNtupler::beginRun(const edm::Run &iRun, const edm::EventSetup &iSetup)
+{
+  bool changedConfig;
+  if(!hltConfig_.init(iRun, iSetup, "HLT", changedConfig))
+  {
+    cout << "Initialization of HLTConfigProvider (processName = HLT) failed!!" << endl;
+    return;
+  }
+
+  bool myChangedConfig;
+  if(!hltConfig_.init(iRun, iSetup, "MYHLT", myChangedConfig))
+  {
+    cout << "Initialization of HLTConfigProvider (processName = MYHLT) failed: in case there was no rerunning HLT" << endl;
+  }
+}
 void MuonHLTNtupler::endRun(const edm::Run &iRun, const edm::EventSetup &iSetup) {}
 
 DEFINE_FWK_MODULE(MuonHLTNtupler);
