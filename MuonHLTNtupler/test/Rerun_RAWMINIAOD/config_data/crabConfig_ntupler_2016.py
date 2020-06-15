@@ -23,7 +23,7 @@ config.Data.unitsPerJob = 5
 config.Data.outLFNDirBase = '/store/user/kplee/'
 config.Site.storageSite = 'T2_KR_KNU'
 
-config.Data.lumiMask = './Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON.txt'
+config.Data.lumiMask = './Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON_Last5invfb.txt'
 
 version = '_v20200615_'
 
