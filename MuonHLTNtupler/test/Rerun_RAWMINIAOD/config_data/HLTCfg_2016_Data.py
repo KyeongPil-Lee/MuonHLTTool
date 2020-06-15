@@ -12552,6 +12552,7 @@ process.source.secondaryFileNames = cms.untracked.vstring(
   "file:/pnfs/knu.ac.kr/data/cms/store/data/Run2016H/HLTPhysics/RAW/v1/000/281/214/00000/A6464A43-F57F-E611-81F0-FA163ED69818.root",
   "file:/pnfs/knu.ac.kr/data/cms/store/data/Run2016H/HLTPhysics/RAW/v1/000/281/231/00000/C2987530-0080-E611-9399-02163E01202C.root",
   )
+process.maxEvents.input = cms.untracked.int32( -1 )
 
 from MuonHLTTool.MuonHLTNtupler.customizerForMuonHLTNtupler import *
 customizerFuncForMuonHLTNtupler(process, "MYHLT")
