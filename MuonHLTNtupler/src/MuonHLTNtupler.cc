@@ -37,7 +37,7 @@
 #include "DataFormats/Scalers/interface/LumiScalers.h"
 
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
-#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
+#include "HLTrigger/HLTcore/interface/HLTPrescaleProvider.h"
 #include "HLTrigger/HLTcore/interface/HLTEventAnalyzerAOD.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
@@ -57,6 +57,8 @@ using namespace edm;
 using namespace pat;
 
 MuonHLTNtupler::MuonHLTNtupler(const edm::ParameterSet& iConfig):
+hltPreConfig_(iConfig, consumesCollector(), *this),
+myHLTPreConfig_(iConfig, consumesCollector(), *this),
 t_offlineMuon_       ( consumes< edm::View<reco::Muon> >                  (iConfig.getUntrackedParameter<edm::InputTag>("offlineMuon"       )) ),
 t_offlineVertex_     ( consumes< reco::VertexCollection >                 (iConfig.getUntrackedParameter<edm::InputTag>("offlineVertex"     )) ),
 t_triggerResults_    ( consumes< edm::TriggerResults >                    (iConfig.getUntrackedParameter<edm::InputTag>("triggerResults"    )) ),
@@ -154,8 +156,8 @@ void MuonHLTNtupler::analyze(const edm::Event &iEvent, const edm::EventSetup &iS
 
   // -- fill each object
   Fill_Muon(iEvent);
-  Fill_HLT(iEvent, 0); // -- original HLT objects saved in data taking
-  Fill_HLT(iEvent, 1); // -- rerun objects
+  Fill_HLT(iEvent, iSetup, 0); // -- original HLT objects saved in data taking
+  Fill_HLT(iEvent, iSetup, 1); // -- rerun objects
   Fill_HLTMuon(iEvent);
   Fill_L1Muon(iEvent);
   Fill_IterL3(iEvent);
@@ -726,7 +728,7 @@ void MuonHLTNtupler::Fill_Muon(const edm::Event &iEvent)
   }
 }
 
-void MuonHLTNtupler::Fill_HLT(const edm::Event &iEvent, bool isMYHLT)
+void MuonHLTNtupler::Fill_HLT(const edm::Event &iEvent, const edm::EventSetup &iSetup, bool isMYHLT)
 {
   edm::Handle<edm::TriggerResults>  h_triggerResults;
   edm::Handle<trigger::TriggerEvent> h_triggerEvent;
@@ -748,12 +750,12 @@ void MuonHLTNtupler::Fill_HLT(const edm::Event &iEvent, bool isMYHLT)
         if( isMYHLT )
         {
           vec_myFiredTrigger_.push_back( pathName );
-          vec_myPrescale_.push_back( myHLTConfig_.prescaleValue(0, pathName) );
+          vec_myPrescale_.push_back( myHLTPreConfig_.prescaleValue(iEvent, iSetup, pathName) );
         }
         else
         {
           vec_firedTrigger_.push_back( pathName );
-          vec_prescale_.push_back( hltConfig_.prescaleValue(0, pathName) );
+          vec_prescale_.push_back( hltPreConfig_.prescaleValue(iEvent, iSetup, pathName) );
         }
       }
     } // -- end of if fired -- //
@@ -840,7 +842,8 @@ bool MuonHLTNtupler::SavedTriggerCondition( std::string& pathName )
       pathName.find("HLT_TkMu")     != std::string::npos ||
       pathName.find("HLT_IsoTkMu")  != std::string::npos ||
       pathName.find("HLT_DoubleMu") != std::string::npos ||
-      pathName.find("HLT_Mu8_T")    != std::string::npos ) flag = true;
+      pathName.find("HLT_Mu8_T")    != std::string::npos || 
+      pathName.find("HLT_Physics_") != std::string::npos ) flag = true;
 
   return flag;
 }
@@ -1202,16 +1205,16 @@ void MuonHLTNtupler::endJob() {}
 void MuonHLTNtupler::beginRun(const edm::Run &iRun, const edm::EventSetup &iSetup)
 {
   bool changedConfig;
-  if(!hltConfig_.init(iRun, iSetup, "HLT", changedConfig))
+  if(!hltPreConfig_.init(iRun, iSetup, "HLT", changedConfig))
   {
-    cout << "Initialization of HLTConfigProvider (processName = HLT) failed!!" << endl;
+    cout << "Initialization of HLTPrescaleProvider (processName = HLT) failed!!" << endl;
     return;
   }
 
   bool myChangedConfig;
-  if(!hltConfig_.init(iRun, iSetup, "MYHLT", myChangedConfig))
+  if(!myHLTPreConfig_.init(iRun, iSetup, "MYHLT", myChangedConfig))
   {
-    cout << "Initialization of HLTConfigProvider (processName = MYHLT) failed: in case there was no rerunning HLT" << endl;
+    cout << "Initialization of HLTPrescaleProvider (processName = MYHLT) failed: in case there was no rerunning HLT" << endl;
   }
 }
 void MuonHLTNtupler::endRun(const edm::Run &iRun, const edm::EventSetup &iSetup) {}

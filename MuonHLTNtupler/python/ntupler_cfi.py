@@ -35,6 +35,11 @@ ntuplerBase = cms.EDAnalyzer("MuonHLTNtupler",
 	isMiniAOD             = cms.bool(False),
 	triggerObject_miniAOD = cms.untracked.InputTag("notUsed"), # -- only used when isMiniAOD == True
 
+	# -- for HLTPrescaleProvider
+	l1tAlgBlkInputTag     = cms.InputTag("gtStage2Digis"), # -- for L1TGlobalUtil
+	l1tExtBlkInputTag     = cms.InputTag("gtStage2Digis"), # -- for L1TGlobalUtil
+	ReadPrescalesFromFile = cms.bool( False ),             # -- for L1TGlobalUtil
+
 	# isMiniAOD             = cms.untracked.bool(True),
 	# triggerObject_miniAOD = cms.untracked.InputTag("slimmedPatTrigger")
 )

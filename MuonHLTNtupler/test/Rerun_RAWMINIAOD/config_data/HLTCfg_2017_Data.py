@@ -11937,3 +11937,6 @@ process.ntupler.offlineMuon           = cms.untracked.InputTag("slimmedMuons")
 process.ntupler.triggerObject_miniAOD = cms.untracked.InputTag("slimmedPatTrigger")
 process.ntupler.PUSummaryInfo         = cms.untracked.InputTag("slimmedAddPileupInfo")
 process.ntupler.genParticle           = cms.untracked.InputTag("prunedGenParticles")
+process.ntupler.l1tAlgBlkInputTag     = cms.InputTag("gtStage2Digis") # -- for L1TGlobalUtil
+process.ntupler.l1tExtBlkInputTag     = cms.InputTag("gtStage2Digis") # -- for L1TGlobalUtil
+process.ntupler.ReadPrescalesFromFile = cms.bool( False )             # -- for L1TGlobalUtil

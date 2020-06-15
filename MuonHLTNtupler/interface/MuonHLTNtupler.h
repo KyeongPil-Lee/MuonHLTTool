@@ -34,7 +34,7 @@
 #include "DataFormats/Scalers/interface/LumiScalers.h"
 
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
-#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
+#include "HLTrigger/HLTcore/interface/HLTPrescaleProvider.h"
 #include "HLTrigger/HLTcore/interface/HLTEventAnalyzerAOD.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
@@ -65,7 +65,7 @@ public:
 private:
   void Init();
   void Make_Branch();
-  void Fill_HLT(const edm::Event &iEvent, bool isMYHLT);
+  void Fill_HLT(const edm::Event &iEvent, const edm::EventSetup &iSetup, bool isMYHLT);
   void Fill_Muon(const edm::Event &iEvent);
   void Fill_HLTMuon(const edm::Event &iEvent);
   void Fill_L1Muon(const edm::Event &iEvent);
@@ -78,6 +78,9 @@ private:
   bool SavedFilterCondition( std::string& filterName );
 
   bool isNewHighPtMuon(const reco::Muon& muon, const reco::Vertex& vtx);
+
+  HLTPrescaleProvider hltPreConfig_;
+  HLTPrescaleProvider myHLTPreConfig_;
 
   edm::EDGetTokenT< edm::View<reco::Muon> >                  t_offlineMuon_;
   edm::EDGetTokenT< reco::VertexCollection >                 t_offlineVertex_;
@@ -105,9 +108,6 @@ private:
 
   bool isMiniAOD_;
   edm::EDGetTokenT< std::vector<pat::TriggerObjectStandAlone> > t_triggerObject_miniAOD_;
-
-  HLTConfigProvider hltConfig_;
-  HLTConfigProvider myHLTConfig_;
 
 
 
