@@ -12559,7 +12559,8 @@ customizerFuncForMuonHLTNtupler(process, "MYHLT")
 process.ntupler.isMiniAOD             = cms.bool(True)
 process.ntupler.offlineVertex         = cms.untracked.InputTag("offlineSlimmedPrimaryVertices")
 process.ntupler.offlineMuon           = cms.untracked.InputTag("slimmedMuons")
-process.ntupler.triggerObject_miniAOD = cms.untracked.InputTag("slimmedPatTrigger")
+# process.ntupler.triggerObject_miniAOD = cms.untracked.InputTag("slimmedPatTrigger")
+process.ntupler.triggerObject_miniAOD = cms.untracked.InputTag("selectedPatTrigger") # -- 2016 version
 process.ntupler.PUSummaryInfo         = cms.untracked.InputTag("slimmedAddPileupInfo")
 process.ntupler.genParticle           = cms.untracked.InputTag("prunedGenParticles")
 process.ntupler.l1tAlgBlkInputTag     = cms.InputTag("gtStage2Digis") # -- for L1TGlobalUtil
