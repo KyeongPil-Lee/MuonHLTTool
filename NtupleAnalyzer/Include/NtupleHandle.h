@@ -64,6 +64,7 @@ public:
 
   // -- trigger information
   vector<string>  *vec_firedTrigger;
+  vector<double>  *vec_prescale;
   vector<string>  *vec_filterName;
   vector<double>  *vec_HLTObj_pt;
   vector<double>  *vec_HLTObj_eta;
@@ -232,6 +233,7 @@ public:
   {
     // -- init. vectors
     vec_firedTrigger = 0;
+    vec_prescale = 0;
     vec_filterName = 0;
     vec_HLTObj_pt = 0;
     vec_HLTObj_eta = 0;
@@ -259,6 +261,7 @@ public:
   void Clear()
   {
     delete vec_firedTrigger;
+    delete vec_prescale;
     delete vec_filterName;
     delete vec_HLTObj_pt;
     delete vec_HLTObj_eta;
@@ -269,6 +272,7 @@ public:
     delete vec_myHLTObj_eta;
     delete vec_myHLTObj_phi;
     vec_firedTrigger = 0;
+    vec_prescale = 0;
     vec_filterName = 0;
     vec_HLTObj_pt = 0;
     vec_HLTObj_eta = 0;
@@ -326,6 +330,9 @@ public:
   {
     chain_->SetBranchStatus("vec_firedTrigger", 1);
     chain_->SetBranchAddress("vec_firedTrigger", &vec_firedTrigger);
+
+    chain_->SetBranchStatus("vec_prescale", 1);
+    chain_->SetBranchAddress("vec_prescale", &vec_prescale);
 
     chain_->SetBranchStatus("vec_filterName", 1);
     chain_->SetBranchAddress("vec_filterName", &vec_filterName);
