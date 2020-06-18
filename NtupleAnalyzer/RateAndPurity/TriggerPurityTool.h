@@ -128,6 +128,8 @@ public:
   TString fileName_PUWeight_ = "";
   TString histName_PUWeight_ = "";
 
+  Bool_t isHLTPhysics_; // -- take into account HLT_Physics prescales if true
+
   TriggerPurityTool( Double_t _EtaLo, Double_t _EtaUp )
   {
     this->maxEvents = -1;
@@ -198,6 +200,11 @@ public:
     doPUReweighting_ = flag;
     fileName_PUWeight_ = fileName;
     histName_PUWeight_ = histName;
+  }
+
+  void Set_HLTPhysicsDataset(Bool_t flag = kTRUE)
+  {
+    Set_HLTPhysicsDataset = flag;
   }
 
   void Analyze()
@@ -298,6 +305,13 @@ public:
         // -- PU == 0 -> corresponding bin in PU weight histogram = 1
         // -- PU == 1 -> corresponding bin in PU weight histogram = i+1;
         weight = h_PUWeight->GetBinContent(truePU+1);
+      }
+
+      if( isHLTPhysics_ )
+      {
+        Double_t prescale = FindPrescale_PhysicsTrigger(ntuple);
+        if( prescale == -1 ) continue; // -- HLT_Physics trigger is not fired: skip this event
+        else weight *= prescale;
       }
 
       if(ntuple->runNum >= this->RunMin && ntuple->runNum <= this->RunMax)
@@ -727,6 +741,33 @@ private:
     cout << "Total CPU time:  " << cpuTime << " (seconds)" << endl;
     cout << "  CPU time / real time = " << cpuTime / realTime << endl;
     cout << "************************************************" << endl;
+  }
+
+  Double_t FindPrescale_PhysicsTrigger(NtupleHandle* ntuple)
+  {
+    Double_t thePrescale = -1;
+
+    Int_t nFiredTrigger = (Int_t)ntuple->vec_firedTrigger->size();
+    for(Int_t i_trig = 0; i_trig < nFiredTrigger; i_trig++)
+    {
+      TString triggerPath = ntuple->vec_firedTrigger->at(i_trig);
+      if( triggerPath.Contains("HLT_Physics_") )
+        thePrescale = ntuple->vec_prescale->at(i_trig);
+    }
+
+    if( thePrescale == -1 )
+    {
+      cout << "HLT_Physics trigger is not fired in this event! ... the list of fired events:" << endl;
+      Int_t nFiredTrigger = (Int_t)ntuple->vec_firedTrigger->size();
+      for(Int_t i_trig = 0; i_trig < nFiredTrigger; i_trig++)
+      {
+        TString  triggerPath = ntuple->vec_firedTrigger->at(i_trig);
+        Double_t prescale    = ntuple->vec_prescale->at(i_trig);
+        printf("  [%dth trigger] name = %s, prescale = %.0lf\n", i_trig, triggerPath.Data(), prescale);
+      }
+    }
+
+    return thePrescale;
   }
 
   static inline void printMemory( TString tab = "" )
