@@ -332,9 +332,18 @@ public:
             vector<Double_t> eta_filled_tmp = {};
             vector<Double_t> phi_filled_tmp = {};
 
+            Bool_t isL1 = kFALSE;
+            if( filters[ifilter].Contains("hltL1fL1sMu22L1Filtered0") )
+              isL1 = kTRUE;
+
             Bool_t isL2 = kFALSE;
             if( filters[ifilter].Contains("hltL2fL1sMu22L1f0L2Filtered10Q") || filters[ifilter].Contains("hltL2fL1sSingleMu22L1f0L2Filtered10Q") )
               isL2 = kTRUE;
+
+            Double_t dRMax = 0; // -- dR cone size for matching to a offline muon
+            if( isL1 )      dRMax = 0.5;
+            else if( isL2 ) dRMax = 0.3;
+            else            dRMax = 0.1; // -- L3 or isolation
 
             for(size_t i_hlt=0; i_hlt<ntuple->vec_filterName->size(); i_hlt++)
             {
@@ -361,7 +370,7 @@ public:
                       if(debug)  cout << "\t --> pass eta cut " << endl;
                       if(debug)  cout << "\t --> pass filter: " << TriggerTag << endl;
 
-                      Bool_t isPass = this->offSelection( ntuple, HLTObj, strSel );
+                      Bool_t isPass = this->offSelection( ntuple, HLTObj, strSel, dRMax );
 
                       if(isPass) {
                         
@@ -407,7 +416,7 @@ public:
                     if(debug)  cout << "\t --> pass eta cut " << endl;
                     if(debug)  cout << "\t --> pass filter: " << TriggerTag << endl;
 
-                    Bool_t isPass = this->offSelection( ntuple, HLTObj, strSel );
+                    Bool_t isPass = this->offSelection( ntuple, HLTObj, strSel, dRMax );
 
                     if(isPass) {
                       (vec_HistContainer[i_sel])->Fill( ntuple, HLTObj );
@@ -600,7 +609,7 @@ private:
   }
 
   template <class T>  // HLTObject or MYHLTObject
-  Bool_t offSelection( NtupleHandle *ntuple, T *L3Mu, TString _sel )
+  Bool_t offSelection( NtupleHandle *ntuple, T *L3Mu, TString _sel, Double_t dRMax )
   {
     TString sel = _sel;
 
@@ -624,7 +633,7 @@ private:
 
     else if(Mat == "Mat1") {
       //-- Find matched offline
-      Double_t max_dR = 0.1;
+      Double_t max_dR = dRMax;
       Int_t matched_mu = -999;
       Double_t deltaR_best = 999.;
       for(Int_t i_mu=0; i_mu<ntuple->nMuon; i_mu++)
