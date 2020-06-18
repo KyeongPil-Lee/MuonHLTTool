@@ -7,13 +7,13 @@ void MuonTriggerPurity( TString Trigger = "", TString Dataset = "", TString Vers
   vector< TString > vec_Data = vec_Dataset;
 
   if( Trigger == "" ) Trigger = "HLT_Mu24_v";
-  if( Dataset == "" ) Dataset = "TTSemiLep102XMUOVal";
+  if( Dataset == "" ) Dataset = "HLTPhysicsRun2018D";
   if( Version == "" ) Version = "TEST";
   if( JobId   == "" ) Version = "Job0";
 
   if(vec_Dataset.size()==0) {
     // vec_Data = {"../ntuple_77.root"};  // {"../ntuple_2001.root"};
-    vec_Data = {"dcap://cluster142.knu.ac.kr//pnfs/knu.ac.kr/data/cms/store/user/jskim/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/crab_MuonHLTNtuple_SimMatchingInfo_2018_TTToSemiLeptonic__PUAvg50ForMUOVal/200227_162718/0000/ntuple_8.root"};
+    vec_Data = {"/gv0/Users/kplee/MUO19001/HLTPhysicsRun2018D/ntuple_3705.root"};
   }
 
   vector< TString > vec_Sel = {

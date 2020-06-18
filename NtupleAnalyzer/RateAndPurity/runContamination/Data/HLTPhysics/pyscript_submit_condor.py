@@ -11,20 +11,19 @@ theVersion = "v202"
 
 # list_dataset = ["Run2016H", "Run2018D"]
 list_trigger_2016 = [
-    'hltL1fL1sMu22L1Filtered0',
-    'hltL2fL1sMu22L1f0L2Filtered10Q',
-    'HLT_Mu24_v',
-    'HLT_TkMu24_v',
-    'HLT_IsoMu24_v',
-    'HLT_IsoTkMu24_v',
+    # 'hltL1fL1sMu22L1Filtered0',
+    # 'hltL2fL1sMu22L1f0L2Filtered10Q',
+    # 'HLT_Mu24_v',
+    # 'HLT_TkMu24_v',
+    # 'HLT_IsoMu24_v',
+    # 'HLT_IsoTkMu24_v',
 ]
 
 list_trigger_2018 = [
-    'hltL1fL1sMu22L1Filtered0',
+    # 'hltL1fL1sMu22L1Filtered0',
     'hltL2fL1sSingleMu22L1f0L2Filtered10Q', # -- different L2 filter name with 2016
     'HLT_Mu24_v',
     'HLT_IsoMu24_v',
-    'HLT_Mu50_v',
 ]
 
 dic_dataset_trigger = {
@@ -47,7 +46,7 @@ for theDataset in dic_dataset_trigger.keys():
         generator.trigger = theTrigger
         generator.dataset = theDataset
         generator.version = theVersion
-        generator.nJob = 20
+        generator.nJob = 40 # -- nJob = 20: does not run! why...?
 
         generator.Generate()
 
