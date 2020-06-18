@@ -204,7 +204,7 @@ public:
 
   void Set_HLTPhysicsDataset(Bool_t flag = kTRUE)
   {
-    Set_HLTPhysicsDataset = flag;
+    isHLTPhysics_ = flag;
   }
 
   void Analyze()
