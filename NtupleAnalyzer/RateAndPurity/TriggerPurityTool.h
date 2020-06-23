@@ -311,7 +311,7 @@ public:
       {
         Double_t prescale = FindPrescale_PhysicsTrigger(ntuple);
         if( prescale == -1 ) continue; // -- HLT_Physics trigger is not fired: skip this event
-        else weight *= prescale;
+        else weight *= 107 * prescale; // -- 107: period in hltL1EventNumberL1Fat (considered as L1 prescale)
       }
 
       if(ntuple->runNum >= this->RunMin && ntuple->runNum <= this->RunMax)
@@ -760,7 +760,7 @@ private:
     for(Int_t i_trig = 0; i_trig < nFiredTrigger; i_trig++)
     {
       TString triggerPath = ntuple->vec_firedTrigger->at(i_trig);
-      if( triggerPath.Contains("HLT_Physics_") )
+      if( triggerPath.Contains("HLT_Physics_v") )
         thePrescale = ntuple->vec_prescale->at(i_trig);
     }
 
