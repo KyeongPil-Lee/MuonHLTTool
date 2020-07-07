@@ -35,7 +35,7 @@ if __name__ == '__main__':
     
     from CRABAPI.RawCommand import crabCommand
 
-    config.General.requestName = 'MuonHLTNtuple'+version+'DoubleMuon_07Aug17_Run2016Hv2_Rerun'
+    config.General.requestName = 'MuonHLTNtuple'+version+'DoubleMuon_07Aug17_Run2016Hv2'
     config.Data.inputDataset = '/DoubleMuon/Run2016H-07Aug17-v1/MINIAOD'
     config.JobType.psetName = 'Run_ntupler_2016.py'
     crabCommand('submit', config = config)
