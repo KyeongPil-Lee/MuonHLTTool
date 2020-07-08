@@ -35,6 +35,9 @@ ntuplerBase = cms.EDAnalyzer("MuonHLTNtupler",
 	isMiniAOD             = cms.bool(False),
 	triggerObject_miniAOD = cms.untracked.InputTag("notUsed"), # -- only used when isMiniAOD == True
 
+	# -- save rerun object?
+	doSaveRerunObject = cms.bool(True),
+
 	# -- for HLTPrescaleProvider
 	l1tAlgBlkInputTag     = cms.InputTag("gtStage2Digis"), # -- for L1TGlobalUtil
 	l1tExtBlkInputTag     = cms.InputTag("gtStage2Digis"), # -- for L1TGlobalUtil

@@ -107,6 +107,7 @@ private:
   edm::EDGetTokenT< reco::GenParticleCollection >            t_genParticle_;
 
   bool isMiniAOD_;
+  bool doSaveRerunObject_;
   edm::EDGetTokenT< std::vector<pat::TriggerObjectStandAlone> > t_triggerObject_miniAOD_;
 
 

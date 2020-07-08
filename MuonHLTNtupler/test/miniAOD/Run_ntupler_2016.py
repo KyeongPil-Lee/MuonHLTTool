@@ -52,6 +52,8 @@ else: # -- without HLT rerun
     process.ntupler.PUSummaryInfo         = cms.untracked.InputTag("slimmedAddPileupInfo")
     process.ntupler.genParticle           = cms.untracked.InputTag("prunedGenParticles")
 
+    process.ntupler.doSaveRerunObject     = cms.bool(False)
+
   process.TFileService = cms.Service("TFileService",
     fileName = cms.string("ntuple.root"),
     closeFileFast = cms.untracked.bool(False),
