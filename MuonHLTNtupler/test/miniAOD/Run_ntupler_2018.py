@@ -7,7 +7,7 @@ flag_miniAOD = True
 
 exampleFile = ""
 if flag_miniAOD:
-  exampleFile = "file:/u/user/kplee/scratch/ROOTFiles_Test/102X/MINIAODSIM_Autumn18_DYJetsToLL_M50.root" # -- @ KNU
+  exampleFile = "file:/pnfs/knu.ac.kr/data/cms/store/data/Run2018D/HLTPhysics/MINIAOD/PromptReco-v2/000/320/479/00000/26CBAEBD-E194-E811-94FB-FA163E50185F.root" # -- @ KNU
 else:
   exampleFile = "file:/eos/cms/store/data/Run2018A/SingleMuon/AOD/PromptReco-v1/000/316/187/00000/1CCE3B04-E457-E811-A80C-FA163E0178DF.root" # -- @ lxplus
 
@@ -20,7 +20,7 @@ process.source = cms.Source("PoolSource",
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
-process.GlobalTag.globaltag = '101X_dataRun2_Prompt_v9'
+process.GlobalTag.globaltag = '102X_dataRun2_Prompt_v11'
 
 process.load("Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff")
 process.load('Configuration.Geometry.GeometryRecoDB_cff')
