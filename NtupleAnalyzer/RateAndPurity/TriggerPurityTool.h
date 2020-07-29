@@ -130,6 +130,10 @@ public:
 
   Bool_t isHLTPhysics_; // -- take into account HLT_Physics prescales if true
 
+  Bool_t applyVtxCut_;
+  Double_t vtxMin_;
+  Double_t vtxMax_;
+
   TriggerPurityTool( Double_t _EtaLo, Double_t _EtaUp )
   {
     this->maxEvents = -1;
@@ -141,6 +145,7 @@ public:
     this->EtaUp = _EtaUp;
     this->RunMin = 0;
     this->RunMax = 999999;
+    applyVtxCut_ = kFALSE;
 
     // OffSel_HLT or OffSel_MYHLT
     // OffSel = Match(0, 1)_Id(String)_Iso(String)
@@ -205,6 +210,13 @@ public:
   void Set_HLTPhysicsDataset(Bool_t flag = kTRUE)
   {
     isHLTPhysics_ = flag;
+  }
+
+  void Set_VtxRange(Double_t min, Double_t max)
+  {
+    applyVtxCut_ = kTRUE;
+    vtxMin_ = min;
+    vtxMax_ = max;
   }
 
   void Analyze()
@@ -286,6 +298,9 @@ public:
       }
     }
 
+    // -- nVertex distribution
+    TH1D* h_nVtx = new TH1D("h_nVtx", "", 200, 0, 200);
+
     for(Int_t i_ev=0; i_ev<nEvent; i_ev++)
     {
       if( debug ) printf("\n ** event %d **\n", i_ev);
@@ -314,8 +329,14 @@ public:
         else weight *= 107 * prescale; // -- 107: period in hltL1EventNumberL1Fat (considered as L1 prescale)
       }
 
+      if( applyVtxCut_ )
+      {
+        if( !(vtxMin_ < ntuple->nVertex && ntuple->nVertex < vtxMax_) ) continue;
+      }
+
       if(ntuple->runNum >= this->RunMin && ntuple->runNum <= this->RunMax)
       {
+        h_nVtx->Fill( ntuple->nVertex, weight );
 
         if(doDimuon) {
           // Bool_t isPassDimuon = dimuonSelection( ntuple, 10. );
@@ -444,6 +465,7 @@ public:
 
     //-- save histograms
     this->f_output->cd();
+    h_nVtx->Write();
     for( const auto& hc : vec_HistContainer ) {
       cout << "\t Saved: " << hc->Tag << endl;
       hc->Save( this->f_output );
