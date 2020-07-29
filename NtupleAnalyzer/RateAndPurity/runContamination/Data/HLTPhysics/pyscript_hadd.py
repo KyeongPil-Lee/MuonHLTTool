@@ -19,14 +19,14 @@ def RunHadd(dataset, version, trigger, etaMin = "0.0", etaMax = "5.0"):
 
 
 if __name__ == '__main__':
-    # RunHadd( "HLTPhysicsRun2016Hv2", "v202", "hltL1fL1sMu22L1Filtered0" )
-    # RunHadd( "HLTPhysicsRun2016Hv2", "v202", "hltL2fL1sMu22L1f0L2Filtered10Q" )
-    # RunHadd( "HLTPhysicsRun2016Hv2", "v202", "HLT_IsoMu24_v" )
-    # RunHadd( "HLTPhysicsRun2016Hv2", "v202", "HLT_IsoTkMu24_v" )
-    # RunHadd( "HLTPhysicsRun2016Hv2", "v202", "HLT_Mu24_v" )
-    # RunHadd( "HLTPhysicsRun2016Hv2", "v202", "HLT_TkMu24_v" )
+    RunHadd( "HLTPhysicsRun2016Hv2", "v205", "hltL1fL1sMu22L1Filtered0" )
+    RunHadd( "HLTPhysicsRun2016Hv2", "v205", "hltL2fL1sMu22L1f0L2Filtered10Q" )
+    RunHadd( "HLTPhysicsRun2016Hv2", "v205", "HLT_IsoMu24_v" )
+    RunHadd( "HLTPhysicsRun2016Hv2", "v205", "HLT_IsoTkMu24_v" )
+    RunHadd( "HLTPhysicsRun2016Hv2", "v205", "HLT_Mu24_v" )
+    RunHadd( "HLTPhysicsRun2016Hv2", "v205", "HLT_TkMu24_v" )
 
-    RunHadd( "HLTPhysicsRun2018D", "v202", "hltL1fL1sMu22L1Filtered0" )
-    RunHadd( "HLTPhysicsRun2018D", "v202", "hltL2fL1sSingleMu22L1f0L2Filtered10Q" )
-    RunHadd( "HLTPhysicsRun2018D", "v202", "HLT_IsoMu24_v" )
-    RunHadd( "HLTPhysicsRun2018D", "v202", "HLT_Mu24_v" )
+    RunHadd( "HLTPhysicsRun2018D", "v205", "hltL1fL1sMu22L1Filtered0" )
+    RunHadd( "HLTPhysicsRun2018D", "v205", "hltL2fL1sSingleMu22L1f0L2Filtered10Q" )
+    RunHadd( "HLTPhysicsRun2018D", "v205", "HLT_IsoMu24_v" )
+    RunHadd( "HLTPhysicsRun2018D", "v205", "HLT_Mu24_v" )

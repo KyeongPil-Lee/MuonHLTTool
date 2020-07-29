@@ -6,28 +6,29 @@ from RateAndPurity.CondorJobGenerator import *
 theBaseJobDir = "/data9/Users/kplee/MUO19001Jobs"
 theRootMacro = cwd+"/MuonTriggerPurity.cxx" # -- macro name: should be sync. with the shell script to run
 theShellScript = cwd+"/script_runMacro_forCondor.sh"
-theVersion = "v202"
+theVersion = "v205" # -- fix prescale bugs
+# theVersion = "v204" # -- larger statistics
 
 
 # list_dataset = ["Run2016H", "Run2018D"]
 list_trigger_2016 = [
-    # 'hltL1fL1sMu22L1Filtered0',
-    # 'hltL2fL1sMu22L1f0L2Filtered10Q',
-    # 'HLT_Mu24_v',
-    # 'HLT_TkMu24_v',
-    # 'HLT_IsoMu24_v',
-    # 'HLT_IsoTkMu24_v',
+    'hltL1fL1sMu22L1Filtered0',
+    'hltL2fL1sMu22L1f0L2Filtered10Q',
+    'HLT_Mu24_v',
+    'HLT_TkMu24_v',
+    'HLT_IsoMu24_v',
+    'HLT_IsoTkMu24_v',
 ]
 
 list_trigger_2018 = [
-    # 'hltL1fL1sMu22L1Filtered0',
+    'hltL1fL1sMu22L1Filtered0',
     'hltL2fL1sSingleMu22L1f0L2Filtered10Q', # -- different L2 filter name with 2016
     'HLT_Mu24_v',
     'HLT_IsoMu24_v',
 ]
 
 dic_dataset_trigger = {
-    "HLTPhysicsRun2016Hv2": list_trigger_2016,
+    "HLTPhysicsRun2016Hv2": list_trigger_2016, # -- now it also contains 2016Hv3 data
     "HLTPhysicsRun2018D":   list_trigger_2018,
 }
 
