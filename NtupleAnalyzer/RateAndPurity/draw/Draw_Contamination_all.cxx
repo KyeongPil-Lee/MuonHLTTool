@@ -40,6 +40,9 @@ public:
 
   void Produce()
   {
+    gStyle->SetPadTickX(1);  // To get tick marks on the opposite side of the frame
+    gStyle->SetPadTickY(1);
+    
     if( fileName_L3_.Contains("TkMu") || fileName_iso_.Contains("IsoTkMu") ) isTkMu_ = kTRUE;
 
     if( fileName_L1_  != "" ) DrawPlot_vs_Var_All(fileName_L1_,  matchingType_ );
@@ -82,12 +85,12 @@ private:
     if (gSystem->mkdir(outputDir, kTRUE) != -1)
       gSystem->mkdir(outputDir, kTRUE);
 
-    TH1D* h_nMuon_tot = nullptr;
-    TH1D* h_nMuon_nonMuon = nullptr;
-    TH1D* h_nMuon_nonMuonNonPrompt = nullptr;
-    GetNMuonHist( fileName, matchingType, var, h_nMuon_tot, h_nMuon_nonMuon, h_nMuon_nonMuonNonPrompt);
+    TH1D* h_nMuon_prompt    = nullptr;
+    TH1D* h_nMuon_nonPrompt = nullptr;
+    TH1D* h_nMuon_nonMuon   = nullptr;
+    GetNMuonHist( fileName, matchingType, var, h_nMuon_prompt, h_nMuon_nonPrompt, h_nMuon_nonMuon);
 
-    if( !h_nMuon_tot || !h_nMuon_nonMuon || !h_nMuon_nonMuonNonPrompt ) return;
+    if( !h_nMuon_prompt || !h_nMuon_nonPrompt || !h_nMuon_nonMuon ) return;
 
     // -- make fraction
 
@@ -95,44 +98,45 @@ private:
     Double_t frac_prompt    = 0;
     Double_t frac_nonPrompt = 0;
     Double_t frac_nonMuon   = 0;
-    GetOverallFraction( h_nMuon_tot, h_nMuon_nonMuonNonPrompt, h_nMuon_nonMuon, frac_prompt, frac_nonPrompt, frac_nonMuon );
+    GetOverallFraction( h_nMuon_prompt, h_nMuon_nonPrompt, h_nMuon_nonMuon, frac_prompt, frac_nonPrompt, frac_nonMuon );
+
+    TH1D* h_nMuon_tot = (TH1D*)h_nMuon_prompt->Clone("h_nMuon_tot");
+    h_nMuon_tot->Add( h_nMuon_nonPrompt );
+    h_nMuon_tot->Add( h_nMuon_nonMuon );
 
     // ---- fraction histogram
-    TH1D* h_frac_all = (TH1D*)h_nMuon_tot->Clone("h_frac_all");
-    for(Int_t i=0; i<h_frac_all->GetNbinsX(); i++)
-    {
-      Int_t i_bin = i+1;
-      if(h_nMuon_tot->GetBinContent(i_bin) != 0.) // -- only fill where # total muon != 0
-      {
-        h_frac_all->SetBinContent(i_bin, 1.0);
-        h_frac_all->SetBinError(i_bin, 0);
-      }
-    }
+    TH1D* h_frac_prompt    = CalcFracHist( h_nMuon_prompt,    h_nMuon_tot, "h_frac_prompt" );    
+    TH1D* h_frac_nonPrompt = CalcFracHist( h_nMuon_nonPrompt, h_nMuon_tot, "h_frac_nonPrompt" );
+    TH1D* h_frac_nonMuon   = CalcFracHist( h_nMuon_nonMuon,   h_nMuon_tot, "h_frac_nonMuon" );
 
-    TH1D* h_frac_nonMuon          = CalcFracHist( h_nMuon_nonMuon,          h_nMuon_tot, "h_frac_nonMuon" );
-    TH1D* h_frac_nonMuonNonPrompt = CalcFracHist( h_nMuon_nonMuonNonPrompt, h_nMuon_tot, "h_frac_nonMuonNonPrompt" );
 
     // -- scale by 100: %
-    h_frac_all->Scale(100);
+    h_frac_prompt->Scale(100);
+    h_frac_nonPrompt->Scale(100);
     h_frac_nonMuon->Scale(100);
-    h_frac_nonMuonNonPrompt->Scale(100);
 
     // -- histogram style
-    Set_HistAttribute(h_frac_all);
+    Set_HistAttribute(h_frac_prompt);
+    Set_HistAttribute(h_frac_nonPrompt);
     Set_HistAttribute(h_frac_nonMuon);
-    Set_HistAttribute(h_frac_nonMuonNonPrompt);
 
-    h_frac_all->SetMarkerColor(kAzure-9);
-    h_frac_all->SetFillColor(kAzure-9);
+    h_frac_prompt->SetMarkerColor(kAzure-9);
+    h_frac_prompt->SetFillColor(kAzure-9);
 
-    h_frac_nonMuonNonPrompt->SetMarkerColor(kRed-7);
-    h_frac_nonMuonNonPrompt->SetFillColor(kRed-7);
+    h_frac_nonPrompt->SetMarkerColor(kRed-7);
+    h_frac_nonPrompt->SetFillColor(kRed-7);
 
     h_frac_nonMuon->SetMarkerColor(kYellow-7);
     h_frac_nonMuon->SetFillColor(kYellow-7);
 
     Bool_t isLogX = kFALSE;
     Bool_t isLogY = kTRUE;
+
+    // -- Stack
+    THStack *hStack = new THStack("hStack", "");
+    hStack->Add( h_frac_nonMuon );
+    hStack->Add( h_frac_nonPrompt );
+    hStack->Add( h_frac_prompt );
 
     TCanvas *c;
     TString canvasName = "c_Contamination_"+matchingType+"_"+var;
@@ -159,27 +163,28 @@ private:
 
     // -- draw
     h_frame->Draw();
-    h_frac_all->Draw("HISTSAME");
-    h_frac_nonMuonNonPrompt->Draw("HISTSAME");
-    h_frac_nonMuon->Draw("HISTSAME");
+    hStack->Draw("HISTSAME");
+    h_frame->Draw("AXISSAME");
 
-    SetAxis_SinglePad( h_frame->GetXaxis(), h_frame->GetYaxis(), GetTitleX(var, trigger), "Contamination [\%]" );
+    SetAxis_SinglePad( h_frame->GetXaxis(), h_frame->GetYaxis(), GetTitleX(var, trigger), "Composition [\%]" );
 
     TLegend *legend;
-    SetLegend( legend, 0.15, 0.72, 0.90, 0.86);
-    legend->AddEntry( h_frac_all,              "#bf{Prompt muon"+TString::Format(" (%.1f%%)}",     100.*frac_prompt),    "f" );
-    legend->AddEntry( h_frac_nonMuonNonPrompt, "#bf{Non-prompt muon"+TString::Format(" (%.1f%%)}", 100.*frac_nonPrompt), "f" );
-    legend->AddEntry( h_frac_nonMuon,          "#bf{Non-muon"+TString::Format(" (%.1f%%)}",        100.*frac_nonMuon),   "f" );
+    // SetLegend( legend, 0.15, 0.72, 0.90, 0.86);
+    SetLegend( legend, 0.50, 0.81, 0.95, 0.93);
+    legend->AddEntry( h_frac_prompt,    "#bf{Isolated muon"+TString::Format(" (%.1f%%)}",     100.*frac_prompt),    "f" );
+    legend->AddEntry( h_frac_nonPrompt, "#bf{Non isolated muon"+TString::Format(" (%.1f%%)}", 100.*frac_nonPrompt), "f" );
+    legend->AddEntry( h_frac_nonMuon,   "#bf{Unmatched"+TString::Format(" (%.1f%%)}",     100.*frac_nonMuon),   "f" );
     legend->Draw();
 
     TLatex latex;
     if( matchingType == "data" )
     {
-      Latex_Preliminary_NoDataInfo( latex );
+      // Latex_Preliminary_NoDataInfo( latex );
+      latex.DrawLatexNDC( 0.13, 0.96, "#font[62]{CMS}" );
       if( dataset.Contains("2016") )
-        latex.DrawLatexNDC( 0.67 , 0.96, "#scale[0.6]{#font[42]{35.9 fb^{-1} (2016, 13 TeV)}}" );
+        latex.DrawLatexNDC( 0.67 , 0.96, "#scale[0.6]{#font[42]{5 fb^{-1} (2016, 13 TeV)}}" );
       else if( dataset.Contains("2018") )
-        latex.DrawLatexNDC( 0.67, 0.96, "#scale[0.6]{#font[42]{59.7 fb^{-1} (2018, 13 TeV)}}" );
+        latex.DrawLatexNDC( 0.67, 0.96, "#scale[0.6]{#font[42]{5 fb^{-1} (2018, 13 TeV)}}" );
     }
     else // -- MC
     {
@@ -200,8 +205,12 @@ private:
 
     // gROOT->ProcessLine( "gErrorIgnoreLevel = 2001;");
     c->SaveAs(outputDir+"/"+canvasName+".pdf","pdf");
-    c->Close();
+    // c->Close();
     // gROOT->ProcessLine( "gErrorIgnoreLevel = kPrint;");
+
+    c->SetLogy(kFALSE);
+    h_frame->GetYaxis()->SetRangeUser(0, 125);
+    c->SaveAs(outputDir+"/"+canvasName+"_linear.pdf","pdf");
   }
 
   void DrawBarPlot(TString matchingType)
@@ -216,46 +225,53 @@ private:
     if (gSystem->mkdir(outputDir, kTRUE) != -1)
       gSystem->mkdir(outputDir, kTRUE);
 
-    TH1D* h_bar_all = nullptr;
-    TH1D* h_bar_nonMuonNonPrompt = nullptr;
-    TH1D* h_bar_nonMuon          = nullptr;
+    TH1D* h_bar_prompt       = nullptr;
+    TH1D* h_bar_nonPrompt = nullptr;
+    TH1D* h_bar_nonMuon   = nullptr;
 
-    GetBarHistogram( h_bar_all, h_bar_nonMuonNonPrompt, h_bar_nonMuon );
+    GetBarHistogram( h_bar_prompt, h_bar_nonPrompt, h_bar_nonMuon );
 
-    Set_HistAttribute( h_bar_all );
-    Set_HistAttribute( h_bar_nonMuonNonPrompt );
+    Set_HistAttribute( h_bar_prompt );
+    Set_HistAttribute( h_bar_nonPrompt );
     Set_HistAttribute( h_bar_nonMuon );
 
-    h_bar_all->SetMarkerColor(kAzure-9);
-    h_bar_all->SetFillColor(kAzure-9);
+    h_bar_prompt->SetMarkerColor(kAzure-9);
+    h_bar_prompt->SetFillColor(kAzure-9);
 
-    h_bar_nonMuonNonPrompt->SetMarkerColor(kRed-7);
-    h_bar_nonMuonNonPrompt->SetFillColor(kRed-7);
+    h_bar_nonPrompt->SetMarkerColor(kRed-7);
+    h_bar_nonPrompt->SetFillColor(kRed-7);
 
     h_bar_nonMuon->SetMarkerColor(kYellow-7);
     h_bar_nonMuon->SetFillColor(kYellow-7);
 
+    // -- Stack
+    THStack *hStack = new THStack("hStack", "");
+    hStack->Add( h_bar_prompt );
+    hStack->Add( h_bar_nonPrompt );
+    hStack->Add( h_bar_nonMuon );
+
+    // -- draw
     TCanvas *c;
     TString canvasName = "c_barPlot_Contamination";
     if( isTkMu_ ) canvasName = canvasName + "_TkMu";
     SetCanvas_Square( c, canvasName, 0, 1 );
     c->cd();
 
-    // -- draw
-    h_bar_all->Draw("HISTSAME");
-    h_bar_nonMuonNonPrompt->Draw("HISTSAME");
-    h_bar_nonMuon->Draw("HISTSAME");
+    TH1D* h_axis = (TH1D*)h_bar_prompt->Clone(); // -- dummy histogram for axis definition
+    h_axis->Reset("ICES");
+    h_axis->Draw();
+    hStack->Draw("SAME");
+    h_axis->Draw("AXISSAME");
 
-    SetAxis_SinglePad( h_bar_all->GetXaxis(), h_bar_all->GetYaxis(), "#mu trigger step", "Contamination [\%]" );
+    SetAxis_SinglePad( h_axis->GetXaxis(), h_axis->GetYaxis(), "#mu trigger step", "Composition [\%]" );
 
-
-    h_bar_all->GetYaxis()->SetRangeUser(5e-2, 1e+3);
+    h_axis->GetYaxis()->SetRangeUser(5e-2, 1e+3);
 
     TLegend *legend;
     SetLegend( legend, 0.50, 0.81, 0.95, 0.93);
-    legend->AddEntry( h_bar_all,              "#bf{Prompt muon}",     "f" );
-    legend->AddEntry( h_bar_nonMuonNonPrompt, "#bf{Non-prompt muon}", "f" );
-    legend->AddEntry( h_bar_nonMuon,          "#bf{Non-muon}",        "f" );
+    legend->AddEntry( h_bar_prompt,    "#bf{Isolated muon}",     "f" );
+    legend->AddEntry( h_bar_nonPrompt, "#bf{Non isolated muon}", "f" );
+    legend->AddEntry( h_bar_nonMuon,   "#bf{Unmatched}",     "f" );
     legend->Draw();
 
     TLatex latex;
@@ -271,11 +287,12 @@ private:
 
     if( matchingType == "data" )
     {
-      Latex_Preliminary_NoDataInfo( latex );
+      // Latex_Preliminary_NoDataInfo( latex );
+      latex.DrawLatexNDC( 0.13, 0.96, "#font[62]{CMS}" );
       if( is2016 )
-        latex.DrawLatexNDC( 0.67 , 0.96, "#scale[0.6]{#font[42]{35.9 fb^{-1} (2016, 13 TeV)}}" );
+        latex.DrawLatexNDC( 0.67 , 0.96, "#scale[0.6]{#font[42]{5 fb^{-1} (2016, 13 TeV)}}" );
       else if( is2018 )
-        latex.DrawLatexNDC( 0.67, 0.96, "#scale[0.6]{#font[42]{59.7 fb^{-1} (2018, 13 TeV)}}" );
+        latex.DrawLatexNDC( 0.67, 0.96, "#scale[0.6]{#font[42]{5 fb^{-1} (2018, 13 TeV)}}" );
     }
     else
     {
@@ -295,7 +312,7 @@ private:
     c->SaveAs(outputDir+"/"+canvasName+".pdf","pdf");
 
     c->SetLogy(kFALSE);
-    h_bar_all->GetYaxis()->SetRangeUser(0, 125);
+    h_axis->GetYaxis()->SetRangeUser(0, 125);
     c->SaveAs(outputDir+"/"+canvasName+"_linear.pdf","pdf");
 
     if( saveResults_ )
@@ -303,8 +320,8 @@ private:
       TString fileName = outputDir+"/ROOTFile_BarPlot_Contamination_"+type_+".root";
       TFile *f_output = TFile::Open(fileName, "RECREATE");
       f_output->cd();
-      h_bar_all->Write("h_bar_all");
-      h_bar_nonMuonNonPrompt->Write("h_bar_nonMuonNonPrompt");
+      h_bar_prompt->Write("h_bar_prompt");
+      h_bar_nonPrompt->Write("h_bar_nonPrompt");
       h_bar_nonMuon->Write("h_bar_nonMuon");
       f_output->Close();
       cout << fileName << " is created" << endl;
@@ -313,7 +330,7 @@ private:
     delete c;
   }
 
-  void GetBarHistogram(TH1D*& h_bar_all, TH1D*& h_bar_nonMuonNonPrompt, TH1D*& h_bar_nonMuon )
+  void GetBarHistogram(TH1D*& h_bar_prompt, TH1D*& h_bar_nonPrompt, TH1D*& h_bar_nonMuon )
   {
     if( isTkMu_ ) // -- no L2 sequence
     {
@@ -331,35 +348,35 @@ private:
       h_bar_nonMuon->GetXaxis()->SetBinLabel(4, "Iso. (p_{T} > 24 GeV)");
     }
 
-    h_bar_nonMuonNonPrompt = (TH1D*)h_bar_nonMuon->Clone("h_bar_nonMuonNonPrompt");
-    h_bar_all              = (TH1D*)h_bar_nonMuon->Clone("h_all");
+    h_bar_nonPrompt = (TH1D*)h_bar_nonMuon->Clone("h_bar_nonPrompt");
+    h_bar_prompt    = (TH1D*)h_bar_nonMuon->Clone("h_bar_prompt");
 
     if( isTkMu_ )
     {
-      FillBarHist( fileName_L1_,  1, matchingType_, h_bar_all, h_bar_nonMuonNonPrompt, h_bar_nonMuon);
-      FillBarHist( fileName_L3_,  2, matchingType_, h_bar_all, h_bar_nonMuonNonPrompt, h_bar_nonMuon);
-      FillBarHist( fileName_iso_, 3, matchingType_, h_bar_all, h_bar_nonMuonNonPrompt, h_bar_nonMuon);
+      FillBarHist( fileName_L1_,  1, matchingType_, h_bar_prompt, h_bar_nonPrompt, h_bar_nonMuon);
+      FillBarHist( fileName_L3_,  2, matchingType_, h_bar_prompt, h_bar_nonPrompt, h_bar_nonMuon);
+      FillBarHist( fileName_iso_, 3, matchingType_, h_bar_prompt, h_bar_nonPrompt, h_bar_nonMuon);
     }
     else
     {
-      FillBarHist( fileName_L1_,  1, matchingType_, h_bar_all, h_bar_nonMuonNonPrompt, h_bar_nonMuon);
-      FillBarHist( fileName_L2_,  2, matchingType_, h_bar_all, h_bar_nonMuonNonPrompt, h_bar_nonMuon);
-      FillBarHist( fileName_L3_,  3, matchingType_, h_bar_all, h_bar_nonMuonNonPrompt, h_bar_nonMuon);
-      FillBarHist( fileName_iso_, 4, matchingType_, h_bar_all, h_bar_nonMuonNonPrompt, h_bar_nonMuon);
+      FillBarHist( fileName_L1_,  1, matchingType_, h_bar_prompt, h_bar_nonPrompt, h_bar_nonMuon);
+      FillBarHist( fileName_L2_,  2, matchingType_, h_bar_prompt, h_bar_nonPrompt, h_bar_nonMuon);
+      FillBarHist( fileName_L3_,  3, matchingType_, h_bar_prompt, h_bar_nonPrompt, h_bar_nonMuon);
+      FillBarHist( fileName_iso_, 4, matchingType_, h_bar_prompt, h_bar_nonPrompt, h_bar_nonMuon);
     }
   }
 
-  void FillBarHist( TString fileName, Int_t i_bin, TString matchingType, TH1D* h_bar_all, TH1D* h_bar_nonMuonNonPrompt, TH1D* h_bar_nonMuon )
+  void FillBarHist( TString fileName, Int_t i_bin, TString matchingType, TH1D* h_bar_prompt, TH1D* h_bar_nonPrompt, TH1D* h_bar_nonMuon )
   {
     // -- Get histograms
     TString var = "Eta"; // -- reference: vs. eta plot
 
-    TH1D* h_nMuon_tot              = nullptr;
-    TH1D* h_nMuon_nonMuon          = nullptr;
-    TH1D* h_nMuon_nonMuonNonPrompt = nullptr;
-    GetNMuonHist( fileName, matchingType, var, h_nMuon_tot, h_nMuon_nonMuon, h_nMuon_nonMuonNonPrompt);
+    TH1D* h_nMuon_prompt    = nullptr;
+    TH1D* h_nMuon_nonPrompt = nullptr;
+    TH1D* h_nMuon_nonMuon   = nullptr;
+    GetNMuonHist( fileName, matchingType, var, h_nMuon_prompt, h_nMuon_nonPrompt, h_nMuon_nonMuon);
 
-    if( !h_nMuon_tot || !h_nMuon_nonMuon || !h_nMuon_nonMuonNonPrompt ) return;
+    if( !h_nMuon_prompt || !h_nMuon_nonPrompt || !h_nMuon_nonMuon ) return;
 
     // -- make fraction
 
@@ -367,15 +384,13 @@ private:
     Double_t frac_prompt    = 0;
     Double_t frac_nonPrompt = 0;
     Double_t frac_nonMuon   = 0;
-    GetOverallFraction( h_nMuon_tot, h_nMuon_nonMuonNonPrompt, h_nMuon_nonMuon, frac_prompt, frac_nonPrompt, frac_nonMuon );
+    GetOverallFraction( h_nMuon_prompt, h_nMuon_nonPrompt, h_nMuon_nonMuon, frac_prompt, frac_nonPrompt, frac_nonMuon );
 
-    Double_t frac_nonMuonNonPrompt = frac_nonMuon + frac_nonPrompt;
+    h_bar_prompt->SetBinContent(i_bin, frac_prompt * 100.0); // -- convert to %
+    h_bar_prompt->SetBinError(i_bin, 0);
 
-    h_bar_all->SetBinContent(i_bin, 100.0); // -- 100%
-    h_bar_all->SetBinError(i_bin, 0);
-
-    h_bar_nonMuonNonPrompt->SetBinContent(i_bin, frac_nonMuonNonPrompt * 100.0); // -- convert to %
-    h_bar_nonMuonNonPrompt->SetBinError(i_bin,   0); // -- for now
+    h_bar_nonPrompt->SetBinContent(i_bin, frac_nonPrompt * 100.0); // -- convert to %
+    h_bar_nonPrompt->SetBinError(i_bin,   0); // -- for now
 
     h_bar_nonMuon->SetBinContent(i_bin, frac_nonMuon * 100.0); // -- convert to %
     h_bar_nonMuon->SetBinError(i_bin, 0); // -- for now
@@ -398,7 +413,7 @@ private:
     return "h_L3_"+var+"_"+runTag+"_"+tag+"_0.0_5.0";
   }
 
-  void GetNMuonHist( TString fileName, TString matchingType, TString var, TH1D*& h_nMuon_tot, TH1D*& h_nMuon_nonMuon, TH1D*& h_nMuon_nonMuonNonPrompt )
+  void GetNMuonHist( TString fileName, TString matchingType, TString var, TH1D*& h_nMuon_prompt, TH1D*& h_nMuon_nonPrompt, TH1D*& h_nMuon_nonMuon )
   {
     TH1D* h = nullptr;
     if( matchingType == "genFlag" )
@@ -411,16 +426,16 @@ private:
       TString histName_prompt          = GetHistName( var, runTag_, tag_prompt );
       TString histName_promptNonPrompt = GetHistName( var, runTag_, tag_promptNonPrompt );
 
-      h_nMuon_tot = Get_Hist(fileName, histName_tot);
-
-      TH1D* h_nMuon_prompt          = Get_Hist(fileName, histName_prompt);
+      TH1D* h_nMuon_tot             = Get_Hist(fileName, histName_tot);
       TH1D* h_nMuon_promptNonPrompt = Get_Hist(fileName, histName_promptNonPrompt);
+
+      h_nMuon_prompt = Get_Hist(fileName, histName_prompt);
+
+      h_nMuon_nonPrompt = (TH1D*)h_nMuon_promptNonPrompt->Clone();
+      h_nMuon_nonPrompt->Add( h_nMuon_prompt, -1 ); // -- (prompt + non-prompt) - prompt
 
       h_nMuon_nonMuon = (TH1D*)h_nMuon_tot->Clone("h_nMuon_nonMuon");
       h_nMuon_nonMuon->Add( h_nMuon_promptNonPrompt, -1 ); // -- total - (prompt + non-prompt)
-
-      h_nMuon_nonMuonNonPrompt = (TH1D*)h_nMuon_tot->Clone("h_nMuon_nonMuonNonPrompt");
-      h_nMuon_nonMuonNonPrompt->Add( h_nMuon_prompt, -1 ); // -- total - prompt
     }
     else if( matchingType == "simHit" )
     {
@@ -432,17 +447,14 @@ private:
       TString histName_prompt    = GetHistName( var, runTag_, tag_prompt );
       TString histName_nonPrompt = GetHistName( var, runTag_, tag_nonPrompt );
 
-      h_nMuon_tot = Get_Hist(fileName, histName_tot);
+      TH1D* h_nMuon_tot = Get_Hist(fileName, histName_tot);
 
-      TH1D* h_nMuon_prompt    = Get_Hist(fileName, histName_prompt);
-      TH1D* h_nMuon_nonPrompt = Get_Hist(fileName, histName_nonPrompt);
+      h_nMuon_prompt    = Get_Hist(fileName, histName_prompt);
+      h_nMuon_nonPrompt = Get_Hist(fileName, histName_nonPrompt);
 
       h_nMuon_nonMuon = (TH1D*)h_nMuon_tot->Clone("h_nMuon_nonMuon");
       h_nMuon_nonMuon->Add( h_nMuon_prompt, -1 ); // -- total - prompt
       h_nMuon_nonMuon->Add( h_nMuon_nonPrompt, -1 ); // -- (total - prompt) - non-prompt
-
-      h_nMuon_nonMuonNonPrompt = (TH1D*)h_nMuon_nonMuon->Clone("h_nMuon_nonMuonNonPrompt");
-      h_nMuon_nonMuonNonPrompt->Add( h_nMuon_nonPrompt ); // -- non-muon + non-prompt
     }
     else if( matchingType == "data" ) // -- contamination plot with data: prompt = ID+Iso / non-prompt = ID only / non-muon = else
     {
@@ -454,35 +466,34 @@ private:
       TString histName_prompt          = GetHistName( var, runTag_, tag_prompt );
       TString histName_promptNonPrompt = GetHistName( var, runTag_, tag_promptNonPrompt );
 
-      h_nMuon_tot = Get_Hist(fileName, histName_tot);
-
-      TH1D* h_nMuon_prompt          = Get_Hist(fileName, histName_prompt);
+      TH1D* h_nMuon_tot             = Get_Hist(fileName, histName_tot);
       TH1D* h_nMuon_promptNonPrompt = Get_Hist(fileName, histName_promptNonPrompt);
+
+      h_nMuon_prompt = Get_Hist(fileName, histName_prompt);
+
+      h_nMuon_nonPrompt = (TH1D*)h_nMuon_promptNonPrompt->Clone();
+      h_nMuon_nonPrompt->Add( h_nMuon_prompt, -1 ); // -- (prompt + non-prompt) - prompt
 
       h_nMuon_nonMuon = (TH1D*)h_nMuon_tot->Clone("h_nMuon_nonMuon");
       h_nMuon_nonMuon->Add( h_nMuon_promptNonPrompt, -1 ); // -- total - (prompt + non-prompt)
-
-      h_nMuon_nonMuonNonPrompt = (TH1D*)h_nMuon_tot->Clone("h_nMuon_nonMuonNonPrompt");
-      h_nMuon_nonMuonNonPrompt->Add( h_nMuon_prompt, -1 ); // -- total - prompt
     }
     else
     {
       cout << "[GetNMuonHist] matching type = " << matchingType << "is not recognized" << endl;
-      h_nMuon_tot = nullptr;
+      h_nMuon_prompt = nullptr;
+      h_nMuon_nonPrompt = nullptr;
       h_nMuon_nonMuon = nullptr;
-      h_nMuon_nonMuonNonPrompt = nullptr;
     }
   }
 
-  void GetOverallFraction( TH1D* h_nMuon_tot, TH1D* h_nMuon_nonMuonNonPrompt, TH1D* h_nMuon_nonMuon, Double_t& frac_prompt, Double_t& frac_nonPrompt, Double_t& frac_nonMuon )
+  void GetOverallFraction( TH1D* h_nMuon_prompt, TH1D* h_nMuon_nonPrompt, TH1D* h_nMuon_nonMuon, Double_t& frac_prompt, Double_t& frac_nonPrompt, Double_t& frac_nonMuon )
   {
     // -- integral: should include under and overflow! to be consistent between variables
-    Double_t nMuon_tot              = h_nMuon_tot->Integral(0, h_nMuon_tot->GetNbinsX()+1);
-    Double_t nMuon_nonMuonNonPrompt = h_nMuon_nonMuonNonPrompt->Integral(0, h_nMuon_tot->GetNbinsX()+1);
-    Double_t nMuon_nonMuon          = h_nMuon_nonMuon->Integral(0, h_nMuon_tot->GetNbinsX()+1);
+    Double_t nMuon_prompt    = h_nMuon_prompt->Integral(0,    h_nMuon_prompt->GetNbinsX()+1);
+    Double_t nMuon_nonPrompt = h_nMuon_nonPrompt->Integral(0, h_nMuon_nonPrompt->GetNbinsX()+1);
+    Double_t nMuon_nonMuon   = h_nMuon_nonMuon->Integral(0,   h_nMuon_nonMuon->GetNbinsX()+1);
 
-    Double_t nMuon_prompt = nMuon_tot - nMuon_nonMuonNonPrompt;
-    Double_t nMuon_nonPrompt = nMuon_nonMuonNonPrompt - nMuon_nonMuon;
+    Double_t nMuon_tot = nMuon_prompt + nMuon_nonPrompt + nMuon_nonMuon;
 
     frac_prompt    = nMuon_prompt / nMuon_tot;
     frac_nonPrompt = nMuon_nonPrompt / nMuon_tot;
@@ -590,9 +601,9 @@ private:
     else if(_name.Contains("IsoTkMu24"))
       out = "Isolated single #mu trigger with p_{T} > 24 GeV";
     else if(_name.Contains("Mu24"))
-      out = "Non-isolated single #mu trigger with p_{T} > 24 GeV";
+      out = "Non isolated single #mu trigger with p_{T} > 24 GeV";
     else if(_name.Contains("Mu50"))
-      out = "Non-isolated single #mu trigger with p_{T} > 50 GeV";
+      out = "Non isolated single #mu trigger with p_{T} > 50 GeV";
     else if(_name.Contains("hltL1fL1sMu"))
       out = "L1, p_{T} > 22 GeV";
     else if(_name.Contains("hltL2fL1s"))
@@ -680,13 +691,59 @@ void Draw_BarChart_2018Data_Iterative()
   producer->Produce();
 }
 
+void Draw_BarChart_HLTPhysics2016Data_Cascade()
+{
+  TString fileName_L1  = "Outputs/Output-MuonTriggerPurity-HLTPhysicsRun2016Hv2-v205-hltL1fL1sMu22L1Filtered0-0.0-5.0.root";
+  TString fileName_L2  = "Outputs/Output-MuonTriggerPurity-HLTPhysicsRun2016Hv2-v205-hltL2fL1sMu22L1f0L2Filtered10Q-0.0-5.0.root";
+  TString fileName_L3  = "Outputs/Output-MuonTriggerPurity-HLTPhysicsRun2016Hv2-v205-HLT_Mu24_v-0.0-5.0.root";
+  TString fileName_iso = "Outputs/Output-MuonTriggerPurity-HLTPhysicsRun2016Hv2-v205-HLT_IsoMu24_v-0.0-5.0.root";
+
+  PlotProducer* producer = new PlotProducer("Run0to999999", "data");
+  producer->Set_FileNames(fileName_L1, fileName_L2, fileName_L3, fileName_iso);
+  producer->verbose_ = kTRUE;
+  producer->Produce();
+}
+
+void Draw_BarChart_HLTPhysics2016Data_TrackerMuon()
+{
+  TString fileName_L1  = "Outputs/Output-MuonTriggerPurity-HLTPhysicsRun2016Hv2-v205-hltL1fL1sMu22L1Filtered0-0.0-5.0.root";
+  TString fileName_L2  = "";
+  TString fileName_L3  = "Outputs/Output-MuonTriggerPurity-HLTPhysicsRun2016Hv2-v205-HLT_TkMu24_v-0.0-5.0.root";
+  TString fileName_iso = "Outputs/Output-MuonTriggerPurity-HLTPhysicsRun2016Hv2-v205-HLT_IsoTkMu24_v-0.0-5.0.root";
+
+  PlotProducer* producer = new PlotProducer("Run0to999999", "data");
+  producer->Set_FileNames(fileName_L1, fileName_L2, fileName_L3, fileName_iso);
+  producer->verbose_ = kTRUE;
+  producer->Produce();
+}
+
+void Draw_BarChart_HLTPhysics2018Data_Iterative()
+{
+
+  TString fileName_L1  = "Outputs/Output-MuonTriggerPurity-HLTPhysicsRun2018D-v205-hltL1fL1sMu22L1Filtered0-0.0-5.0.root";
+  TString fileName_L2  = "Outputs/Output-MuonTriggerPurity-HLTPhysicsRun2018D-v205-hltL2fL1sSingleMu22L1f0L2Filtered10Q-0.0-5.0.root";
+  TString fileName_L3  = "Outputs/Output-MuonTriggerPurity-HLTPhysicsRun2018D-v205-HLT_Mu24_v-0.0-5.0.root";
+  TString fileName_iso = "Outputs/Output-MuonTriggerPurity-HLTPhysicsRun2018D-v205-HLT_IsoMu24_v-0.0-5.0.root";
+
+  PlotProducer* producer = new PlotProducer("Run0to999999", "data");
+  producer->Set_FileNames(fileName_L1, fileName_L2, fileName_L3, fileName_iso);
+  producer->verbose_ = kTRUE;
+  producer->Produce();
+}
+
+
+
 void Draw_Contamination_all()
 {
-  Draw_BarChart_2016MC_Cascade();
-  Draw_BarChart_2016MC_TrackerMuon();
-  Draw_BarChart_2018MC_Iterative();
+  // Draw_BarChart_2016MC_Cascade();
+  // Draw_BarChart_2016MC_TrackerMuon();
+  // Draw_BarChart_2018MC_Iterative();
 
-  Draw_BarChart_2016Data_Cascade();
-  Draw_BarChart_2016Data_TrackerMuon();
-  Draw_BarChart_2018Data_Iterative();
+  // Draw_BarChart_2016Data_Cascade();
+  // Draw_BarChart_2016Data_TrackerMuon();
+  // Draw_BarChart_2018Data_Iterative();
+
+  Draw_BarChart_HLTPhysics2016Data_Cascade();
+  Draw_BarChart_HLTPhysics2016Data_TrackerMuon();
+  Draw_BarChart_HLTPhysics2018Data_Iterative();
 }
