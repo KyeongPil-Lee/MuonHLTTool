@@ -6,7 +6,8 @@ from RateAndPurity.CondorJobGenerator import *
 theBaseJobDir = "/data9/Users/kplee/MUO19001Jobs"
 theRootMacro = cwd+"/MuonTriggerPurity.cxx" # -- macro name: should be sync. with the shell script to run
 theShellScript = cwd+"/script_runMacro_forCondor.sh"
-theVersion = "v205" # -- fix prescale bugs
+theVersion = "v206" # -- add pt plot in barrel, overlap and endcap regions
+# theVersion = "v205" # -- fix prescale bugs
 # theVersion = "v204" # -- larger statistics
 
 
