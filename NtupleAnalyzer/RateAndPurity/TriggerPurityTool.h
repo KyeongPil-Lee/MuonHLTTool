@@ -47,6 +47,11 @@ public:
   TH1D* h_L3_EtaFine;
   TH2D* h_L3_EtaPhi;
 
+  // -- more detailed distributions: for the investigation on the difference between 2016 and 2018 L1 compositions
+  TH1D* h_L3_Pt_Barrel;
+  TH1D* h_L3_Pt_Overlap;
+  TH1D* h_L3_Pt_Endcap;
+
   PurityHistContainer( TString _Tag )
   {
     this->Tag = _Tag;
@@ -69,6 +74,10 @@ public:
     this->h_L3_nVertices->Fill(ntuple->nVertex, theWeight);
     this->h_L3_EtaFine->Fill(L3Mu->eta, theWeight);
     this->h_L3_EtaPhi->Fill(L3Mu->eta, L3Mu->phi, theWeight);
+
+    if( fabs(L3Mu->eta) < 0.9 )            this->h_L3_Pt_Barrel->Fill(L3Mu->pt, theWeight);
+    else if( 0.9 < fabs(L3Mu->eta) < 1.2 ) this->h_L3_Pt_Overlap->Fill(L3Mu->pt, theWeight);
+    else if( fabs(L3Mu->eta) > 1.2 )       this->h_L3_Pt_Endcap->Fill(L3Mu->pt, theWeight);
   }
 
   void Save( TFile *f_output )
@@ -97,6 +106,10 @@ private:
     this->h_L3_nVertices = new TH1D("h_L3_nVertices_"+this->Tag, "", 200, 0, 200 );  this->vec_Hist.push_back( this->h_L3_nVertices );
     this->h_L3_EtaFine = new TH1D("h_L3_EtaFine_"+this->Tag, "", 1000, -5, 5 );  this->vec_Hist.push_back( this->h_L3_EtaFine );
     this->h_L3_EtaPhi  = new TH2D("h_L3_EtaPhi_"+this->Tag, "", 1000, -5, 5, 50, (-1)*TMath::Pi(), TMath::Pi() );
+
+    this->h_L3_Eta_Barrel  = new TH1D("h_L3_Eta_Barrel_"+this->Tag, "", nEtaBin, EtaBin );   this->vec_Hist.push_back( this->h_L3_Eta_Barrel );
+    this->h_L3_Eta_Overlap = new TH1D("h_L3_Eta_Overlap_"+this->Tag, "", nEtaBin, EtaBin );  this->vec_Hist.push_back( this->h_L3_Eta_Overlap );
+    this->h_L3_Eta_Endcap  = new TH1D("h_L3_Eta_Endcap_"+this->Tag, "", nEtaBin, EtaBin );   this->vec_Hist.push_back( this->h_L3_Eta_Endcap );
   }
 };
 
