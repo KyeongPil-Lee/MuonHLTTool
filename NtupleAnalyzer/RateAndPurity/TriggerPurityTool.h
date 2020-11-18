@@ -75,9 +75,9 @@ public:
     this->h_L3_EtaFine->Fill(L3Mu->eta, theWeight);
     this->h_L3_EtaPhi->Fill(L3Mu->eta, L3Mu->phi, theWeight);
 
-    if( fabs(L3Mu->eta) < 0.9 )            this->h_L3_Pt_Barrel->Fill(L3Mu->pt, theWeight);
-    else if( 0.9 < fabs(L3Mu->eta) < 1.2 ) this->h_L3_Pt_Overlap->Fill(L3Mu->pt, theWeight);
-    else if( fabs(L3Mu->eta) > 1.2 )       this->h_L3_Pt_Endcap->Fill(L3Mu->pt, theWeight);
+    if( fabs(L3Mu->eta) < 0.9 )                               this->h_L3_Pt_Barrel->Fill(L3Mu->pt, theWeight);
+    else if( 0.9 < fabs(L3Mu->eta) && fabs(L3Mu->eta) < 1.2 ) this->h_L3_Pt_Overlap->Fill(L3Mu->pt, theWeight);
+    else if( fabs(L3Mu->eta) > 1.2 )                          this->h_L3_Pt_Endcap->Fill(L3Mu->pt, theWeight);
   }
 
   void Save( TFile *f_output )
