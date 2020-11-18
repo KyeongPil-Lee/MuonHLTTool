@@ -92,6 +92,8 @@ public:
 
     this->h_L3_EtaPhi->Write();
     delete this->h_L3_EtaPhi;
+
+    cout << "[PurityHistContainer::Save] Histograms are saved in: " << f_output->GetName() << endl;
   }
 
 private:
