@@ -149,6 +149,8 @@ public:
   Double_t vtxMin_;
   Double_t vtxMax_;
 
+  Bool_t applyL1QualityCut_ = kFALSE;
+
   TriggerPurityTool( Double_t _EtaLo, Double_t _EtaUp )
   {
     this->maxEvents = -1;
@@ -234,6 +236,11 @@ public:
     vtxMax_ = max;
   }
 
+  void Set_ApplyL1QualityCut(Bool_t flag = kTRUE)
+  {
+    applyL1QualityCut_ = flag;
+  }
+
   void Analyze()
   {
     TH1::AddDirectory(kFALSE);
@@ -298,6 +305,7 @@ public:
     ntuple->TurnOnBranches_Muon();
     ntuple->TurnOnBranches_simMuon();
     ntuple->TurnOnBranches_Trigger();
+    ntuple->TurnOnBranches_HLTMuon();
     ntuple->TurnOnBranches_GenParticle();
 
     TH1D* h_PUWeight = nullptr;
@@ -386,6 +394,13 @@ public:
 
               if(strSel.Contains("_HLT")) {
                 HLTObject *HLTObj = new HLTObject( ntuple, i_hlt );
+
+                // -- reject low quality L1 muons (Q < 12)
+                if( applyL1QualityCut_ && isL1 )
+                {
+                  Double_t quality = Get_L1QualityOfL1TriggerObject(ntuple, HLTObj);
+                  if( quality < 12 ) continue;
+                }
 
                 if( fabs(HLTObj->eta) >= this->EtaLo && fabs(HLTObj->eta) < this->EtaUp ) {
 
@@ -814,6 +829,38 @@ private:
     }
 
     return thePrescale;
+  }
+
+  Double_t Get_L1QualityOfL1TriggerObject(NtupleHandle* ntuple, HLTObject *HLTObj)
+  {
+    Double_t theQuality = -1;
+
+    Int_t index_matchedL1Mu = -1;
+    Double_t dR_best = 999.0;
+    for(Int_t i_L1=0; i_L1<ntuple->nL1Muon; i_L1++)
+    {
+      L1Muon L1Mu(ntuple, i_L1);
+      Double_t dR = (HLTObj->vecP).DeltaR( L1Mu.vecP );
+
+      if( dR < 0.1 && dR < dR_best )
+      {
+        index_matchedL1Mu = i_L1;
+        dR_best = dR;
+      }
+    }
+
+    if( index_matchedL1Mu == -1 )
+      cout << "[Get_L1QualityOfL1TriggerObject] Matched L1 muon is not found!! ... return -1 for the quality" << endl;
+    else
+    {
+      L1Muon L1Mu(ntuple, index_matchedL1Mu);
+      theQuality = L1Mu.quality;
+      // printf("[Get_L1QualityOfL1TriggerObject] Matched L1 muon is found\n");
+      // printf("   Trigger object: (pt, eta, phi)          = (%.3lf, %.3lf, %.3lf)\n", HLTObj->pt, HLTObj->eta, HLTObj->phi);
+      // printf("   L1 muon:        (pt, eta, phi, quality) = (%.3lf, %.3lf, %.3lf, %.1lf)\n", L1Mu.pt, L1Mu.eta, L1Mu.phi, L1Mu.quality);
+    }
+
+    return theQuality;
   }
 
   static inline void printMemory( TString tab = "" )

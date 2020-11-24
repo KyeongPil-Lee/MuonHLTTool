@@ -110,6 +110,7 @@ void MuonTriggerPurity( TString Trigger = "", TString Dataset = "", TString Vers
   tool->Set_Output( f_output );
   tool->Set_ApplyL2PtCut();
   tool->Set_HLTPhysicsDataset();
+  tool->Set_ApplyL1QualityCut();
   // tool->debug = kTRUE;
   tool->Analyze();
   delete tool;

@@ -6,7 +6,7 @@ from RateAndPurity.CondorJobGenerator import *
 theBaseJobDir = "/data9/Users/kplee/MUO19001Jobs"
 theRootMacro = cwd+"/MuonTriggerHist.cxx" # -- macro name: should be sync. with the shell script to run
 theShellScript = cwd+"/script_runMacro_forCondor.sh"
-theVersion = "v207"
+theVersion = "v209"
 
 # list_dataset = ["Run2016H", "Run2018D"]
 list_trigger_2016 = [

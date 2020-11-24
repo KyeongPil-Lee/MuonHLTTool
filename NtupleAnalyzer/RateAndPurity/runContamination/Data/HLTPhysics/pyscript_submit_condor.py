@@ -6,7 +6,8 @@ from RateAndPurity.CondorJobGenerator import *
 theBaseJobDir = "/data9/Users/kplee/MUO19001Jobs"
 theRootMacro = cwd+"/MuonTriggerPurity.cxx" # -- macro name: should be sync. with the shell script to run
 theShellScript = cwd+"/script_runMacro_forCondor.sh"
-theVersion = "v206" # -- add pt plot in barrel, overlap and endcap regions
+theVersion = "v210" # -- add quality cut on L1 muons
+# theVersion = "v206" # -- add pt plot in barrel, overlap and endcap regions
 # theVersion = "v205" # -- fix prescale bugs
 # theVersion = "v204" # -- larger statistics
 
@@ -14,18 +15,18 @@ theVersion = "v206" # -- add pt plot in barrel, overlap and endcap regions
 # list_dataset = ["Run2016H", "Run2018D"]
 list_trigger_2016 = [
     'hltL1fL1sMu22L1Filtered0',
-    'hltL2fL1sMu22L1f0L2Filtered10Q',
-    'HLT_Mu24_v',
-    'HLT_TkMu24_v',
-    'HLT_IsoMu24_v',
-    'HLT_IsoTkMu24_v',
+    # 'hltL2fL1sMu22L1f0L2Filtered10Q',
+    # 'HLT_Mu24_v',
+    # 'HLT_TkMu24_v',
+    # 'HLT_IsoMu24_v',
+    # 'HLT_IsoTkMu24_v',
 ]
 
 list_trigger_2018 = [
     'hltL1fL1sMu22L1Filtered0',
-    'hltL2fL1sSingleMu22L1f0L2Filtered10Q', # -- different L2 filter name with 2016
-    'HLT_Mu24_v',
-    'HLT_IsoMu24_v',
+    # 'hltL2fL1sSingleMu22L1f0L2Filtered10Q', # -- different L2 filter name with 2016
+    # 'HLT_Mu24_v',
+    # 'HLT_IsoMu24_v',
 ]
 
 dic_dataset_trigger = {
@@ -48,7 +49,8 @@ for theDataset in dic_dataset_trigger.keys():
         generator.trigger = theTrigger
         generator.dataset = theDataset
         generator.version = theVersion
-        generator.nJob = 40 # -- nJob = 20: does not run! why...?
+        # generator.nJob = 40 # -- nJob = 20: does not run! why...?
+        generator.nJob = 80 # -- nJob = 40: Run2016D runs only on small fraction of jobs... why?
 
         generator.Generate()
 

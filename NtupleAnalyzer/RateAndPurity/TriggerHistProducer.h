@@ -50,6 +50,7 @@ public:
   TH1D* h_trigObj_pt_;
   TH1D* h_trigObj_eta_;
   TH1D* h_trigObj_phi_;
+  TH1D* h_trigObj_quality_;
   TH1D* h_trigObj_pt_barrel_;
   TH1D* h_trigObj_pt_overlap_;
   TH1D* h_trigObj_pt_endcap_;
@@ -70,11 +71,12 @@ public:
     Init();
   }
 
-  void Fill( HLTObject *trigObj, Muon *mu, Double_t weight)
+  void Fill( HLTObject *trigObj, Double_t quality, Muon *mu, Double_t weight)
   {
     h_trigObj_pt_->Fill( trigObj->pt, weight);
     h_trigObj_eta_->Fill( trigObj->eta, weight);
     h_trigObj_phi_->Fill( trigObj->phi, weight);
+    h_trigObj_quality_->Fill( quality, weight); // -- only meaningful for L1 muon only; -1 for the other trigger objects
 
     if( fabs(trigObj->eta) < 0.9 )                             h_trigObj_pt_barrel_->Fill( trigObj->pt, weight);
     if( 0.9 < fabs(trigObj->eta) && fabs(trigObj->eta) < 1.2 ) h_trigObj_pt_overlap_->Fill( trigObj->pt, weight);
@@ -120,6 +122,8 @@ private:
     h_trigObj_eta_ = new TH1D("h_trigObj_eta_"+type_, "", nEtaBin, arr_etaBinEdge );           vec_hist_.push_back( h_trigObj_eta_ );
     h_trigObj_phi_ = new TH1D("h_trigObj_phi_"+type_, "", 20, (-1)*TMath::Pi(), TMath::Pi() ); vec_hist_.push_back( h_trigObj_phi_ );
 
+    h_trigObj_quality_ = new TH1D("h_trigObj_quality_"+type_, "", 21, -1, 20); vec_hist_.push_back( h_trigObj_quality_ );
+
     h_trigObj_pt_barrel_  = new TH1D("h_trigObj_pt_barrel_"+type_, "", nPtBin, arr_ptBinEdge );  vec_hist_.push_back( h_trigObj_pt_barrel_ );
     h_trigObj_pt_overlap_ = new TH1D("h_trigObj_pt_overlap_"+type_, "", nPtBin, arr_ptBinEdge ); vec_hist_.push_back( h_trigObj_pt_overlap_ );
     h_trigObj_pt_endcap_  = new TH1D("h_trigObj_pt_endcap_"+type_, "", nPtBin, arr_ptBinEdge );  vec_hist_.push_back( h_trigObj_pt_endcap_ );
@@ -148,10 +152,16 @@ public:
 
   Bool_t isHLTPhysics_ = kFALSE;
 
-  void Set_Trigger(TString trigger) { trigger_ = trigger; }
-  void Set_HLTPhysicsDataset(Bool_t flag = kTRUE) { isHLTPhysics_ = flag; }
-  void Set_DataPath(vector<TString> vec_dataPath) { vec_dataPath_ = vec_dataPath; }
-  void Set_OutputFile(TFile* f_output) { f_output_ = f_output; }
+  Bool_t usePtMatching_ = kFALSE;
+
+  Bool_t applyL1QualityCut_ = kFALSE;
+
+  void Set_Trigger(TString trigger)                 { trigger_ = trigger; }
+  void Set_HLTPhysicsDataset(Bool_t flag = kTRUE)   { isHLTPhysics_ = flag; }
+  void Set_DataPath(vector<TString> vec_dataPath)   { vec_dataPath_ = vec_dataPath; }
+  void Set_OutputFile(TFile* f_output)              { f_output_ = f_output; }
+  void Set_UsePtMatching( Bool_t flag = kTRUE )     { usePtMatching_ = flag; }
+  void Set_ApplyL1QualityCut( Bool_t flag = kTRUE ) { applyL1QualityCut_ = flag; }
 
   void Produce()
   {
@@ -181,8 +191,10 @@ public:
     ntuple->TurnOnBranches_Event();
     ntuple->TurnOnBranches_Muon();
     ntuple->TurnOnBranches_simMuon();
+    ntuple->TurnOnBranches_HLTMuon();
     ntuple->TurnOnBranches_Trigger();
     ntuple->TurnOnBranches_GenParticle();
+
 
 
     Int_t nEvent = chain->GetEntries();
@@ -210,12 +222,24 @@ public:
         TString filterName = HLTObj->filterName;
         if( filterName.Contains(trigger_) ) // -- corresponding HLT object
         {
+          // -- 2018 L2: skip if L2 pT < 10 GeV (to synchronize with 2016 L2, which internally has 10 GeV cut)
+          if( filterName.Contains("hltL2fL1sSingleMu22L1f0L2Filtered10Q") && HLTObj->pt < 10 ) continue;
+
+          Double_t quality;
+          if( triggerType_ == "L1" ) quality = Get_L1QualityOfL1TriggerObject(ntuple, HLTObj);
+          else                       quality = -1;
+
+          if( applyL1QualityCut_ )
+          {
+            if( quality < 12 ) continue;
+          }
+
           TString matchingType = "";
           Muon* matchedMu = TrigObj_Offline_Matching( ntuple, HLTObj, dRMax, matchingType );
-          if( matchingType == "nonMuon" )       hist_nonMuon->Fill( HLTObj, nullptr, weight );
-          if( matchingType == "matchedToReco" ) hist_matchedToReco->Fill( HLTObj, matchedMu, weight );
-          if( matchingType == "nonIsolated" )   hist_nonIsolated->Fill( HLTObj, matchedMu, weight );
-          if( matchingType == "isolated" )      hist_isolated->Fill( HLTObj, matchedMu, weight );
+          if( matchingType == "nonMuon" )       hist_nonMuon->Fill( HLTObj, quality, nullptr, weight );
+          if( matchingType == "matchedToReco" ) hist_matchedToReco->Fill( HLTObj, quality, matchedMu, weight );
+          if( matchingType == "nonIsolated" )   hist_nonIsolated->Fill( HLTObj, quality, matchedMu, weight );
+          if( matchingType == "isolated" )      hist_isolated->Fill( HLTObj, quality, matchedMu, weight );
         }
 
       } // -- end of HLT object iteration
@@ -242,7 +266,14 @@ private:
       Muon Mu(ntuple, i_mu);
       Double_t dR = (HLTObj->vecP).DeltaR( Mu.vecP );
 
-      if( dR < dRMax && dR < dR_best )
+      Double_t pt_HLTObj = HLTObj->pt;
+      Double_t pt_reco   = Mu.pt;
+      Double_t ptDiff = fabs(  (pt_HLTObj - pt_reco) / pt_reco  );
+      Bool_t ptCheck;
+      if( usePtMatching_ ) ptCheck = ptDiff < 0.3;
+      else                 ptCheck = kTRUE;
+
+      if( dR < dRMax && dR < dR_best && ptCheck )
       {
         index_matchedMu = i_mu;
         dR_best = dR;
@@ -317,6 +348,38 @@ private:
         ) type = "L3";
 
     return type;
+  }
+
+  Double_t Get_L1QualityOfL1TriggerObject(NtupleHandle* ntuple, HLTObject *HLTObj)
+  {
+    Double_t theQuality = -1;
+
+    Int_t index_matchedL1Mu = -1;
+    Double_t dR_best = 999.0;
+    for(Int_t i_L1=0; i_L1<ntuple->nL1Muon; i_L1++)
+    {
+      L1Muon L1Mu(ntuple, i_L1);
+      Double_t dR = (HLTObj->vecP).DeltaR( L1Mu.vecP );
+
+      if( dR < 0.1 && dR < dR_best )
+      {
+        index_matchedL1Mu = i_L1;
+        dR_best = dR;
+      }
+    }
+
+    if( index_matchedL1Mu == -1 )
+      cout << "[Get_L1QualityOfL1TriggerObject] Matched L1 muon is not found!! ... return -1 for the quality" << endl;
+    else
+    {
+      L1Muon L1Mu(ntuple, index_matchedL1Mu);
+      theQuality = L1Mu.quality;
+      // printf("[Get_L1QualityOfL1TriggerObject] Matched L1 muon is found\n");
+      // printf("   Trigger object: (pt, eta, phi)          = (%.3lf, %.3lf, %.3lf)\n", HLTObj->pt, HLTObj->eta, HLTObj->phi);
+      // printf("   L1 muon:        (pt, eta, phi, quality) = (%.3lf, %.3lf, %.3lf, %.1lf)\n", L1Mu.pt, L1Mu.eta, L1Mu.phi, L1Mu.quality);
+    }
+
+    return theQuality;
   }
 
   static inline void loadBar(int x, int n, int r, int w)
