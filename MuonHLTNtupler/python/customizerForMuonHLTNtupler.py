@@ -10,6 +10,11 @@ def customizerFuncForMuonHLTNtupler(process, newProcessName = "MYHLT"):
         del process.DQMOutput
 
 
+    # -- for the extrapolation of offlie muon to 2nd muon station
+    process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAny_cfi")
+    process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAlong_cfi")
+    process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorOpposite_cfi")
+    
     from MuonHLTTool.MuonHLTNtupler.ntupler_cfi import ntuplerBase
     process.ntupler = ntuplerBase.clone()
 

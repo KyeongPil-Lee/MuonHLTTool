@@ -25,6 +25,11 @@ process.GlobalTag.globaltag = '102X_dataRun2_Prompt_v11'
 process.load("Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff")
 process.load('Configuration.Geometry.GeometryRecoDB_cff')
 
+# -- for the extrapolation of offlie muon to 2nd muon station
+process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAny_cfi")
+process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAlong_cfi")
+process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorOpposite_cfi")
+
 # -- ntupler -- #
 
 if flag_HLTRerun:
