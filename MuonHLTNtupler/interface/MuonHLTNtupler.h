@@ -44,6 +44,9 @@
 
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 
+// -- for the extrapolation of the offline muon to 2nd muon station
+#include "MuonAnalysis/MuonAssociators/interface/PropagateToMuon.h"
+
 #include "TTree.h"
 
 using namespace std;
@@ -109,6 +112,8 @@ private:
   bool isMiniAOD_;
   bool doSaveRerunObject_;
   edm::EDGetTokenT< std::vector<pat::TriggerObjectStandAlone> > t_triggerObject_miniAOD_;
+
+  PropagateToMuon propagatorToMuon;
 
 
 
@@ -242,6 +247,9 @@ private:
   int muon_nMatchedStation_[arrSize_];
   int muon_nMatchedRPCLayer_[arrSize_];
   int muon_stationMask_[arrSize_];
+
+  double muon_propEta_[arrSize_];
+  double muon_propPhi_[arrSize_];
 
   // -- L3 muon
   int nL3Muon_;

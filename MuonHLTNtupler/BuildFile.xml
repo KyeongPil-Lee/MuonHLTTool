@@ -14,5 +14,6 @@
 <use name="TrackPropagation/SteppingHelixPropagator"/>
 <use name="RecoMuon/Records"/>
 <use name="RecoMuon/DetLayers"/>
+<use name="MuonAnalysis/MuonAssociators"/>
 <!--   <flags   EDM_PLUGIN="1"/> -->
 <flags EDM_PLUGIN="1"/>

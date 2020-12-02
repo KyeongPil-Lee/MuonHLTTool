@@ -1,5 +1,10 @@
 import FWCore.ParameterSet.Config as cms
 
+# -- for the extrapolation of offlie muon to 2nd muon station
+process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAny_cfi")
+process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAlong_cfi")
+process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorOpposite_cfi")
+
 ntuplerBase = cms.EDAnalyzer("MuonHLTNtupler",
 	# -- information stored in edm file
 	triggerResults    = cms.untracked.InputTag("TriggerResults::HLT"),
@@ -45,4 +50,14 @@ ntuplerBase = cms.EDAnalyzer("MuonHLTNtupler",
 
 	# isMiniAOD             = cms.untracked.bool(True),
 	# triggerObject_miniAOD = cms.untracked.InputTag("slimmedPatTrigger")
+
+	# -- for the extrapolation of offlie muon to 2nd muon station
+	preselection = cms.string("gmtMuonCand.quality > 1"), # FIXME: maybe exclude CSC-only region?
+	useTrack  = cms.string("tracker"),
+	useState  = cms.string("atVertex"),
+	maxDeltaR   = cms.double(1.5),             ## FIXME: to be tuned
+	maxDeltaEta = cms.double(0.3),             ## FIXME: to be tuned
+	l1PhiOffset = cms.double(1.25 * pi/180.),
+	useSimpleGeometry = cms.bool(True),
+	fallbackToME1     = cms.bool(True),
 )

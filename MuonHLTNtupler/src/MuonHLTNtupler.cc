@@ -83,7 +83,8 @@ t_genEventInfo_      ( consumes< GenEventInfoProduct >                    (iConf
 t_genParticle_       ( consumes< reco::GenParticleCollection >            (iConfig.getUntrackedParameter<edm::InputTag>("genParticle"       )) ),
 
 isMiniAOD_               ( iConfig.existsAs<bool>("isMiniAOD") ? iConfig.getParameter<bool>("isMiniAOD") : false),
-t_triggerObject_miniAOD_ ( mayConsume< std::vector<pat::TriggerObjectStandAlone> > (iConfig.getUntrackedParameter<edm::InputTag>("triggerObject_miniAOD")) ) // -- not used in AOD case
+t_triggerObject_miniAOD_ ( mayConsume< std::vector<pat::TriggerObjectStandAlone> > (iConfig.getUntrackedParameter<edm::InputTag>("triggerObject_miniAOD")) ), // -- not used in AOD case
+propagatorToMuon(iConfig)
 {
   cout << "isMiniAOD_ = " << isMiniAOD_ << endl;
 }
@@ -91,6 +92,8 @@ t_triggerObject_miniAOD_ ( mayConsume< std::vector<pat::TriggerObjectStandAlone>
 void MuonHLTNtupler::analyze(const edm::Event &iEvent, const edm::EventSetup &iSetup)
 {
   Init();
+
+  propagatorToMuon.init(iSetup);
 
   // -- basic info.
   isRealData_ = iEvent.isRealData();
@@ -311,6 +314,9 @@ void MuonHLTNtupler::Init()
     muon_nMatchedStation_[i] = -999;
     muon_nMatchedRPCLayer_[i] = -999;
     muon_stationMask_[i] = -999;
+
+    muon_propEta_[i] = -999;
+    muon_propPhi_[i] = -999;
   }
 
   nL3Muon_ = 0;
@@ -542,6 +548,9 @@ void MuonHLTNtupler::Make_Branch()
   ntuple_->Branch("muon_nMatchedRPCLayer", &muon_nMatchedRPCLayer_, "muon_nMatchedRPCLayer[nMuon]/I");
   ntuple_->Branch("muon_stationMask", &muon_stationMask_, "muon_stationMask[nMuon]/I");
 
+  ntuple_->Branch("muon_propEta", &muon_propEta_, "muon_propEta[nMuon]/D");
+  ntuple_->Branch("muon_propPhi", &muon_propPhi_, "muon_propPhi[nMuon]/D");
+
   ntuple_->Branch("nL3Muon", &nL3Muon_, "nL3Muon/I");
   ntuple_->Branch("L3Muon_pt", &L3Muon_pt_, "L3Muon_pt[nL3Muon]/D");
   ntuple_->Branch("L3Muon_eta", &L3Muon_eta_, "L3Muon_eta[nL3Muon]/D");
@@ -694,6 +703,17 @@ void MuonHLTNtupler::Fill_Muon(const edm::Event &iEvent)
         muon_nTrackerLayer_global_[_nMuon] = globalTrkHit.trackerLayersWithMeasurement();
         muon_nPixelHit_global_[_nMuon]     = globalTrkHit.numberOfValidPixelHits();
         muon_nMuonHit_global_[_nMuon]      = globalTrkHit.numberOfValidMuonHits();
+
+        // -- propagation to the 2nd station and get eta and phi value (for the matching with L1 muons)
+        TrajectoryStateOnSurface prop = propagatorToMuon.extrapolate( *(mu->globalTrack()) );
+        if( prop.isValid() )
+        {
+          muon_propEta_[_nMuon] = prop.globalPosition().eta();
+          muon_propPhi_[_nMuon] = prop.globalPosition().phi();
+          printf("[Propagation: suceeded]\n");
+          printf("  (eta, propagated eta) = (%lf, %lf)\n", muon_eta_[_nMuon], muon_propEta_[_nMuon]);
+          printf("  (phi, propagated phi) = (%lf, %lf)\n", muon_phi_[_nMuon], muon_propPhi_[_nMuon]);
+        }
       }
 
       reco::TrackRef innerTrk = mu->innerTrack();
@@ -809,7 +829,8 @@ void MuonHLTNtupler::Fill_HLT(const edm::Event &iEvent, const edm::EventSetup &i
     const edm::TriggerNames names = iEvent.triggerNames(*h_triggerResults);
     for( pat::TriggerObjectStandAlone triggerObj : *h_triggerObject)
     {
-      triggerObj.unpackNamesAndLabels(iEvent, *h_triggerResults);
+      // triggerObj.unpackNamesAndLabels(iEvent, *h_triggerResults); # -- does not work under 80X
+      triggerObj.unpackPathNames(names);
 
       for( size_t i_filter = 0; i_filter < triggerObj.filterLabels().size(); ++i_filter )
       {
@@ -1170,33 +1191,35 @@ void MuonHLTNtupler::Fill_IterL3(const edm::Event &iEvent)
 }
 
 // -- reference: https://github.com/cms-sw/cmssw/blob/master/DataFormats/MuonReco/src/MuonSelectors.cc#L910-L938
+// -- expectedNnumberOfMatchedStations() is not available under 80X: temporarily removed for the universality between 80X and 102X
 bool MuonHLTNtupler::isNewHighPtMuon(const reco::Muon& muon, const reco::Vertex& vtx){
-  if(!muon.isGlobalMuon()) return false;
+  // if(!muon.isGlobalMuon()) return false;
 
-  bool muValHits = ( muon.globalTrack()->hitPattern().numberOfValidMuonHits()>0 ||
-                     muon.tunePMuonBestTrack()->hitPattern().numberOfValidMuonHits()>0 );
+  // bool muValHits = ( muon.globalTrack()->hitPattern().numberOfValidMuonHits()>0 ||
+  //                    muon.tunePMuonBestTrack()->hitPattern().numberOfValidMuonHits()>0 );
 
-  bool muMatchedSt = muon.numberOfMatchedStations()>1;
-  if(!muMatchedSt) {
-    if( muon.isTrackerMuon() && muon.numberOfMatchedStations()==1 ) {
-      if( muon.expectedNnumberOfMatchedStations()<2 ||
-          !(muon.stationMask()==1 || muon.stationMask()==16) ||
-          muon.numberOfMatchedRPCLayers()>2
-        )
-        muMatchedSt = true;
-    }
-  }
+  // bool muMatchedSt = muon.numberOfMatchedStations()>1;
+  // if(!muMatchedSt) {
+  //   if( muon.isTrackerMuon() && muon.numberOfMatchedStations()==1 ) {
+  //     if( muon.expectedNnumberOfMatchedStations()<2 ||
+  //         !(muon.stationMask()==1 || muon.stationMask()==16) ||
+  //         muon.numberOfMatchedRPCLayers()>2
+  //       )
+  //       muMatchedSt = true;
+  //   }
+  // }
 
-  bool muID = muValHits && muMatchedSt;
+  // bool muID = muValHits && muMatchedSt;
 
-  bool hits = muon.innerTrack()->hitPattern().trackerLayersWithMeasurement() > 5 &&
-    muon.innerTrack()->hitPattern().numberOfValidPixelHits() > 0; 
+  // bool hits = muon.innerTrack()->hitPattern().trackerLayersWithMeasurement() > 5 &&
+  //   muon.innerTrack()->hitPattern().numberOfValidPixelHits() > 0; 
 
-  bool momQuality = muon.tunePMuonBestTrack()->ptError()/muon.tunePMuonBestTrack()->pt() < 0.3;
+  // bool momQuality = muon.tunePMuonBestTrack()->ptError()/muon.tunePMuonBestTrack()->pt() < 0.3;
 
-  bool ip = fabs(muon.innerTrack()->dxy(vtx.position())) < 0.2 && fabs(muon.innerTrack()->dz(vtx.position())) < 0.5;
+  // bool ip = fabs(muon.innerTrack()->dxy(vtx.position())) < 0.2 && fabs(muon.innerTrack()->dz(vtx.position())) < 0.5;
 
-  return muID && hits && momQuality && ip;
+  // return muID && hits && momQuality && ip;
+  return 0; // -- remove it when above lines are retrieved
 
 }
 
