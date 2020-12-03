@@ -737,13 +737,13 @@ void MuonHLTNtupler::Fill_Muon(const edm::Event &iEvent)
       {
         muon_propEta_[_nMuon] = prop.globalPosition().eta();
         muon_propPhi_[_nMuon] = prop.globalPosition().phi();
-        printf("[Propagation: suceeded (isGLB, isTRK, isSTA, isPF) = (%d, %d, %d, %d)]\n", muon_isGLB_[_nMuon], muon_isTRK_[_nMuon], muon_isSTA_[_nMuon], muon_isPF_[_nMuon]);
-        printf("  (eta, propagated eta) = (%lf, %lf)\n", muon_eta_[_nMuon], muon_propEta_[_nMuon]);
-        printf("  (phi, propagated phi) = (%lf, %lf)\n", muon_phi_[_nMuon], muon_propPhi_[_nMuon]);
+        // printf("[Propagation: suceeded (isGLB, isTRK, isSTA, isPF) = (%d, %d, %d, %d)]\n", muon_isGLB_[_nMuon], muon_isTRK_[_nMuon], muon_isSTA_[_nMuon], muon_isPF_[_nMuon]);
+        // printf("  (eta, propagated eta) = (%lf, %lf)\n", muon_eta_[_nMuon], muon_propEta_[_nMuon]);
+        // printf("  (phi, propagated phi) = (%lf, %lf)\n", muon_phi_[_nMuon], muon_propPhi_[_nMuon]);
       }
       else
       {
-        printf("[Propagation: failed (isGLB, isTRK, isSTA, isPF) = (%d, %d, %d, %d)]\n", muon_isGLB_[_nMuon], muon_isTRK_[_nMuon], muon_isSTA_[_nMuon], muon_isPF_[_nMuon]);
+        // printf("[Propagation: failed (isGLB, isTRK, isSTA, isPF) = (%d, %d, %d, %d)]\n", muon_isGLB_[_nMuon], muon_isTRK_[_nMuon], muon_isSTA_[_nMuon], muon_isPF_[_nMuon]);
       }
 
       _nMuon++;
