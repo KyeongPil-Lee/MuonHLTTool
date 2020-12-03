@@ -25,7 +25,9 @@ config.Site.storageSite = 'T2_KR_KNU'
 
 config.Data.lumiMask = './Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON_Last5invfb.txt'
 
-version = '_v20200708_'
+config.JobType.allowUndistributedCMSSW = True
+
+version = '_v20201203_'
 
 # 'MultiCRAB' part
 if __name__ == '__main__':
@@ -33,8 +35,12 @@ if __name__ == '__main__':
     from CRABAPI.RawCommand import crabCommand
 
     # -- for efficiency: useParent = True
-    config.General.requestName = 'MuonHLTNtuple'+version+'DoubleMuon_Run2018D'
-    config.Data.inputDataset = '/DoubleMuon/Run2018D-PromptReco-v2/MINIAOD'
+    # config.General.requestName = 'MuonHLTNtuple'+version+'DoubleMuon_Run2018D'
+    # config.Data.inputDataset = '/DoubleMuon/Run2018D-PromptReco-v2/MINIAOD'
+    # config.JobType.psetName = 'Run_ntupler_2018.py'
+    # crabCommand('submit', config = config)
+
+    config.General.requestName = 'MuonHLTNtuple'+version+'HLTPhysics_Run2018D'
+    config.Data.inputDataset = '/HLTPhysics/Run2018D-PromptReco-v2/MINIAOD'
     config.JobType.psetName = 'Run_ntupler_2018.py'
     crabCommand('submit', config = config)
-

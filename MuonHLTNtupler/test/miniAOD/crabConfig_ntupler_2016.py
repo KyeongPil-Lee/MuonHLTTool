@@ -28,15 +28,27 @@ config.Data.lumiMask = './Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_
 # config.Data.ignoreLocality = True
 # config.Site.whitelist = ['T2_KR_*', 'T3_KR_*', 'T2_US_*']
 
-version = '_v20200708_'
+config.JobType.allowUndistributedCMSSW = True
+
+version = '_v20201203_'
 
 # 'MultiCRAB' part
 if __name__ == '__main__':
     
     from CRABAPI.RawCommand import crabCommand
 
-    config.General.requestName = 'MuonHLTNtuple'+version+'DoubleMuon_07Aug17_Run2016Hv2'
-    config.Data.inputDataset = '/DoubleMuon/Run2016H-07Aug17-v1/MINIAOD'
+    # config.General.requestName = 'MuonHLTNtuple'+version+'DoubleMuon_07Aug17_Run2016Hv2'
+    # config.Data.inputDataset = '/DoubleMuon/Run2016H-07Aug17-v1/MINIAOD'
+    # config.JobType.psetName = 'Run_ntupler_2016.py'
+    # crabCommand('submit', config = config)
+
+    config.General.requestName = 'MuonHLTNtuple'+version+'HLTPhysics_Run2016Hv2'
+    config.Data.inputDataset = '/HLTPhysics/Run2016H-PromptReco-v2/MINIAOD'
+    config.JobType.psetName = 'Run_ntupler_2016.py'
+    crabCommand('submit', config = config)
+
+    config.General.requestName = 'MuonHLTNtuple'+version+'HLTPhysics_Run2016Hv3'
+    config.Data.inputDataset = '/HLTPhysics/Run2016H-PromptReco-v3/MINIAOD'
     config.JobType.psetName = 'Run_ntupler_2016.py'
     crabCommand('submit', config = config)
 
