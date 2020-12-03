@@ -21,7 +21,7 @@ config.Data.splitting = 'LumiBased'
 config.Data.unitsPerJob = 20
 
 config.Data.outLFNDirBase = '/store/user/kplee/'
-config.Site.storageSite = 'T2_KR_KNU'
+config.Site.storageSite = 'T3_KR_KNU'
 
 config.Data.lumiMask = './Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON_Last5invfb.txt'
 
