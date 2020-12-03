@@ -704,17 +704,6 @@ void MuonHLTNtupler::Fill_Muon(const edm::Event &iEvent)
         muon_nTrackerLayer_global_[_nMuon] = globalTrkHit.trackerLayersWithMeasurement();
         muon_nPixelHit_global_[_nMuon]     = globalTrkHit.numberOfValidPixelHits();
         muon_nMuonHit_global_[_nMuon]      = globalTrkHit.numberOfValidMuonHits();
-
-        // -- propagation to the 2nd station and get eta and phi value (for the matching with L1 muons)
-        TrajectoryStateOnSurface prop = propagatorToMuon.extrapolate( *(mu->globalTrack()) );
-        if( prop.isValid() )
-        {
-          muon_propEta_[_nMuon] = prop.globalPosition().eta();
-          muon_propPhi_[_nMuon] = prop.globalPosition().phi();
-          printf("[Propagation: suceeded]\n");
-          printf("  (eta, propagated eta) = (%lf, %lf)\n", muon_eta_[_nMuon], muon_propEta_[_nMuon]);
-          printf("  (phi, propagated phi) = (%lf, %lf)\n", muon_phi_[_nMuon], muon_propPhi_[_nMuon]);
-        }
       }
 
       reco::TrackRef innerTrk = mu->innerTrack();
@@ -741,6 +730,21 @@ void MuonHLTNtupler::Fill_Muon(const edm::Event &iEvent)
       muon_nMatchedStation_[_nMuon] = mu->numberOfMatchedStations();
       muon_nMatchedRPCLayer_[_nMuon] = mu->numberOfMatchedRPCLayers();
       muon_stationMask_[_nMuon] = mu->stationMask();
+
+      // -- propagation to the 2nd station and get eta and phi value (for the matching with L1 muons)
+      TrajectoryStateOnSurface prop = propagatorToMuon.extrapolate( *(mu->muonBestTrack()) );
+      if( prop.isValid() )
+      {
+        muon_propEta_[_nMuon] = prop.globalPosition().eta();
+        muon_propPhi_[_nMuon] = prop.globalPosition().phi();
+        printf("[Propagation: suceeded (isGLB, isTRK, isSTA, isPF) = (%d, %d, %d, %d)]\n", muon_isGLB_[_nMuon], muon_isTRK_[_nMuon], muon_isSTA_[_nMuon], muon_isPF_[_nMuon]);
+        printf("  (eta, propagated eta) = (%lf, %lf)\n", muon_eta_[_nMuon], muon_propEta_[_nMuon]);
+        printf("  (phi, propagated phi) = (%lf, %lf)\n", muon_phi_[_nMuon], muon_propPhi_[_nMuon]);
+      }
+      else
+      {
+        printf("[Propagation: failed (isGLB, isTRK, isSTA, isPF) = (%d, %d, %d, %d)]\n", muon_isGLB_[_nMuon], muon_isTRK_[_nMuon], muon_isSTA_[_nMuon], muon_isPF_[_nMuon]);
+      }
 
       _nMuon++;
     }
@@ -831,7 +835,7 @@ void MuonHLTNtupler::Fill_HLT(const edm::Event &iEvent, const edm::EventSetup &i
     const edm::TriggerNames names = iEvent.triggerNames(*h_triggerResults);
     for( pat::TriggerObjectStandAlone triggerObj : *h_triggerObject)
     {
-      // triggerObj.unpackNamesAndLabels(iEvent, *h_triggerResults); # -- does not work under 80X
+      // triggerObj.unpackNamesAndLabels(iEvent, *h_triggerResults); // -- does not work under 80X
       triggerObj.unpackPathNames(names);
 
       for( size_t i_filter = 0; i_filter < triggerObj.filterLabels().size(); ++i_filter )
