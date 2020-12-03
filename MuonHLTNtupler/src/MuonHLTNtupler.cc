@@ -82,7 +82,8 @@ t_PUSummaryInfo_     ( consumes< std::vector<PileupSummaryInfo> >         (iConf
 t_genEventInfo_      ( consumes< GenEventInfoProduct >                    (iConfig.getUntrackedParameter<edm::InputTag>("genEventInfo"      )) ),
 t_genParticle_       ( consumes< reco::GenParticleCollection >            (iConfig.getUntrackedParameter<edm::InputTag>("genParticle"       )) ),
 
-isMiniAOD_               ( iConfig.existsAs<bool>("isMiniAOD") ? iConfig.getParameter<bool>("isMiniAOD") : false),
+isMiniAOD_               ( iConfig.existsAs<bool>("isMiniAOD")         ? iConfig.getParameter<bool>("isMiniAOD")         : false),
+doSaveRerunObject_       ( iConfig.existsAs<bool>("doSaveRerunObject") ? iConfig.getParameter<bool>("doSaveRerunObject") : false),
 t_triggerObject_miniAOD_ ( mayConsume< std::vector<pat::TriggerObjectStandAlone> > (iConfig.getUntrackedParameter<edm::InputTag>("triggerObject_miniAOD")) ), // -- not used in AOD case
 propagatorToMuon(iConfig)
 {
@@ -160,7 +161,7 @@ void MuonHLTNtupler::analyze(const edm::Event &iEvent, const edm::EventSetup &iS
   // -- fill each object
   Fill_Muon(iEvent);
   Fill_HLT(iEvent, iSetup, 0); // -- original HLT objects saved in data taking
-  Fill_HLT(iEvent, iSetup, 1); // -- rerun objects
+  if( doSaveRerunObject_ ) Fill_HLT(iEvent, iSetup, 1); // -- rerun objects
   Fill_HLTMuon(iEvent);
   Fill_L1Muon(iEvent);
   Fill_IterL3(iEvent);
@@ -751,7 +752,6 @@ void MuonHLTNtupler::Fill_Muon(const edm::Event &iEvent)
 void MuonHLTNtupler::Fill_HLT(const edm::Event &iEvent, const edm::EventSetup &iSetup, bool isMYHLT)
 {
   edm::Handle<edm::TriggerResults>  h_triggerResults;
-  edm::Handle<trigger::TriggerEvent> h_triggerEvent;
 
   if( isMYHLT ) iEvent.getByToken(t_myTriggerResults_, h_triggerResults);
   else          iEvent.getByToken(t_triggerResults_,   h_triggerResults);
@@ -784,6 +784,8 @@ void MuonHLTNtupler::Fill_HLT(const edm::Event &iEvent, const edm::EventSetup &i
 
   if( !isMiniAOD_ || isMYHLT ) // -- AOD case or rerun object (rerun object always saved as AOD format)
   {
+    edm::Handle<trigger::TriggerEvent> h_triggerEvent;
+    
     if( isMYHLT ) iEvent.getByToken(t_myTriggerEvent_, h_triggerEvent);
     else          iEvent.getByToken(t_triggerEvent_,   h_triggerEvent);
 
