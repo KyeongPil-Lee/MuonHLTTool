@@ -7,7 +7,11 @@ flag_miniAOD = True
 
 exampleFile = ""
 if flag_miniAOD:
-  exampleFile = "file:/u/user/kplee/scratch/ROOTFiles_Test/102X/MINIAODSIM_Autumn18_DYJetsToLL_M50.root" # -- @ KNU
+  exampleFile = (
+  "file:/pnfs/knu.ac.kr/data/cms/store/data/Run2016H/HLTPhysics/MINIAOD/PromptReco-v2/000/281/207/00000/E2580541-6482-E611-8B86-FA163E368DD1.root",
+  "file:/pnfs/knu.ac.kr/data/cms/store/data/Run2016H/HLTPhysics/MINIAOD/PromptReco-v2/000/281/214/00000/FC5ED140-6982-E611-AC5F-FA163E823565.root",
+  "file:/pnfs/knu.ac.kr/data/cms/store/data/Run2016H/HLTPhysics/MINIAOD/PromptReco-v2/000/281/231/00000/E893081E-6B82-E611-92C2-FA163EA68523.root",
+  )
 else:
   exampleFile = "file:/eos/cms/store/data/Run2018A/SingleMuon/AOD/PromptReco-v1/000/316/187/00000/1CCE3B04-E457-E811-A80C-FA163E0178DF.root" # -- @ lxplus
 
@@ -20,7 +24,9 @@ process.source = cms.Source("PoolSource",
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
-process.GlobalTag.globaltag = '80X_dataRun2_2016LegacyRepro_v4'
+# process.GlobalTag.globaltag = '80X_dataRun2_2016LegacyRepro_v4'
+process.GlobalTag.globaltag = '80X_dataRun2_Prompt_v14'
+
 
 process.load("Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff")
 process.load('Configuration.Geometry.GeometryRecoDB_cff')

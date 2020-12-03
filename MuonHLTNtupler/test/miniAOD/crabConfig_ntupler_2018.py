@@ -40,7 +40,7 @@ if __name__ == '__main__':
     # config.JobType.psetName = 'Run_ntupler_2018.py'
     # crabCommand('submit', config = config)
 
-    config.General.requestName = 'MuonHLTNtuple'+version+'HLTPhysics_Run2018D'
+    config.General.requestName = 'MuonHLTNtuple'+version+'HLTPhysics_Run2018D_v2'
     config.Data.inputDataset = '/HLTPhysics/Run2018D-PromptReco-v2/MINIAOD'
     config.JobType.psetName = 'Run_ntupler_2018.py'
     crabCommand('submit', config = config)

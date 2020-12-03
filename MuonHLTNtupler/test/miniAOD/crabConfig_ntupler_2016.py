@@ -42,12 +42,12 @@ if __name__ == '__main__':
     # config.JobType.psetName = 'Run_ntupler_2016.py'
     # crabCommand('submit', config = config)
 
-    config.General.requestName = 'MuonHLTNtuple'+version+'HLTPhysics_Run2016Hv2'
+    config.General.requestName = 'MuonHLTNtuple'+version+'HLTPhysics_Run2016Hv2_v2'
     config.Data.inputDataset = '/HLTPhysics/Run2016H-PromptReco-v2/MINIAOD'
     config.JobType.psetName = 'Run_ntupler_2016.py'
     crabCommand('submit', config = config)
 
-    config.General.requestName = 'MuonHLTNtuple'+version+'HLTPhysics_Run2016Hv3'
+    config.General.requestName = 'MuonHLTNtuple'+version+'HLTPhysics_Run2016Hv3_v2'
     config.Data.inputDataset = '/HLTPhysics/Run2016H-PromptReco-v3/MINIAOD'
     config.JobType.psetName = 'Run_ntupler_2016.py'
     crabCommand('submit', config = config)
