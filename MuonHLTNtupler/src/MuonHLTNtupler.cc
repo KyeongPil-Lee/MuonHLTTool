@@ -1236,10 +1236,13 @@ void MuonHLTNtupler::beginRun(const edm::Run &iRun, const edm::EventSetup &iSetu
     return;
   }
 
-  bool myChangedConfig;
-  if(!myHLTPreConfig_.init(iRun, iSetup, "MYHLT", myChangedConfig))
+  if( doSaveRerunObject_ )
   {
-    cout << "Initialization of HLTPrescaleProvider (processName = MYHLT) failed: in case there was no rerunning HLT" << endl;
+    bool myChangedConfig;
+    if(!myHLTPreConfig_.init(iRun, iSetup, "MYHLT", myChangedConfig))
+    {
+      cout << "Initialization of HLTPrescaleProvider (processName = MYHLT) failed: in case there was no rerunning HLT" << endl;
+    }
   }
 }
 void MuonHLTNtupler::endRun(const edm::Run &iRun, const edm::EventSetup &iSetup) {}
