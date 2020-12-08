@@ -6,14 +6,14 @@ void MuonTriggerPurity( TString Trigger = "", TString Dataset = "", TString Vers
 {
   vector< TString > vec_Data = vec_Dataset;
 
-  if( Trigger == "" ) Trigger = "HLT_Mu24_v";
+  if( Trigger == "" ) Trigger = "hltL1fL1sMu22L1Filtered0";
   if( Dataset == "" ) Dataset = "HLTPhysicsRun2018D";
   if( Version == "" ) Version = "TEST";
   if( JobId   == "" ) Version = "Job0";
 
   if(vec_Dataset.size()==0) {
     // vec_Data = {"../ntuple_77.root"};  // {"../ntuple_2001.root"};
-    vec_Data = {"/gv0/Users/kplee/MUO19001/HLTPhysicsRun2018D/ntuple_3705.root"};
+    vec_Data = {"/gv0/Users/kplee/MUO19001/HLTPhysicsRun2018D_v2/ntuple_1.root"};
   }
 
   vector< TString > vec_Sel = {
@@ -29,7 +29,6 @@ void MuonTriggerPurity( TString Trigger = "", TString Dataset = "", TString Vers
     "Mat1_IdMedium_IsoPFTight_SimNo_HLT",
     "Mat1_IdTight_IsoPFTight_SimNo_HLT"
   };
-
 
 
   vector< Int_t > vec_RunNum = { 0, 999999 };
@@ -111,6 +110,8 @@ void MuonTriggerPurity( TString Trigger = "", TString Dataset = "", TString Vers
   tool->Set_ApplyL2PtCut();
   tool->Set_HLTPhysicsDataset();
   tool->Set_ApplyL1QualityCut();
+  // tool->Set_UseFirstObjectOnly();
+  tool->Set_UsePropagatedEtaPhi();
   // tool->debug = kTRUE;
   tool->Analyze();
   delete tool;

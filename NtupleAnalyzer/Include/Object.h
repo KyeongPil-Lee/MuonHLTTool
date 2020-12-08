@@ -184,6 +184,10 @@ public:
   Int_t    nMatchedRPCLayer;
   Int_t    stationMask;
 
+  // -- eta and phi after the propagation to the 2nd muon station (useful for the matching to L1 muons)
+  Double_t propEta;
+  Double_t propPhi;
+
   Int_t simType;
   Int_t simExtType;
   Int_t simPdgId;
@@ -267,6 +271,9 @@ public:
     nMatchedRPCLayer = ntuple->muon_nMatchedRPCLayer[index];
     stationMask      = ntuple->muon_stationMask[index];
 
+    propEta = ntuple->muon_propEta[index];
+    propPhi = ntuple->muon_propPhi[index];
+
     if(!ntuple->isRealData) {
       simType      = ntuple->muon_simType[index];
       simExtType   = ntuple->muon_simExtType[index];
@@ -275,6 +282,18 @@ public:
 
     relPFIso_dBeta = (PFIso04_charged + max(0., PFIso04_neutral + PFIso04_photon - 0.5*PFIso04_sumPU))/pt;
     relTrkIso = iso03_sumPt / pt;
+  }
+
+  // -- update default muon eta and phi to the one after the propagation to the 2nd muon station
+  void UpdateEtaPhi_PropagatedOne()
+  {
+    eta = propEta;
+    phi = propPhi;
+
+    vecP.SetPtEtaPhiM(pt, eta, phi, mass);
+    px = vecP.Px();
+    py = vecP.Py();
+    pz = vecP.Pz();
   }
 
 private:

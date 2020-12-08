@@ -127,6 +127,10 @@ public:
   Int_t           muon_nMatchedRPCLayer[ArrSize];
   Int_t           muon_stationMask[ArrSize];
 
+  // -- eta and phi after the propagation to 2nd muon station (for matching to L1 muons)
+  Double_t        muon_propEta[ArrSize];
+  Double_t        muon_propPhi[ArrSize];
+
   Int_t muon_simType[ArrSize];
   Int_t muon_simExtType[ArrSize];
   Int_t muon_simPdgId[ArrSize];
@@ -594,6 +598,12 @@ public:
 
     chain_->SetBranchStatus("muon_stationMask", 1);
     chain_->SetBranchAddress("muon_stationMask", &muon_stationMask);
+
+    chain_->SetBranchStatus("muon_propEta", 1);
+    chain_->SetBranchAddress("muon_propEta", &muon_propEta);
+
+    chain_->SetBranchStatus("muon_propPhi", 1);
+    chain_->SetBranchAddress("muon_propPhi", &muon_propPhi);
   }
 
   void TurnOnBranches_simMuon()

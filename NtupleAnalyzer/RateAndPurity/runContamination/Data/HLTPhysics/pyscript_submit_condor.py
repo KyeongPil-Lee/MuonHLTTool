@@ -6,7 +6,10 @@ from RateAndPurity.CondorJobGenerator import *
 theBaseJobDir = "/data9/Users/kplee/MUO19001Jobs"
 theRootMacro = cwd+"/MuonTriggerPurity.cxx" # -- macro name: should be sync. with the shell script to run
 theShellScript = cwd+"/script_runMacro_forCondor.sh"
-theVersion = "v210" # -- add quality cut on L1 muons
+
+theVersion = "v216" # -- use offline eta and phi propagated to 2nd muon station
+# theVersion = "v212" # -- use the first trigger object only
+# theVersion = "v210" # -- add quality cut on L1 muons
 # theVersion = "v206" # -- add pt plot in barrel, overlap and endcap regions
 # theVersion = "v205" # -- fix prescale bugs
 # theVersion = "v204" # -- larger statistics
@@ -30,8 +33,10 @@ list_trigger_2018 = [
 ]
 
 dic_dataset_trigger = {
-    "HLTPhysicsRun2016Hv2": list_trigger_2016, # -- now it also contains 2016Hv3 data
-    "HLTPhysicsRun2018D":   list_trigger_2018,
+    # "HLTPhysicsRun2016Hv2": list_trigger_2016, # -- now it also contains 2016Hv3 data
+    # "HLTPhysicsRun2018D":   list_trigger_2018,
+    "HLTPhysicsRun2016Hv2_v2": list_trigger_2016, # -- _v2: extrapolated eta & phi are included; Hv2 also has Hv3 ntuples
+    "HLTPhysicsRun2018D_v2":   list_trigger_2018,
 }
 
 for theDataset in dic_dataset_trigger.keys():

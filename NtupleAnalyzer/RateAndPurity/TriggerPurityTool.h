@@ -151,6 +151,12 @@ public:
 
   Bool_t applyL1QualityCut_ = kFALSE;
 
+  Bool_t useFirstObjectOnly_ = kFALSE;
+
+  Bool_t debug2 = kFALSE;
+
+  Bool_t usePropagatedEtaPhi_ = kFALSE;
+
   TriggerPurityTool( Double_t _EtaLo, Double_t _EtaUp )
   {
     this->maxEvents = -1;
@@ -241,6 +247,13 @@ public:
     applyL1QualityCut_ = flag;
   }
 
+  void Set_UseFirstObjectOnly(Bool_t flag = kTRUE)
+  {
+    useFirstObjectOnly_ = flag;
+  }
+
+  void Set_UsePropagatedEtaPhi( Bool_t flag = kTRUE ) { usePropagatedEtaPhi_ = flag; }
+
   void Analyze()
   {
     TH1::AddDirectory(kFALSE);
@@ -327,6 +340,8 @@ public:
     for(Int_t i_ev=0; i_ev<nEvent; i_ev++)
     {
       if( debug ) printf("\n ** event %d **\n", i_ev);
+      if( debug2 ) cout << "[" << i_ev << "th Event" << "]" << endl;
+
       ntuple->GetEvent( i_ev );
       loadBar(i_ev+1, nEvent, 100, 100);
 
@@ -389,17 +404,23 @@ public:
             else if( isL2 ) dRMax = 0.3;
             else            dRMax = 0.1; // -- L3 or isolation
 
+            if( isL1 && usePropagatedEtaPhi_ ) dRMax = 0.3;
+
+            TString triggerType = "";
+            if( isL1 ) triggerType = "L1";
+            if( isL2 ) triggerType = "L2";
+            else       triggerType = "L3";
+
+            Bool_t isFirstObject = kTRUE; // -- for useFirstObjectOnly_
+            if( debug2 ) cout << "Run over HLT objects..." << endl;
             for(size_t i_hlt=0; i_hlt<ntuple->vec_filterName->size(); i_hlt++)
             {
 
               if(strSel.Contains("_HLT")) {
                 HLTObject *HLTObj = new HLTObject( ntuple, i_hlt );
-
-                // -- reject low quality L1 muons (Q < 12)
-                if( applyL1QualityCut_ && isL1 )
+                if( debug2 )
                 {
-                  Double_t quality = Get_L1QualityOfL1TriggerObject(ntuple, HLTObj);
-                  if( quality < 12 ) continue;
+                  cout << "  [" << i_hlt << "th HLT object] (pt, eta, phi) = (" << HLTObj->pt << ", " << HLTObj->eta << ", " << HLTObj->phi << ")" << endl;
                 }
 
                 if( fabs(HLTObj->eta) >= this->EtaLo && fabs(HLTObj->eta) < this->EtaUp ) {
@@ -421,7 +442,20 @@ public:
                       if(debug)  cout << "\t --> pass eta cut " << endl;
                       if(debug)  cout << "\t --> pass filter: " << TriggerTag << endl;
 
-                      Bool_t isPass = this->offSelection( ntuple, HLTObj, strSel, dRMax );
+                      if( useFirstObjectOnly_ )
+                      {
+                        if( isFirstObject ) isFirstObject = kFALSE;
+                        else                continue;
+                      }
+
+                      // -- reject low quality L1 muons (Q < 12)
+                      if( applyL1QualityCut_ && isL1 )
+                      {
+                        Double_t quality = Get_L1QualityOfL1TriggerObject(ntuple, HLTObj);
+                        if( quality < 12 ) continue;
+                      }
+
+                      Bool_t isPass = this->offSelection( ntuple, HLTObj, strSel, dRMax, triggerType );
 
                       if(isPass) {
                         
@@ -454,6 +488,11 @@ public:
                 }
 
                 delete HLTObj;
+                if( debug2 )
+                {
+                  cout << "  end of " << i_hlt << "th HLT object calculation" << endl;
+                  cout << endl;
+                }
               }
 
               /*
@@ -491,6 +530,8 @@ public:
       }  // if runNum in RunRange
 
       ntuple->Clear();
+      if( debug2 ) cout << endl;
+      if( debug2 ) cout << endl;
     }  // end of Events iteration
 
     //-- save histograms
@@ -661,7 +702,7 @@ private:
   }
 
   template <class T>  // HLTObject or MYHLTObject
-  Bool_t offSelection( NtupleHandle *ntuple, T *L3Mu, TString _sel, Double_t dRMax )
+  Bool_t offSelection( NtupleHandle *ntuple, T *L3Mu, TString _sel, Double_t dRMax, TString triggerType )
   {
     TString sel = _sel;
 
@@ -691,6 +732,7 @@ private:
       for(Int_t i_mu=0; i_mu<ntuple->nMuon; i_mu++)
       {
         Muon *Mu = new Muon( ntuple, i_mu );
+        if( usePropagatedEtaPhi_ && triggerType == "L1" ) Mu->UpdateEtaPhi_PropagatedOne();
 
         Double_t deltaR = (L3Mu->vecP).DeltaR( Mu->vecP );
 
