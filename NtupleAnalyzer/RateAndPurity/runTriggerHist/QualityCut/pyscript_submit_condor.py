@@ -6,7 +6,9 @@ from RateAndPurity.CondorJobGenerator import *
 theBaseJobDir = "/data9/Users/kplee/MUO19001Jobs"
 theRootMacro = cwd+"/MuonTriggerHist.cxx" # -- macro name: should be sync. with the shell script to run
 theShellScript = cwd+"/script_runMacro_forCondor.sh"
-theVersion = "v209"
+theVersion = "v219" # -- extrapolated values
+# theVersion = "v211" # -- add oflfine histograms
+# theVersion = "v209" # -- quality cut
 
 # list_dataset = ["Run2016H", "Run2018D"]
 list_trigger_2016 = [
@@ -26,8 +28,10 @@ list_trigger_2018 = [
 ]
 
 dic_dataset_trigger = {
-    "HLTPhysicsRun2016Hv2": list_trigger_2016, # -- now it also contains 2016Hv3 data
-    "HLTPhysicsRun2018D":   list_trigger_2018,
+    # "HLTPhysicsRun2016Hv2": list_trigger_2016, # -- now it also contains 2016Hv3 data
+    # "HLTPhysicsRun2018D":   list_trigger_2018,
+    "HLTPhysicsRun2016Hv2_v2": list_trigger_2016,
+    "HLTPhysicsRun2018D_v2":   list_trigger_2018,
 }
 
 for theDataset in dic_dataset_trigger.keys():

@@ -33,5 +33,6 @@ void MuonTriggerHist( TString trigger = "", TString dataset = "", TString versio
   producer->Set_DataPath( vec_dataPath );
   producer->Set_OutputFile( f_output );
   producer->Set_ApplyL1QualityCut();
+  producer->Set_UsePropagatedEtaPhi();
   producer->Produce();
 }

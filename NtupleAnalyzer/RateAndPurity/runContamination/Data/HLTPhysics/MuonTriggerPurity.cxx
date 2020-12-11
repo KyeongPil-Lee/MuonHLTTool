@@ -13,7 +13,18 @@ void MuonTriggerPurity( TString Trigger = "", TString Dataset = "", TString Vers
 
   if(vec_Dataset.size()==0) {
     // vec_Data = {"../ntuple_77.root"};  // {"../ntuple_2001.root"};
-    vec_Data = {"/gv0/Users/kplee/MUO19001/HLTPhysicsRun2018D_v2/ntuple_1.root"};
+    vec_Data = {
+      "/gv0/Users/kplee/MUO19001/HLTPhysicsRun2018D_v2/ntuple_1.root", 
+      "/gv0/Users/kplee/MUO19001/HLTPhysicsRun2018D_v2/ntuple_2.root", 
+      "/gv0/Users/kplee/MUO19001/HLTPhysicsRun2018D_v2/ntuple_3.root", 
+      "/gv0/Users/kplee/MUO19001/HLTPhysicsRun2018D_v2/ntuple_4.root", 
+      "/gv0/Users/kplee/MUO19001/HLTPhysicsRun2018D_v2/ntuple_5.root",
+      "/gv0/Users/kplee/MUO19001/HLTPhysicsRun2018D_v2/ntuple_6.root",
+      "/gv0/Users/kplee/MUO19001/HLTPhysicsRun2018D_v2/ntuple_7.root",
+      "/gv0/Users/kplee/MUO19001/HLTPhysicsRun2018D_v2/ntuple_8.root",
+      "/gv0/Users/kplee/MUO19001/HLTPhysicsRun2018D_v2/ntuple_9.root",
+      "/gv0/Users/kplee/MUO19001/HLTPhysicsRun2018D_v2/ntuple_10.root"
+    };
   }
 
   vector< TString > vec_Sel = {
@@ -111,7 +122,7 @@ void MuonTriggerPurity( TString Trigger = "", TString Dataset = "", TString Vers
   tool->Set_HLTPhysicsDataset();
   tool->Set_ApplyL1QualityCut();
   // tool->Set_UseFirstObjectOnly();
-  tool->Set_UsePropagatedEtaPhi();
+  tool->Set_UsePropagatedEtaPhi(kTRUE, 0.3);
   // tool->debug = kTRUE;
   tool->Analyze();
   delete tool;

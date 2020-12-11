@@ -34,6 +34,68 @@ const double arr_ptBinEdge[25]  = { 0, 5, 10, 20, 24, 27, 30, 35, 40, 45, 50, 55
 const Int_t nEtaBin = 15;
 const double arr_etaBinEdge[16] = {-5, -2.4, -2.1, -1.6, -1.2, -0.9, -0.3, -0.2,  0.2, 0.3, 0.9, 1.2, 1.6, 2.1, 2.4, 5};
 
+class OfflineMuHistContainer
+{
+public:
+  // -- type
+  // -- all: all muons
+  // -- looseID: muons passing loose ID
+  TString type_;
+
+  vector<TH1D*> vec_hist_;
+  TH1D* h_pt_;
+  TH1D* h_eta_;
+  TH1D* h_phi_;
+  TH1D* h_pt_barrel_;
+  TH1D* h_pt_overlap_;
+  TH1D* h_pt_endcap_;
+
+  OfflineMuHistContainer(TString type)
+  {
+    type_ = type;
+    Init();
+  }
+
+  void Fill( Muon *mu, Double_t weight)
+  {
+    h_pt_->Fill( mu->pt, weight);
+    h_eta_->Fill( mu->eta, weight);
+    h_phi_->Fill( mu->phi, weight);
+
+    if( fabs(mu->eta) < 0.9 )                        h_pt_barrel_->Fill( mu->pt, weight);
+    if( 0.9 < fabs(mu->eta) && fabs(mu->eta) < 1.2 ) h_pt_overlap_->Fill( mu->pt, weight);
+    if( fabs(mu->eta) > 1.2 )                        h_pt_endcap_->Fill( mu->pt, weight);
+  }
+
+  void Save( TFile *f_output )
+  {
+    f_output->cd();
+
+    for( const auto& h : vec_hist_ ) 
+    {
+      h->Write();
+      delete h;
+    }
+    vector<TH1D*>().swap(vec_hist_);
+
+    cout << "[OfflineMuHistContainer::Save] Histograms are saved in: " << f_output->GetName() << endl;
+  }
+
+private:
+  void Init()
+  {
+    TH1::SetDefaultSumw2(kTRUE);
+    TH1::AddDirectory(kFALSE);
+
+    h_pt_  = new TH1D("h_pt_"+type_, "", nPtBin, arr_ptBinEdge );              vec_hist_.push_back( h_pt_ );
+    h_eta_ = new TH1D("h_eta_"+type_, "", nEtaBin, arr_etaBinEdge );           vec_hist_.push_back( h_eta_ );
+    h_phi_ = new TH1D("h_phi_"+type_, "", 20, (-1)*TMath::Pi(), TMath::Pi() ); vec_hist_.push_back( h_phi_ );
+
+    h_pt_barrel_  = new TH1D("h_pt_barrel_"+type_, "", nPtBin, arr_ptBinEdge );  vec_hist_.push_back( h_pt_barrel_ );
+    h_pt_overlap_ = new TH1D("h_pt_overlap_"+type_, "", nPtBin, arr_ptBinEdge ); vec_hist_.push_back( h_pt_overlap_ );
+    h_pt_endcap_  = new TH1D("h_pt_endcap_"+type_, "", nPtBin, arr_ptBinEdge );  vec_hist_.push_back( h_pt_endcap_ );
+  }
+};
 
 class HistContainer
 {
@@ -156,12 +218,15 @@ public:
 
   Bool_t applyL1QualityCut_ = kFALSE;
 
+  Bool_t usePropagatedEtaPhi_ = kFALSE;
+
   void Set_Trigger(TString trigger)                 { trigger_ = trigger; }
   void Set_HLTPhysicsDataset(Bool_t flag = kTRUE)   { isHLTPhysics_ = flag; }
   void Set_DataPath(vector<TString> vec_dataPath)   { vec_dataPath_ = vec_dataPath; }
   void Set_OutputFile(TFile* f_output)              { f_output_ = f_output; }
   void Set_UsePtMatching( Bool_t flag = kTRUE )     { usePtMatching_ = flag; }
   void Set_ApplyL1QualityCut( Bool_t flag = kTRUE ) { applyL1QualityCut_ = flag; }
+  void Set_UsePropagatedEtaPhi( Bool_t flag = kTRUE ) { usePropagatedEtaPhi_ = flag; }
 
   void Produce()
   {
@@ -171,12 +236,17 @@ public:
     else if( triggerType_ == "L2" ) dRMax = 0.3;
     else                            dRMax = 0.1; // -- L3 or isolation
 
+    if( triggerType_ == "L1" && usePropagatedEtaPhi_) dRMax = 0.3; // -- reduce the dR size as the propagated value is used
+
     // -- histograms
     HistContainer* hist_nonMuon       = new HistContainer("nonMuon");
     HistContainer* hist_matchedToReco = new HistContainer("matchedToReco");
     HistContainer* hist_nonIsolated   = new HistContainer("nonIsolated");
     HistContainer* hist_isolated      = new HistContainer("isolated");
 
+    // -- offline muon histograms
+    OfflineMuHistContainer* offlineHist_all     = new OfflineMuHistContainer("all");
+    OfflineMuHistContainer* offlineHist_looseID = new OfflineMuHistContainer("looseID");
 
     // -- make a chain
     TChain *chain = new TChain("ntupler/ntuple");
@@ -244,6 +314,14 @@ public:
 
       } // -- end of HLT object iteration
 
+      // -- iteration over offline muons
+      for(Int_t i_mu=0; i_mu<ntuple->nMuon; i_mu++)
+      {
+        Muon *mu = new Muon(ntuple, i_mu);
+        offlineHist_all->Fill( mu, weight );
+        if( mu->isLoose ) offlineHist_looseID->Fill( mu, weight );
+      }
+
     } // -- end of event iteration
 
     f_output_->cd();
@@ -251,8 +329,13 @@ public:
     hist_matchedToReco->Save(f_output_);
     hist_nonIsolated->Save(f_output_);
     hist_isolated->Save(f_output_);
+
+    offlineHist_all->Save(f_output_);
+    offlineHist_looseID->Save(f_output_);
+
     f_output_->Close();
   }
+  
 private:
   Muon* TrigObj_Offline_Matching( NtupleHandle* ntuple, HLTObject *HLTObj, Double_t dRMax, TString& matchingType )
   {
@@ -264,13 +347,18 @@ private:
     for(Int_t i_mu=0; i_mu<ntuple->nMuon; i_mu++)
     {
       Muon Mu(ntuple, i_mu);
+      if( usePropagatedEtaPhi_ && triggerType_ == "L1" ) Mu.UpdateEtaPhi_PropagatedOne();
+
       Double_t dR = (HLTObj->vecP).DeltaR( Mu.vecP );
 
       Double_t pt_HLTObj = HLTObj->pt;
       Double_t pt_reco   = Mu.pt;
       Double_t ptDiff = fabs(  (pt_HLTObj - pt_reco) / pt_reco  );
       Bool_t ptCheck;
-      if( usePtMatching_ ) ptCheck = ptDiff < 0.3;
+      // Double_t relPtDiffCut = 0.3;
+      // Double_t relPtDiffCut = 1.0;
+      Double_t relPtDiffCut = 2.0;
+      if( usePtMatching_ ) ptCheck = ptDiff < relPtDiffCut;
       else                 ptCheck = kTRUE;
 
       if( dR < dRMax && dR < dR_best && ptCheck )
