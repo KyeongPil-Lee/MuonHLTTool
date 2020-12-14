@@ -835,8 +835,8 @@ void MuonHLTNtupler::Fill_HLT(const edm::Event &iEvent, const edm::EventSetup &i
     const edm::TriggerNames names = iEvent.triggerNames(*h_triggerResults);
     for( pat::TriggerObjectStandAlone triggerObj : *h_triggerObject)
     {
-      // triggerObj.unpackNamesAndLabels(iEvent, *h_triggerResults); // -- does not work under 80X
-      triggerObj.unpackPathNames(names);
+      triggerObj.unpackNamesAndLabels(iEvent, *h_triggerResults); // -- does not work under 80X
+      // triggerObj.unpackPathNames(names);
 
       for( size_t i_filter = 0; i_filter < triggerObj.filterLabels().size(); ++i_filter )
       {
@@ -1199,33 +1199,33 @@ void MuonHLTNtupler::Fill_IterL3(const edm::Event &iEvent)
 // -- reference: https://github.com/cms-sw/cmssw/blob/master/DataFormats/MuonReco/src/MuonSelectors.cc#L910-L938
 // -- expectedNnumberOfMatchedStations() is not available under 80X: temporarily removed for the universality between 80X and 102X
 bool MuonHLTNtupler::isNewHighPtMuon(const reco::Muon& muon, const reco::Vertex& vtx){
-  // if(!muon.isGlobalMuon()) return false;
+  if(!muon.isGlobalMuon()) return false;
 
-  // bool muValHits = ( muon.globalTrack()->hitPattern().numberOfValidMuonHits()>0 ||
-  //                    muon.tunePMuonBestTrack()->hitPattern().numberOfValidMuonHits()>0 );
+  bool muValHits = ( muon.globalTrack()->hitPattern().numberOfValidMuonHits()>0 ||
+                     muon.tunePMuonBestTrack()->hitPattern().numberOfValidMuonHits()>0 );
 
-  // bool muMatchedSt = muon.numberOfMatchedStations()>1;
-  // if(!muMatchedSt) {
-  //   if( muon.isTrackerMuon() && muon.numberOfMatchedStations()==1 ) {
-  //     if( muon.expectedNnumberOfMatchedStations()<2 ||
-  //         !(muon.stationMask()==1 || muon.stationMask()==16) ||
-  //         muon.numberOfMatchedRPCLayers()>2
-  //       )
-  //       muMatchedSt = true;
-  //   }
-  // }
+  bool muMatchedSt = muon.numberOfMatchedStations()>1;
+  if(!muMatchedSt) {
+    if( muon.isTrackerMuon() && muon.numberOfMatchedStations()==1 ) {
+      if( muon.expectedNnumberOfMatchedStations()<2 ||
+          !(muon.stationMask()==1 || muon.stationMask()==16) ||
+          muon.numberOfMatchedRPCLayers()>2
+        )
+        muMatchedSt = true;
+    }
+  }
 
-  // bool muID = muValHits && muMatchedSt;
+  bool muID = muValHits && muMatchedSt;
 
-  // bool hits = muon.innerTrack()->hitPattern().trackerLayersWithMeasurement() > 5 &&
-  //   muon.innerTrack()->hitPattern().numberOfValidPixelHits() > 0; 
+  bool hits = muon.innerTrack()->hitPattern().trackerLayersWithMeasurement() > 5 &&
+    muon.innerTrack()->hitPattern().numberOfValidPixelHits() > 0; 
 
-  // bool momQuality = muon.tunePMuonBestTrack()->ptError()/muon.tunePMuonBestTrack()->pt() < 0.3;
+  bool momQuality = muon.tunePMuonBestTrack()->ptError()/muon.tunePMuonBestTrack()->pt() < 0.3;
 
-  // bool ip = fabs(muon.innerTrack()->dxy(vtx.position())) < 0.2 && fabs(muon.innerTrack()->dz(vtx.position())) < 0.5;
+  bool ip = fabs(muon.innerTrack()->dxy(vtx.position())) < 0.2 && fabs(muon.innerTrack()->dz(vtx.position())) < 0.5;
 
-  // return muID && hits && momQuality && ip;
-  return 0; // -- remove it when above lines are retrieved
+  return muID && hits && momQuality && ip;
+  // return 0; // -- remove it when above lines are retrieved
 
 }
 
