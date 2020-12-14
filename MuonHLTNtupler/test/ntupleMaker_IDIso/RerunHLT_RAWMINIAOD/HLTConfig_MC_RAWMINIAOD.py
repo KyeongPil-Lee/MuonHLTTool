@@ -12102,10 +12102,10 @@ modifyHLTforEras(process)
 # -- modification
 # -- RAW+MINIAOD
 process.source.fileNames = cms.untracked.vstring(
-  "root://cms-xrd-global.cern.ch//store/mc/Run3Winter20DRMiniAOD/DYToLL_M-50_TuneCP5_14TeV-pythia8/MINIAODSIM/DRFlatPU30to80_110X_mcRun3_2021_realistic_v6-v2/230000/FBAA112F-A923-324B-9CD6-BFDC0031162C.root",
+  "file:/afs/cern.ch/user/k/kplee/work/private/ROOTFile_Test/110X/Run3_IDIso/MINIAOD_DYLL_M50_Pythia8_Run3Winter20.root",
   )
 process.source.secondaryFileNames = cms.untracked.vstring(
-  "root://cms-xrd-global.cern.ch//store/mc/Run3Winter20DRMiniAOD/DYToLL_M-50_TuneCP5_14TeV-pythia8/GEN-SIM-RAW/DRFlatPU30to80_110X_mcRun3_2021_realistic_v6-v2/230000/4C05B8B2-2C67-9042-8DA3-42859514E7B9.root",
+  "file:/afs/cern.ch/user/k/kplee/work/private/ROOTFile_Test/110X/Run3_IDIso/GENSIMRAW_DYLL_M50_Pythia8_Run3Winter20.root",
   )
 process.maxEvents.input = cms.untracked.int32( -1 )
 
