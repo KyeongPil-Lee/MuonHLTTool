@@ -1,3 +1,5 @@
+#include <TStopwatch.h>
+
 #include <TagProbe/TnPTool.h>
 
 class TnPPair: public MuonHLT::TnPPairBase
