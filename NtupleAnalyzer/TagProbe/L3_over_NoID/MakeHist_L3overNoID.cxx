@@ -2,6 +2,53 @@
 
 #include <TagProbe/TnPTool.h>
 
+namespace TnPTool
+{
+
+// -- define Tag & Probe condition outside of TnPPair: 
+// ---- to use it in HistProducer (only loop over the muons passing tag or probe condition to reduce the runtime)
+Bool_t IsTag(MuonHLT::Muon mu, MuonHLT::NtupleHandle* ntuple)
+{
+  // -- IsoMu24 final filter: hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07 -- //
+  // -- IsoMu27 final filter: hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07 -- //
+  // -- Mu50 final filter: hltL3fL1sMu22Or25L1f0L2f10QL3Filtered50Q -- //
+  Bool_t flag = kFALSE;
+
+  if( MuonHLT::dRMatching_HLTObj(mu.vecP, ntuple, "hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07::HLT", 0.1) &&
+      mu.pt > 26 &&
+      fabs(mu.eta) < 2.4 &&
+      mu.isTight && 
+      mu.relPFIso_dBeta < 0.15 )
+    flag = kTRUE;
+
+  return flag;
+}
+
+Bool_t IsProbe(MuonHLT::Muon mu, MuonHLT::NtupleHandle* ntuple)
+{
+  Bool_t flag = kFALSE;
+
+  if( mu.isTight && 
+      mu.relPFIso_dBeta < 0.15 && 
+      MuonHLT::dRMatching_IterL3MuonNoID(mu.vecP, ntuple, -1.0, 0.1) )
+    flag = kTRUE;
+
+  return flag;
+}
+
+Bool_t IsPassingProbe(MuonHLT::Muon mu, MuonHLT::NtupleHandle* ntuple)
+{
+  Bool_t flag = kFALSE;
+  if( MuonHLT::dRMatching_L3Muon(mu.vecP, ntuple, -1.0, 0.1) )
+    flag = kTRUE;
+
+  return flag;
+}
+
+};
+
+
+
 class TnPPair: public MuonHLT::TnPPairBase
 {
 public:
@@ -12,44 +59,19 @@ public:
   }
 
   // -- user-defined tag condition -- //
-  Bool_t IsTag() {
-    // -- IsoMu24 final filter: hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07 -- //
-    // -- IsoMu27 final filter: hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07 -- //
-    // -- Mu50 final filter: hltL3fL1sMu22Or25L1f0L2f10QL3Filtered50Q -- //
-    Bool_t flag = kFALSE;
-
-    if( MuonHLT::dRMatching_HLTObj(tag_.vecP, ntuple_, "hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07::HLT", 0.1) &&
-        tag_.pt > 26 &&
-        fabs(tag_.eta) < 2.4 &&
-        tag_.isTight && 
-        tag_.relPFIso_dBeta < 0.15 )
-      flag = kTRUE;
-
-    // if( flag )
-    //   cout << "Tag is found" << endl;
-
-    return flag;
+  Bool_t IsTag() 
+  {
+    return TnPTool::IsTag(tag_, ntuple_);
   }
 
   Bool_t IsProbe()
   {
-    Bool_t flag = kFALSE;
-
-    if( probe_.isTight && 
-        probe_.relPFIso_dBeta < 0.15 && 
-        MuonHLT::dRMatching_IterL3MuonNoID(probe_.vecP, ntuple_, -1.0, 0.1) )
-      flag = kTRUE;
-
-    return flag;
+    return TnPTool::IsProbe(probe_, ntuple_);
   }
 
   Bool_t IsPassingProbe()
   {
-    Bool_t flag = kFALSE;
-    if( MuonHLT::dRMatching_L3Muon(probe_.vecP, ntuple_, -1.0, 0.1) )
-      flag = kTRUE;
-
-    return flag;
+    return TnPTool::IsPassingProbe(probe_, ntuple_);
   }
 };
 
@@ -61,11 +83,11 @@ public:
     outputFileName_ = outputFileName;
   }
 
-  void AddDataPath( TString dataPath )
-  {
-    printf("[Add data path: %s]\n", dataPath.Data() );
-    vec_dataPath.push_back( dataPath );
-  }
+  // void AddDataPath( TString dataPath )
+  // {
+  //   printf("[Add data path: %s]\n", dataPath.Data() );
+  //   vec_dataPath.push_back( dataPath );
+  // }
 
   void Set_minPt( Double_t value ) { minPt_ = value; }
 
@@ -102,6 +124,7 @@ public:
       for(Int_t i_tagCand=0; i_tagCand<ntuple->nMuon; i_tagCand++)
       {
         MuonHLT::Muon mu_tagCand( ntuple, i_tagCand );
+        if( !TnPTool::IsTag(mu_tagCand, ntuple) ) continue; // -- check here to save runtime
 
         // -- collect the probes sharing same tag
         vector<TnPPair*> vec_tnpPairs_sameTag;
@@ -112,6 +135,7 @@ public:
           if( i_tagCand == i_probeCand ) continue;
 
           MuonHLT::Muon mu_probeCand( ntuple, i_probeCand );
+          if( !TnPTool::IsProbe(mu_probeCand, ntuple) ) continue; // -- check here to save runtime
 
           TnPPair *tnpPair_ij = new TnPPair( mu_tagCand, mu_probeCand, ntuple );
           if( tnpPair_ij->IsValid() )
@@ -175,11 +199,6 @@ void MakeHist_L3overNoID(TString textFile_ntupleList)
   TString outputFileName = TString::Format("ROOTFile_TnPHist_L3overNoID_%s.root", textFile_ntupleList.Data());
   histProducer->Set_OutputFileName(outputFileName);
 
-  // TString basePath = gSystem->Getenv("MUONHLT_ANALYZER_PATH");
-  // TString ntuplePath = basePath+"/Include/exampleNtuple_Run3Winter20_ZToMuMuPowheg_M50to120.root";
-
-  // TString ntuplePath = "/gv0/Users/kplee/MuonHLT/Run3Winter20/noIDVar/ZToMuMu_M50to120_Powheg/*.root";
-  // histProducer->AddDataPath(ntuplePath);
   histProducer->Set_ntupleListFile(textFile_ntupleList);
   histProducer->Set_minPt( 26 ); // -- min pT applied for eta, phi and vtx
 

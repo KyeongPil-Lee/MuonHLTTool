@@ -13,5 +13,5 @@ Arguments            = "ntuplePathList_$(Process).txt"
 output               = condor/condor_output_$(Process).log
 error                = condor/condor_error_$(Process).log
 
-queue 30
+queue 5
 

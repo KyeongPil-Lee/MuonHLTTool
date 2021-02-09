@@ -1,7 +1,6 @@
 #include <TStopwatch.h>
 
-// #include <TagProbe/TnPTool.h>
-#include "TnPTool.h"
+#include <TagProbe/TnPTool.h>
 
 namespace TnPTool
 {
@@ -10,6 +9,9 @@ namespace TnPTool
 // ---- to use it in HistProducer (only loop over the muons passing tag or probe condition to reduce the runtime)
 Bool_t IsTag(MuonHLT::Muon mu, MuonHLT::NtupleHandle* ntuple)
 {
+  // -- IsoMu24 final filter: hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07 -- //
+  // -- IsoMu27 final filter: hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07 -- //
+  // -- Mu50 final filter: hltL3fL1sMu22Or25L1f0L2f10QL3Filtered50Q -- //
   Bool_t flag = kFALSE;
 
   if( MuonHLT::dRMatching_HLTObj(mu.vecP, ntuple, "hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07::HLT", 0.1) &&
@@ -28,7 +30,16 @@ Bool_t IsProbe(MuonHLT::Muon mu, MuonHLT::NtupleHandle* ntuple)
 
   if( mu.isTight && 
       mu.relPFIso_dBeta < 0.15 && 
-      MuonHLT::dRMatching_IterL3MuonNoID(mu.vecP, ntuple, -1.0, 0.1) )
+      MuonHLT::dRMatching_L3Muon(mu.vecP, ntuple, -1.0, 0.1) )
+    flag = kTRUE;
+
+  return flag;
+}
+
+Bool_t IsPassingProbe(MuonHLT::Muon mu, MuonHLT::NtupleHandle* ntuple)
+{
+  Bool_t flag = kFALSE;
+  if( MuonHLT::dRMatching_MYHLTObj(mu.vecP, ntuple, "hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07::MYHLT", 0.1) )
     flag = kTRUE;
 
   return flag;
@@ -48,46 +59,19 @@ public:
   }
 
   // -- user-defined tag condition -- //
-  Bool_t IsTag() {
-    // -- IsoMu24 final filter: hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07 -- //
-    // -- IsoMu27 final filter: hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07 -- //
-    // -- Mu50 final filter: hltL3fL1sMu22Or25L1f0L2f10QL3Filtered50Q -- //
-
-    // Bool_t flag = kFALSE;
-
-    // if( MuonHLT::dRMatching_HLTObj(tag_.vecP, ntuple_, "hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07::HLT", 0.1) &&
-    //     tag_.pt > 26 &&
-    //     fabs(tag_.eta) < 2.4 &&
-    //     tag_.isTight && 
-    //     tag_.relPFIso_dBeta < 0.15 )
-    //   flag = kTRUE;
-
-    // return flag;
-
+  Bool_t IsTag() 
+  {
     return TnPTool::IsTag(tag_, ntuple_);
   }
 
   Bool_t IsProbe()
   {
-    // Bool_t flag = kFALSE;
-
-    // if( probe_.isTight && 
-    //     probe_.relPFIso_dBeta < 0.15 && 
-    //     MuonHLT::dRMatching_IterL3MuonNoID(probe_.vecP, ntuple_, -1.0, 0.1) )
-    //   flag = kTRUE;
-
-    // return flag;
-
     return TnPTool::IsProbe(probe_, ntuple_);
   }
 
   Bool_t IsPassingProbe()
   {
-    Bool_t flag = kFALSE;
-    if( MuonHLT::dRMatching_L3Muon(probe_.vecP, ntuple_, -1.0, 0.1) )
-      flag = kTRUE;
-
-    return flag;
+    return TnPTool::IsPassingProbe(probe_, ntuple_);
   }
 };
 
@@ -99,21 +83,24 @@ public:
     outputFileName_ = outputFileName;
   }
 
-  void AddDataPath( TString dataPath )
-  {
-    printf("[Add data path: %s]\n", dataPath.Data() );
-    vec_dataPath.push_back( dataPath );
-  }
+  // void AddDataPath( TString dataPath )
+  // {
+  //   printf("[Add data path: %s]\n", dataPath.Data() );
+  //   vec_dataPath.push_back( dataPath );
+  // }
 
   void Set_minPt( Double_t value ) { minPt_ = value; }
+
+  void Set_ntupleListFile( TString fileName ) { fileName_ntupleList_ = fileName; }
 
   void Produce()
   {
     StartTimer();
 
     TChain* chain = new TChain("ntupler/ntuple");
-    for(const auto& dataPath : vec_dataPath )
-      chain->Add(dataPath);
+    // for(const auto& dataPath : vec_dataPath )
+    //   chain->Add(dataPath);
+    MuonHLT::AddNtupleToChain( chain, fileName_ntupleList_ );
 
     MuonHLT::NtupleHandle* ntuple = new MuonHLT::NtupleHandle( chain );
     // ntuple->TurnOnBranches_GenParticle();
@@ -121,33 +108,23 @@ public:
     ntuple->TurnOnBranches_HLTMuon();
     ntuple->TurnOnBranches_IterL3Muon();
 
-    if( debug_ ) cout << "turn on branches..." << endl;
-
     MuonHLT::TnPHistProducer* tnpHist = new MuonHLT::TnPHistProducer(minPt_);
-
-    if( debug_ ) cout << "Initialize TnP histograms ..." << endl;
 
     Int_t nEvent = chain->GetEntries();
     std::cout << "[Total event: " << nEvent << "]" << std::endl;
 
     for(Int_t i_ev=0; i_ev<nEvent; i_ev++)
     {
-      // MuonHLT::loadBar(i_ev+1, nEvent, 100, 100);
-
+      MuonHLT::loadBar(i_ev+1, nEvent, 100, 100);
       ntuple->GetEvent(i_ev);
-
-      if( debug_ ) cout << i_ev << "th event" << endl;
 
       Double_t weight = ntuple->isRealData? 1.0 : ntuple->genEventWeight;
 
       // -- make tag&pobe pair
-      if( debug_ ) printf("Start loop over all offline muons (nMuon = %d)\n", ntuple->nMuon);
-
       for(Int_t i_tagCand=0; i_tagCand<ntuple->nMuon; i_tagCand++)
       {
         MuonHLT::Muon mu_tagCand( ntuple, i_tagCand );
-        if( !TnPTool::IsTag(mu_tagCand, ntuple) ) continue;
-        if( debug_ ) printf("--> look for %dth tag candidate\n", i_tagCand);
+        if( !TnPTool::IsTag(mu_tagCand, ntuple) ) continue; // -- check here to save runtime
 
         // -- collect the probes sharing same tag
         vector<TnPPair*> vec_tnpPairs_sameTag;
@@ -158,8 +135,7 @@ public:
           if( i_tagCand == i_probeCand ) continue;
 
           MuonHLT::Muon mu_probeCand( ntuple, i_probeCand );
-          if( !TnPTool::IsProbe(mu_probeCand, ntuple) ) continue;
-          if( debug_ ) printf("----> look for %dth probe candidate\n", i_probeCand);
+          if( !TnPTool::IsProbe(mu_probeCand, ntuple) ) continue; // -- check here to save runtime
 
           TnPPair *tnpPair_ij = new TnPPair( mu_tagCand, mu_probeCand, ntuple );
           if( tnpPair_ij->IsValid() )
@@ -169,7 +145,6 @@ public:
         } // -- end of iteration for the probe candidate
 
         // -- fill TnP histogram only when probeMultiplicity == 1
-        if( debug_ ) printf("--> Fill the histogram (only when probeMultiplicit==1, this case: probeMulti = %d)\n", (Int_t)vec_tnpPairs_sameTag.size());
         if( (Int_t)vec_tnpPairs_sameTag.size() == 1 ) 
           tnpHist->Fill( vec_tnpPairs_sameTag[0], weight );
 
@@ -177,8 +152,6 @@ public:
           delete tnpPair;
 
       } // -- end of iteration for tag candidate
-
-      if( debug_ ) cout << endl;
 
     } // -- end of event iteration
 
@@ -199,7 +172,7 @@ private:
   vector<TString> vec_dataPath;
   Double_t minPt_;
 
-  Bool_t debug_ = kTRUE;
+  TString fileName_ntupleList_ = "";
 
   void StartTimer()
   {
@@ -220,16 +193,13 @@ private:
 };
 
 
-void MakeHist_IDoverL3()
+void MakeHist_ISOoverL3(TString textFile_ntupleList)
 {
   HistProducer* histProducer = new HistProducer();
-  histProducer->Set_OutputFileName("ROOTFile_TnPHist_IDoverL3.root");
+  TString outputFileName = TString::Format("ROOTFile_TnPHist_L3overNoID_%s.root", textFile_ntupleList.Data());
+  histProducer->Set_OutputFileName(outputFileName);
 
-  // TString basePath = gSystem->Getenv("MUONHLT_ANALYZER_PATH");
-  // TString ntuplePath = basePath+"/Include/exampleNtuple_Run3Winter20_ZToMuMuPowheg_M50to120.root";
-
-  TString ntuplePath = "exampleNtuple_Run3Winter20_ZToMuMuPowheg_M50to120.root";
-  histProducer->AddDataPath(ntuplePath);
+  histProducer->Set_ntupleListFile(textFile_ntupleList);
   histProducer->Set_minPt( 26 ); // -- min pT applied for eta, phi and vtx
 
   histProducer->Produce();
