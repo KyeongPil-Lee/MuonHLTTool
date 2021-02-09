@@ -358,7 +358,7 @@ public:
 
   CanvasBase(TString canvasName, Bool_t isLogX = kFALSE, Bool_t isLogY = kFALSE )
   {
-    canvasName_ = canvasName_;
+    canvasName_ = canvasName;
     isLogX_ = isLogX;
     isLogY_ = isLogY;
   }
