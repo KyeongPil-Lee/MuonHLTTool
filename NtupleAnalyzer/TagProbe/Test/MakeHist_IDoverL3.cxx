@@ -183,7 +183,7 @@ void MakeHist_IDoverL3()
   // TString basePath = gSystem->Getenv("MUONHLT_ANALYZER_PATH");
   // TString ntuplePath = basePath+"/Include/exampleNtuple_Run3Winter20_ZToMuMuPowheg_M50to120.root";
 
-  TString ntuplePath = "/gv0/Users/kplee/MuonHLT/Run3Winter20/noIDVar/ZToMuMu_M50to120_Powheg/*.root";
+  TString ntuplePath = "exampleNtuple_Run3Winter20_ZToMuMuPowheg_M50to120.root";
   histProducer->AddDataPath(ntuplePath);
   histProducer->Set_minPt( 26 ); // -- min pT applied for eta, phi and vtx
 
