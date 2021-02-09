@@ -1,3 +1,5 @@
+#include <TEfficiency.h>
+
 #include <Include/MuonHLTTool.h>
 #include <Include/SimplePlotTools.h>
 

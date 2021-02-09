@@ -164,10 +164,10 @@ private:
 };
 
 
-void MakeHist_IDoverL3()
+void MakeHist_L3overNoID()
 {
   HistProducer* histProducer = new HistProducer();
-  histProducer->Set_OutputFileName("ROOTFile_TnPHist_IDoverL3.root");
+  histProducer->Set_OutputFileName("ROOTFile_TnPHist_L3overNoID.root");
 
   // TString basePath = gSystem->Getenv("MUONHLT_ANALYZER_PATH");
   // TString ntuplePath = basePath+"/Include/exampleNtuple_Run3Winter20_ZToMuMuPowheg_M50to120.root";

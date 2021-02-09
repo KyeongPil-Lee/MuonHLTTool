@@ -1,4 +1,5 @@
 #include <Include/Object.h>
+#include <fstream>
 #include <iostream>
 
 namespace MuonHLT
@@ -189,6 +190,29 @@ static inline void loadBar(int x, int n, int r, int w)
     // previous line and clear it.
   cout << "]\r" << flush;
 
+}
+
+void AddNtupleToChain(TChain* chain, TString textFileName)
+{
+  ifstream openFile( textFileName.Data() );
+  cout << "===============================" << endl;
+  cout << "Read " << textFileName << endl;
+  cout << "===============================" << endl;
+
+  if( openFile.is_open() )
+  {
+    string line;
+    while(getline(openFile, line))
+    {
+      cout << line << endl;
+      chain->Add(line.data());
+    }
+    openFile.close();
+  }
+
+  cout << "==================================" << endl;
+  cout << "All ROOT Files are put into TChain" << endl;
+  cout << "==================================" << endl;
 }
 
 
