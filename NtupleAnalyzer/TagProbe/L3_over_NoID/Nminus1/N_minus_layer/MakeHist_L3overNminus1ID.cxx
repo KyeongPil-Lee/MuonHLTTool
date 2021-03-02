@@ -1,4 +1,4 @@
-#include <TagProbe/L3_over_NoID/Nminus1/MakeHist_L3overNminus1ID.cxx>
+#include <TagProbe/L3_over_NoID/Nminus1/MakeHist_L3overNminus1ID.h>
 
 void MakeHist_L3overNminus1ID(TString textFile_ntupleList)
 {
