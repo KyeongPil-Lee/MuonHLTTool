@@ -760,6 +760,12 @@ public:
   Int_t    isSTA;
   Int_t    isTRK;
 
+  Int_t TMOST; // -- TMOneStationTight
+  Int_t nTrackerLayer;
+  Int_t nPixelLayer;
+  Int_t expectedNMatchedStation;
+  Int_t nMatchedStation;
+
   IterL3MuonNoID()
   {
     Init();
@@ -783,6 +789,12 @@ public:
     isGLB = ntuple->iterL3MuonNoID_isGLB[index];
     isSTA = ntuple->iterL3MuonNoID_isSTA[index];
     isTRK = ntuple->iterL3MuonNoID_isTRK[index];
+
+    TMOST                   = ntuple->iterL3MuonNoID_TMOST[index];
+    nTrackerLayer           = ntuple->iterL3MuonNoID_nTrackerLayer[index];
+    nPixelLayer             = ntuple->iterL3MuonNoID_nPixelLayer[index];
+    expectedNMatchedStation = ntuple->iterL3MuonNoID_expectedNMatchedStation[index];
+    nMatchedStation         = ntuple->iterL3MuonNoID_nMatchedStation[index];
   }
 
 private:
@@ -796,6 +808,12 @@ private:
     isGLB = -999;
     isSTA = -999;
     isTRK = -999;
+
+    TMOST = -999;
+    nTrackerLayer = -999;
+    nPixelLayer = -999;
+    expectedNMatchedStation = -999;
+    nMatchedStation = -999;
   }
 };
 
