@@ -15,5 +15,6 @@
 <use name="RecoMuon/Records"/>
 <use name="RecoMuon/DetLayers"/>
 <use name="MuonAnalysis/MuonAssociators"/>
+<use name="SimDataFormats/GeneratorProducts"/>
 <!--   <flags   EDM_PLUGIN="1"/> -->
 <flags EDM_PLUGIN="1"/>

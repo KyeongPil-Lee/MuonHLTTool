@@ -907,7 +907,7 @@ void MuonHLTNtupler::Fill_HLTMuon(const edm::Event &iEvent)
   {
     edm::Handle<reco::RecoChargedCandidateIsolationMap> h_ECALIsoMap;
     edm::Handle<reco::RecoChargedCandidateIsolationMap> h_HCALIsoMap;
-    edm::Handle<reco::RecoChargedCandidateIsolationMap> h_trkTIsoMap;
+    edm::Handle<reco::RecoChargedCandidateIsolationMap> h_trkIsoMap;
 
     int _nL3Muon = 0;
     for(unsigned int i_L3=0; i_L3<h_L3Muon->size(); i_L3++)
