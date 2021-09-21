@@ -10,7 +10,7 @@ git cms-init
 
 git cms-addpkg HLTrigger/Configuration
 git clone https://github.com/khaosmos93/MuonHLTForRun3.git HLTrigger/Configuration/python/MuonHLTForRun3
-git clone git@github.com:KyeongPil-Lee/MuonHLTTool.git
+git clone git@github.com:KyeongPil-Lee/MuonHLTTool.git -b Run3_IDIso
 
 scram b -j 8 >&scram.log&
 ```
