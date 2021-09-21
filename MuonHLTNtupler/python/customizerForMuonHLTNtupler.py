@@ -28,14 +28,14 @@ def customizerFuncForMuonHLTNtupler(process, newProcessName = "MYHLT"):
     process.ntupler.L3Muon           = cms.untracked.InputTag("hltIterL3MuonCandidates", "",     newProcessName)
     process.ntupler.TkMuon           = cms.untracked.InputTag("hltHighPtTkMuonCands",    "",     newProcessName)
 
-    process.ntupler.ECALIsoMap = cms.untracked.InputTag("HLTL3muonEcalPFisorecoSequenceNoBoolsForMuons", "",               newProcessName),
-    process.ntupler.HCALIsoMap = cms.untracked.InputTag("HLTL3muonHcalPFisorecoSequenceNoBoolsForMuons", "" ,              newProcessName),
-    process.ntupler.trkIsoMap  = cms.untracked.InputTag("hltMuonTkRelIsolationCut0p07Map",               "trkIsoDeposits", newProcessName),
+    process.ntupler.ECALIsoMap = cms.untracked.InputTag("HLTL3muonEcalPFisorecoSequenceNoBoolsForMuons", "",               newProcessName)
+    process.ntupler.HCALIsoMap = cms.untracked.InputTag("HLTL3muonHcalPFisorecoSequenceNoBoolsForMuons", "" ,              newProcessName)
+    process.ntupler.trkIsoMap  = cms.untracked.InputTag("hltMuonTkRelIsolationCut0p07Map",               "trkIsoDeposits", newProcessName)
 
-    process.ntupler.iterL3MuonNoID.iterL3OI        = cms.untracked.InputTag("hltL3MuonsIterL3OI",                   "", newProcessName),
-    process.ntupler.iterL3MuonNoID.iterL3IOFromL2  = cms.untracked.InputTag("hltL3MuonsIterL3IO",                   "", newProcessName),
-    process.ntupler.iterL3MuonNoID.iterL3FromL2    = cms.untracked.InputTag("hltIterL3MuonsFromL2LinksCombination", "", newProcessName),
-    process.ntupler.iterL3MuonNoID.iterL3IOFromL1  = cms.untracked.InputTag("hltIter3IterL3FromL1MuonMerged",       "", newProcessName),
+    process.ntupler.iterL3MuonNoID.iterL3OI        = cms.untracked.InputTag("hltL3MuonsIterL3OI",                   "", newProcessName)
+    process.ntupler.iterL3MuonNoID.iterL3IOFromL2  = cms.untracked.InputTag("hltL3MuonsIterL3IO",                   "", newProcessName)
+    process.ntupler.iterL3MuonNoID.iterL3FromL2    = cms.untracked.InputTag("hltIterL3MuonsFromL2LinksCombination", "", newProcessName)
+    process.ntupler.iterL3MuonNoID.iterL3IOFromL1  = cms.untracked.InputTag("hltIter3IterL3FromL1MuonMerged",       "", newProcessName)
     process.ntupler.iterL3MuonNoID                 = cms.untracked.InputTag("hltIterL3MuonsNoID",                   "", newProcessName)
 
     process.TFileService = cms.Service("TFileService",
