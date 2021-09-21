@@ -66,6 +66,9 @@ t_triggerEvent_      ( mayConsume< trigger::TriggerEvent >                (iConf
 t_myTriggerResults_  ( consumes< edm::TriggerResults >                    (iConfig.getUntrackedParameter<edm::InputTag>("myTriggerResults"  )) ),
 t_myTriggerEvent_    ( mayConsume< trigger::TriggerEvent >                (iConfig.getUntrackedParameter<edm::InputTag>("myTriggerEvent"    )) ), // -- not used in miniAOD case
 t_L3Muon_            ( consumes< reco::RecoChargedCandidateCollection >   (iConfig.getUntrackedParameter<edm::InputTag>("L3Muon"            )) ),
+t_ECALIsoMap_        ( consumes< reco::RecoChargedCandidateIsolationMap > (iConfig.getUntrackedParameter<edm::InputTag>("ECALIsoMap"        )) ),
+t_HCALIsoMap_        ( consumes< reco::RecoChargedCandidateIsolationMap > (iConfig.getUntrackedParameter<edm::InputTag>("HCALIsoMap"        )) ),
+t_trkIsoMap_         ( consumes< reco::IsoDepositMap >                    (iConfig.getUntrackedParameter<edm::InputTag>("trkIsoMap"         )) ),
 t_L2Muon_            ( consumes< reco::RecoChargedCandidateCollection >   (iConfig.getUntrackedParameter<edm::InputTag>("L2Muon"            )) ),
 t_L1Muon_            ( consumes< l1t::MuonBxCollection  >                 (iConfig.getUntrackedParameter<edm::InputTag>("L1Muon"            )) ),
 t_TkMuon_            ( consumes< reco::RecoChargedCandidateCollection >   (iConfig.getUntrackedParameter<edm::InputTag>("TkMuon"            )) ),
@@ -328,6 +331,9 @@ void MuonHLTNtupler::Init()
     L3Muon_phi_[i] = -999;
     L3Muon_charge_[i] = -999;
     L3Muon_trkPt_[i] = -999;
+    L3Muon_ECALIso_[i] = -999;
+    L3Muon_HCALIso_[i] = -999;
+    L3Muon_trkIso_[i] = -999;
   }
 
   nL2Muon_ = 0;
@@ -558,6 +564,9 @@ void MuonHLTNtupler::Make_Branch()
   ntuple_->Branch("L3Muon_phi", &L3Muon_phi_, "L3Muon_phi[nL3Muon]/D");
   ntuple_->Branch("L3Muon_charge", &L3Muon_charge_, "L3Muon_charge[nL3Muon]/D");
   ntuple_->Branch("L3Muon_trkPt", &L3Muon_trkPt_, "L3Muon_trkPt[nL3Muon]/D");
+  ntuple_->Branch("L3Muon_ECALIso", &L3Muon_ECALIso_, "L3Muon_ECALIso[nL3Muon]/D");
+  ntuple_->Branch("L3Muon_HCALIso", &L3Muon_HCALIso_, "L3Muon_HCALIso[nL3Muon]/D");
+  ntuple_->Branch("L3Muon_trkIso",  &L3Muon_trkIso_,  "L3Muon_trkIso[nL3Muon]/D");
 
   ntuple_->Branch("nL2Muon", &nL2Muon_, "nL2Muon/I");
   ntuple_->Branch("L2Muon_pt", &L2Muon_pt_, "L2Muon_pt[nL2Muon]/D");
@@ -896,6 +905,10 @@ void MuonHLTNtupler::Fill_HLTMuon(const edm::Event &iEvent)
   edm::Handle<reco::RecoChargedCandidateCollection> h_L3Muon;
   if( iEvent.getByToken( t_L3Muon_, h_L3Muon ) )
   {
+    edm::Handle<reco::RecoChargedCandidateIsolationMap> h_ECALIsoMap;
+    edm::Handle<reco::RecoChargedCandidateIsolationMap> h_HCALIsoMap;
+    edm::Handle<reco::RecoChargedCandidateIsolationMap> h_trkTIsoMap;
+
     int _nL3Muon = 0;
     for(unsigned int i_L3=0; i_L3<h_L3Muon->size(); i_L3++)
     {
@@ -909,7 +922,24 @@ void MuonHLTNtupler::Fill_HLTMuon(const edm::Event &iEvent)
       reco::TrackRef trackRef = ref_L3Mu->track();
       L3Muon_trkPt_[_nL3Muon] = trackRef->pt();
 
+      if( iEvent.getByToken(t_ECALIsoMap_, h_ECALIsoMap) )
+      {
+        reco::RecoChargedCandidateIsolationMap::const_iterator iter_ECALIsoMap = (*h_ECALIsoMap).find( ref_L3Mu );
+        L3Muon_ECALIso_[_nL3Muon] = iter_ECALIsoMap->val;
+      }
+      if( iEvent.getByToken(t_HCALIsoMap_, h_HCALIsoMap) )
+      {
+        reco::RecoChargedCandidateIsolationMap::const_iterator iter_HCALIsoMap = (*h_HCALIsoMap).find( ref_L3Mu );
+        L3Muon_HCALIso_[_nL3Muon] = iter_HCALIsoMap->val;
+      }
+      if( iEvent.getByToken(t_trkIsoMap_, h_trkIsoMap) )
+      {
+        reco::IsoDeposit trkIsoDeposit = (*h_trkIsoMap)[ref_L3Mu];
+        L3Muon_trkIso_[_nL3Muon] = trkIsoDeposit.depositWithin(0.3);
+      }
+
       _nL3Muon++;
+
     }
     nL3Muon_ = _nL3Muon;
   } // -- if( L3 handle is valid ) -- //

@@ -93,6 +93,9 @@ private:
   edm::EDGetTokenT< trigger::TriggerEvent >                  t_myTriggerEvent_;
 
   edm::EDGetTokenT< reco::RecoChargedCandidateCollection >   t_L3Muon_;
+  edm::EDGetTokenT< reco::RecoChargedCandidateIsolationMap > t_ECALIsoMap_;
+  edm::EDGetTokenT< reco::RecoChargedCandidateIsolationMap > t_HCALIsoMap_;
+  edm::EDGetTokenT< reco::IsoDepositMap >                    t_trkIsoMap_;
   edm::EDGetTokenT< reco::RecoChargedCandidateCollection >   t_L2Muon_;
   edm::EDGetTokenT< l1t::MuonBxCollection >                  t_L1Muon_;
   edm::EDGetTokenT< reco::RecoChargedCandidateCollection >   t_TkMuon_;
@@ -258,6 +261,10 @@ private:
   double L3Muon_phi_[arrSize_];
   double L3Muon_charge_[arrSize_];
   double L3Muon_trkPt_[arrSize_];
+
+  double L3Muon_ECALIso_[arrSize_];
+  double L3Muon_HCALIso_[arrSize_];
+  double L3Muon_trkIso_[arrSize_];
 
   // -- L2 muon
   int nL2Muon_;

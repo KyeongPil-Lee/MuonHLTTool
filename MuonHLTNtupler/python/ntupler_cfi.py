@@ -20,6 +20,10 @@ ntuplerBase = cms.EDAnalyzer("MuonHLTNtupler",
 	L3Muon = cms.untracked.InputTag("hltIterL3MuonCandidates", "",     "MYHLT"),
 	TkMuon = cms.untracked.InputTag("hltHighPtTkMuonCands",    "",     "MYHLT"),
 
+	ECALIsoMap = cms.untracked.InputTag("HLTL3muonEcalPFisorecoSequenceNoBoolsForMuons", "",               "MYHLT"),
+	HCALIsoMap = cms.untracked.InputTag("HLTL3muonHcalPFisorecoSequenceNoBoolsForMuons", "" ,              "MYHLT"),
+	trkIsoMap  = cms.untracked.InputTag("hltMuonTkRelIsolationCut0p07Map",               "trkIsoDeposits", "MYHLT"),
+
 	iterL3OI        = cms.untracked.InputTag("hltL3MuonsIterL3OI",                   "", "MYHLT"),
 	iterL3IOFromL2  = cms.untracked.InputTag("hltL3MuonsIterL3IO",                   "", "MYHLT"),
 	iterL3FromL2    = cms.untracked.InputTag("hltIterL3MuonsFromL2LinksCombination", "", "MYHLT"),
