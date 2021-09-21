@@ -20,8 +20,8 @@ ntuplerBase = cms.EDAnalyzer("MuonHLTNtupler",
 	L3Muon = cms.untracked.InputTag("hltIterL3MuonCandidates", "",     "MYHLT"),
 	TkMuon = cms.untracked.InputTag("hltHighPtTkMuonCands",    "",     "MYHLT"),
 
-	ECALIsoMap = cms.untracked.InputTag("HLTL3muonEcalPFisorecoSequenceNoBoolsForMuons", "",               "MYHLT"),
-	HCALIsoMap = cms.untracked.InputTag("HLTL3muonHcalPFisorecoSequenceNoBoolsForMuons", "" ,              "MYHLT"),
+	ECALIsoMap = cms.untracked.InputTag("hltMuonEcalMFPFClusterIsoForMuons", "",               "MYHLT"),
+	HCALIsoMap = cms.untracked.InputTag("hltMuonHcalRegPFClusterIsoForMuons", "" ,              "MYHLT"),
 	trkIsoMap  = cms.untracked.InputTag("hltMuonTkRelIsolationCut0p07Map",               "trkIsoDeposits", "MYHLT"),
 
 	iterL3OI        = cms.untracked.InputTag("hltL3MuonsIterL3OI",                   "", "MYHLT"),
@@ -46,6 +46,7 @@ ntuplerBase = cms.EDAnalyzer("MuonHLTNtupler",
 	l1tAlgBlkInputTag     = cms.InputTag("gtStage2Digis"), # -- for L1TGlobalUtil
 	l1tExtBlkInputTag     = cms.InputTag("gtStage2Digis"), # -- for L1TGlobalUtil
 	ReadPrescalesFromFile = cms.bool( False ),             # -- for L1TGlobalUtil
+	stageL1Trigger        = cms.uint32( 2 ),               # -- newly added in higher CMSSW version
 
 	# isMiniAOD             = cms.untracked.bool(True),
 	# triggerObject_miniAOD = cms.untracked.InputTag("slimmedPatTrigger")

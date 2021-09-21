@@ -5,8 +5,8 @@ config.General.requestName = ''
 config.General.workArea = 'CRABDir'
 
 config.JobType.pluginName = 'Analysis'
-config.JobType.psetName = '' # -- should be filled
-config.JobType.numCores = 4
+config.JobType.psetName = 'hlt_muon_Run3_mc.py' # -- should be filled
+config.JobType.numCores = 1
 # config.JobType.maxMemoryMB = 2500
 # config.JobType.maxJobRuntimeMin = 2000
 
