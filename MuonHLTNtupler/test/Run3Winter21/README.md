@@ -21,15 +21,20 @@ scram b -j 8 >&scram.log&
 
 ## Step 1: hltGetConfiguration
 
+* works only in **lxplus** (as far as I know)
+  * ```/afs/cern.ch/user/k/kplee/work/private/Detector/MuonHLTTool/Run3_IDIso/CMSSW_12_0_1/src```
+
 ```
 hltGetConfiguration /dev/CMSSW_12_0_0/GRun/V6 --type GRun \
 --path HLTriggerFirstPath,HLT_IsoMu24_v*,HLT_Mu50_v*,HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v*,HLTriggerFinalPath,HLTAnalyzerEndpath \
 --unprescale --cff >$CMSSW_BASE/src/HLTrigger/Configuration/python/HLT_MuonHLT_cff.py
 ```
 
-
+-> once it is generated in lxplus, scp the file to your working machine from lxplus
 
 ## Step 2: cmsDriver
+
+* works anywhere if the above configuration is available in the working space
 
 ### for MC:
 
