@@ -24,9 +24,9 @@ config.Site.storageSite = 'T2_BE_IIHE'
 
 # config.Data.lumiMask = './Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON_Last5invfb.txt'
 
-config.JobType.allowUndistributedCMSSW = True
+# config.JobType.allowUndistributedCMSSW = True
 
-version = 'v01'
+version = 'v02'
 config.Data.outLFNDirBase = '/store/user/kplee/MuonHLTTree_%s' % version
 
 # 'MultiCRAB' part
