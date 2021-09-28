@@ -327,6 +327,14 @@ public:
   Double_t charge;
   Double_t trkPt;
 
+  Double_t ECALIso;
+  Double_t HCALIso;
+  Double_t trkIso;
+
+  Double_t relECALIso;
+  Double_t relHCALIso;
+  Double_t relTrkIso;
+
   L3Muon()
   {
     Init();
@@ -347,6 +355,14 @@ public:
 
     charge = ntuple->L3Muon_charge[index];
     trkPt  = ntuple->L3Muon_trkPt[index];
+
+    ECALIso = ntuple->L3Muon_ECALIso[index];
+    HCALIso = ntuple->L3Muon_HCALIso[index];
+    trkIso  = ntuple->L3Muon_trkIso[index];
+
+    relECALIso = ECALIso / pt;
+    relHCALIso = HCALIso / pt;
+    relTrkIso  = trkIso / pt;
   }
 
 private:
@@ -358,6 +374,14 @@ private:
     mass = -999;
     charge = -999;
     trkPt = -999;
+
+    ECALIso = -999.0;
+    HCALIso = -999.0;
+    trkIso = -999.0;
+
+    relECALIso = -999.0;
+    relHCALIso = -999.0;
+    relTrkIso = -999.0;
   }
 };
 

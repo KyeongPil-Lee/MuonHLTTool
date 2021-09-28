@@ -133,6 +133,10 @@ public:
   Double_t        L3Muon_charge[ArrSize];
   Double_t        L3Muon_trkPt[ArrSize];
 
+  Double_t        L3Muon_ECALIso[ArrSize];
+  Double_t        L3Muon_HCALIso[ArrSize];
+  Double_t        L3Muon_trkIso[ArrSize];
+
   // -- L2 muons
   Int_t           nL2Muon;
   Double_t        L2Muon_pt[ArrSize];
@@ -579,6 +583,15 @@ public:
 
     chain_->SetBranchStatus("L3Muon_trkPt", 1);
     chain_->SetBranchAddress("L3Muon_trkPt", &L3Muon_trkPt);
+
+    chain_->SetBranchStatus("L3Muon_ECALIso", 1);
+    chain_->SetBranchAddress("L3Muon_ECALIso", &L3Muon_ECALIso);
+
+    chain_->SetBranchStatus("L3Muon_HCALIso", 1);
+    chain_->SetBranchAddress("L3Muon_HCALIso", &L3Muon_HCALIso);
+
+    chain_->SetBranchStatus("L3Muon_trkIso", 1);
+    chain_->SetBranchAddress("L3Muon_trkIso", &L3Muon_trkIso);
 
     chain_->SetBranchStatus("nL2Muon", 1);
     chain_->SetBranchAddress("nL2Muon", &nL2Muon);

@@ -1,6 +1,9 @@
 #include <Include/Object.h>
 #include <fstream>
 #include <iostream>
+#include <vector>
+
+#include <TH1.h>
 
 namespace MuonHLT
 {
@@ -213,6 +216,28 @@ void AddNtupleToChain(TChain* chain, TString textFileName)
   cout << "==================================" << endl;
   cout << "All ROOT Files are put into TChain" << endl;
   cout << "==================================" << endl;
+}
+
+Bool_t Find_CorrespondingL3Muon(MuonHLT::MYHLTObject HLTObj, MuonHLT::NtupleHandle* ntuple, MuonHLT::L3Muon& theL3Muon)
+{
+  Bool_t isFound = kFALSE;
+
+  vector<MuonHLT::L3Muon> vec_L3Muon = GetAllL3Muon(ntuple);
+
+  for(auto& L3Muon : vec_L3Muon )
+  {
+    Double_t relDiff_pt = (L3Muon.pt - HLTObj.pt) / HLTObj.pt;
+    Double_t dR = HLTObj.vecP.DeltaR( L3Muon.vecP );
+
+    if( relDiff_pt < 0.001 && dR < 0.01 )
+    {
+      theL3Muon = L3Muon;
+      isFound = kTRUE;
+      break;
+    }
+  }
+
+  return isFound;
 }
 
 
