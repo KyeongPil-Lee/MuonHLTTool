@@ -31,6 +31,21 @@ public:
     TH1D* h_IsoMu24Obj_pt  = new TH1D("h_IsoMu24Obj_pt", "", 10000, 0, 10000);
     TH1D* h_IsoMu24Obj_eta = new TH1D("h_IsoMu24Obj_eta", "", 60, -3, 3);
     TH1D* h_IsoMu24Obj_phi = new TH1D("h_IsoMu24Obj_phi", "", 80, -4, 4);
+
+    TH1D* h_IsoMu24Obj_ECALIso_EE = new TH1D("h_IsoMu24Obj_ECALIso_EE", "", 10000, 0, 10000);
+    TH1D* h_IsoMu24Obj_ECALIso_EB = new TH1D("h_IsoMu24Obj_ECALIso_EB", "", 10000, 0, 10000);
+    TH1D* h_IsoMu24Obj_relECALIso_EE = new TH1D("h_IsoMu24Obj_relECALIso_EE", "", 1000, 0, 10);
+    TH1D* h_IsoMu24Obj_relECALIso_EB = new TH1D("h_IsoMu24Obj_relECALIso_EB", "", 1000, 0, 10);
+
+    TH1D* h_IsoMu24Obj_HCALIso_EE = new TH1D("h_IsoMu24Obj_HCALIso_EE", "", 10000, 0, 10000);
+    TH1D* h_IsoMu24Obj_HCALIso_EB = new TH1D("h_IsoMu24Obj_HCALIso_EB", "", 10000, 0, 10000);
+    TH1D* h_IsoMu24Obj_relHCALIso_EE = new TH1D("h_IsoMu24Obj_relHCALIso_EE", "", 1000, 0, 10);
+    TH1D* h_IsoMu24Obj_relHCALIso_EB = new TH1D("h_IsoMu24Obj_relHCALIso_EB", "", 1000, 0, 10);
+
+    TH1D* h_IsoMu24Obj_trkIso_EE = new TH1D("h_IsoMu24Obj_trkIso_EE", "", 10000, 0, 10000);
+    TH1D* h_IsoMu24Obj_trkIso_EB = new TH1D("h_IsoMu24Obj_trkIso_EB", "", 10000, 0, 10000);
+    TH1D* h_IsoMu24Obj_relTrkIso_EE = new TH1D("h_IsoMu24Obj_relTrkIso_EE", "", 1000, 0, 10);
+    TH1D* h_IsoMu24Obj_relTrkIso_EB = new TH1D("h_IsoMu24Obj_relTrkIso_EB", "", 1000, 0, 10);
     TString filterName_IsoMu24 = "hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07::MYHLT";
 
     // -- Mu24 object
@@ -94,6 +109,40 @@ public:
         h_IsoMu24Obj_pt->Fill( obj.pt, weight );
         h_IsoMu24Obj_eta->Fill( obj.eta, weight );
         h_IsoMu24Obj_phi->Fill( obj.phi, weight );
+
+        MuonHLT::L3Muon L3Mu;
+        if( Find_CorrespondingL3Muon(obj, ntuple, L3Mu) )
+        {
+          Double_t ECALIso = L3Mu.ECALIso;
+          Double_t HCALIso = L3Mu.HCALIso;
+          Double_t trkIso  = L3Mu.trkIso;
+
+          Double_t relECALIso = L3Mu.relECALIso;
+          Double_t relHCALIso = L3Mu.relHCALIso;
+          Double_t relTrkIso  = L3Mu.relTrkIso;
+
+          if( fabs(obj.eta) < 1.479 )
+          {
+            h_IsoMu24Obj_ECALIso_EB->Fill( ECALIso, weight );
+            h_IsoMu24Obj_HCALIso_EB->Fill( HCALIso, weight );
+            h_IsoMu24Obj_trkIso_EB->Fill( trkIso, weight );
+
+            h_IsoMu24Obj_relECALIso_EB->Fill( relECALIso, weight );
+            h_IsoMu24Obj_relHCALIso_EB->Fill( relHCALIso, weight );
+            h_IsoMu24Obj_relTrkIso_EB->Fill( relTrkIso, weight );
+          }
+          else
+          {
+            h_IsoMu24Obj_ECALIso_EE->Fill( ECALIso, weight );
+            h_IsoMu24Obj_HCALIso_EE->Fill( HCALIso, weight );
+            h_IsoMu24Obj_trkIso_EE->Fill( trkIso, weight );
+
+            h_IsoMu24Obj_relECALIso_EE->Fill( relECALIso, weight );
+            h_IsoMu24Obj_relHCALIso_EE->Fill( relHCALIso, weight );
+            h_IsoMu24Obj_relTrkIso_EE->Fill( relTrkIso, weight );
+          }
+        }
+
       }
 
       Int_t nMu24Obj_IsoF = 0;
@@ -226,6 +275,21 @@ public:
     h_IsoMu24Obj_pt->Write();
     h_IsoMu24Obj_eta->Write();
     h_IsoMu24Obj_phi->Write();
+
+    h_IsoMu24Obj_ECALIso_EE->Write();
+    h_IsoMu24Obj_ECALIso_EB->Write();
+    h_IsoMu24Obj_relECALIso_EE->Write(); 
+    h_IsoMu24Obj_relECALIso_EB->Write();
+
+    h_IsoMu24Obj_HCALIso_EE->Write(); 
+    h_IsoMu24Obj_HCALIso_EB->Write();
+    h_IsoMu24Obj_relHCALIso_EE->Write(); 
+    h_IsoMu24Obj_relHCALIso_EB->Write();
+
+    h_IsoMu24Obj_trkIso_EE->Write(); 
+    h_IsoMu24Obj_trkIso_EB->Write();
+    h_IsoMu24Obj_relTrkIso_EE->Write(); 
+    h_IsoMu24Obj_relTrkIso_EB->Write();
 
 
     h_nMu24Obj->Write();
