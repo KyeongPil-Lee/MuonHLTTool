@@ -56,7 +56,7 @@ public:
       Double_t weight = ntuple->isRealData? 1.0 : ntuple->genEventWeight;
 
       vector<MuonHLT::MYHLTObject> vec_IsoMu24Obj = GetAllMYHLTObject(ntuple, filterName_IsoMu24);
-      Int_t nIsoMu24Obj = (Int_t)vec_IsoMu24Obj->size();
+      Int_t nIsoMu24Obj = (Int_t)vec_IsoMu24Obj.size();
       h_nIsoMu24Obj->Fill( nIsoMu24Obj, weight );
       for( auto& obj : vec_IsoMu24Obj )
       {
@@ -93,7 +93,7 @@ public:
        // -- inconsistent case: print all information
       if( nIsoMu24Obj != nMu24Obj_IsoF )
       {
-        TString analyzerPath = gSystem->Getenv("MUONHLT_ANALYZER_PATH")
+        TString analyzerPath = gSystem->Getenv("MUONHLT_ANALYZER_PATH");
         TString basePath = analyzerPath+"/Run3Winter21/IsoDist";
         ofstream logEvent(basePath+"/Event_differentNumberOfObject.txt", std::ios_base::out | std::ios_base::app);
 
