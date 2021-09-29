@@ -336,7 +336,7 @@ void MakeHist_Validation_CustomIsoFilter(TString textFile_ntupleList)
   TString tag = textFile_ntupleList.Data();
   tag = gSystem->BaseName(tag);
   tag.ReplaceAll(".txt", "");
-  TString outputFileName = TString::Format("ROOTFile_MakeHist_Isolation_IsoMu24_%s.root", tag.Data());
+  TString outputFileName = TString::Format("ROOTFile_MakeHist_Validation_CustomIsoFilter_%s.root", tag.Data());
 
   HistProducer* histProducer = new HistProducer();
   histProducer->Set_OutputFileName(outputFileName);
