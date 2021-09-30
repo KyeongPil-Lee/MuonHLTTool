@@ -953,7 +953,7 @@ void MuonHLTNtupler::Fill_HLTMuon(const edm::Event &iEvent)
 
         double conSize = 0.3;
         double theTrackPt_Min = -1.0;
-        std::pair<double, int> trkIsoSumAndCount = trkDeposit.depositAndCountWithin(conSize, vec_trkVeto, theTrackPt_Min);
+        std::pair<double, int> trkIsoSumAndCount = trkIsoDeposit.depositAndCountWithin(conSize, vec_trkVeto, theTrackPt_Min);
         L3Muon_trkIso_[_nL3Muon] = trkIsoSumAndCount.first;
       }
 
