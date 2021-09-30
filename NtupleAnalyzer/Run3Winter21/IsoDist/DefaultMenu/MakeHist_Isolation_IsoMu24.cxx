@@ -39,6 +39,12 @@ public:
     TH1D* h_relTrkIso_EE = new TH1D("h_relTrkIso_EE", "", 1000, 0, 10);
     TH1D* h_relTrkIso_EB = new TH1D("h_relTrkIso_EB", "", 1000, 0, 10);
 
+    TH1D* h_relTrkIso_trkPt_EE = new TH1D("h_relTrkIso_trkPt_EE", "", 1000, 0, 10);
+    TH1D* h_relTrkIso_trkPt_EB = new TH1D("h_relTrkIso_trkPt_EB", "", 1000, 0, 10);
+
+    TH1D* h_pt    = new TH1D("h_pt",    "", 10000, 0, 10000);
+    TH1D* h_trkPt = new TH1D("h_trkPt", "", 10000, 0, 10000);
+
     Int_t nEvent = chain->GetEntries();
     std::cout << "[Total event: " << nEvent << "]" << std::endl;
 
@@ -62,6 +68,7 @@ public:
           Double_t relECALIso = ECALIso / L3Mu.pt;
           Double_t relHCALIso = HCALIso / L3Mu.pt;
           Double_t relTrkIso  = trkIso / L3Mu.pt;
+          Double_t relTrkIso_trkPt  = trkIso / L3Mu.trkPt;
 
           if( fabs(obj.eta) < 1.479 )
           {
@@ -72,6 +79,7 @@ public:
             h_relECALIso_EB->Fill( relECALIso, weight );
             h_relHCALIso_EB->Fill( relHCALIso, weight );
             h_relTrkIso_EB->Fill( relTrkIso, weight );
+            h_relTrkIso_trkPt_EB->Fill( relTrkIso_trkPt, weight );
           }
           else
           {
@@ -82,7 +90,12 @@ public:
             h_relECALIso_EE->Fill( relECALIso, weight );
             h_relHCALIso_EE->Fill( relHCALIso, weight );
             h_relTrkIso_EE->Fill( relTrkIso, weight );
+            h_relTrkIso_trkPt_EE->Fill( relTrkIso_trkPt, weight );
           }
+
+          // -- to check whether default pt == track pt
+          h_pt->Fill( L3Mu.pt, weight );
+          h_trkPt->Fill( L3Mu.trkPt, weight );
 
         } // -- end of Find_CorrespondingL3Muon(obj, L3Mu)
         else
@@ -116,6 +129,12 @@ public:
     h_trkIso_EB->Write();
     h_relTrkIso_EE->Write(); 
     h_relTrkIso_EB->Write();
+
+    h_relTrkIso_trkPt_EE->Write();
+    h_relTrkIso_trkPt_EB->Write();
+
+    h_pt->Write();
+    h_trkPt->Write();
 
     f_output->Close();
 
