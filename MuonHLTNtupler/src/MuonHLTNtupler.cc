@@ -909,6 +909,20 @@ void MuonHLTNtupler::Fill_HLTMuon(const edm::Event &iEvent)
     edm::Handle<reco::RecoChargedCandidateIsolationMap> h_HCALIsoMap;
     edm::Handle<reco::IsoDepositMap> h_trkIsoMap;
 
+    // -- vetos for calculating the tracker isolation: needed for tracker isolation calculation
+    // -- typedef std::vector<Veto> Vetos;
+    IsoDeposit::Vetos vec_trkVeto(h_L3Muon->size());
+    if( iEvent.getByToken(t_trkIsoMap_, h_trkIsoMap) )
+    {
+      for(unsigned int i_L3=0; i_L3<h_L3Muon->size(); i_L3++)
+      {
+        reco::RecoChargedCandidateRef ref_L3Mu(h_L3Muon, i_L3);
+        reco::IsoDeposit trkIsoDeposit = (*h_trkIsoMap)[ref_L3Mu];
+        vec_trkVeto[i_L3] = trkIsoDeposit.veto();
+      }
+    }
+
+    // -- fill L3 muons
     int _nL3Muon = 0;
     for(unsigned int i_L3=0; i_L3<h_L3Muon->size(); i_L3++)
     {
@@ -935,7 +949,12 @@ void MuonHLTNtupler::Fill_HLTMuon(const edm::Event &iEvent)
       if( iEvent.getByToken(t_trkIsoMap_, h_trkIsoMap) )
       {
         reco::IsoDeposit trkIsoDeposit = (*h_trkIsoMap)[ref_L3Mu];
-        L3Muon_trkIso_[_nL3Muon] = trkIsoDeposit.depositWithin(0.3);
+        // L3Muon_trkIso_[_nL3Muon] = trkIsoDeposit.depositWithin(0.3);
+
+        double conSize = 0.3;
+        double theTrackPt_Min = -1.0;
+        std::pair<double, int> trkIsoSumAndCount = trkDeposit.depositAndCountWithin(conSize, vec_trkVeto, theTrackPt_Min);
+        L3Muon_trkIso_[_nL3Muon] = trkIsoSumAndCount.first;
       }
 
       _nL3Muon++;
