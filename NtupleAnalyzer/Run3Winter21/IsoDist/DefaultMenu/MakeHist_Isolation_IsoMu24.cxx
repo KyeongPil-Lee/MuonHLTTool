@@ -45,6 +45,30 @@ public:
     TH1D* h_pt    = new TH1D("h_pt",    "", 10000, 0, 10000);
     TH1D* h_trkPt = new TH1D("h_trkPt", "", 10000, 0, 10000);
 
+    // -- strange muon: trkIso/pT > 0.07
+    TH1D* h_stMu_pt  = new TH1D("h_stMu_pt", "", 10000, 0, 10000);
+    TH1D* h_stMu_eta = new TH1D("h_stMu_eta", "", 60, -3, 3);
+    TH1D* h_stMu_phi = new TH1D("h_stMu_phi", "", 80, -4, 4);
+
+    TH1D* h_stMu_ECALIso_EE = new TH1D("h_stMu_ECALIso_EE", "", 10000, 0, 10000);
+    TH1D* h_stMu_ECALIso_EB = new TH1D("h_stMu_ECALIso_EB", "", 10000, 0, 10000);
+    TH1D* h_stMu_relECALIso_EE = new TH1D("h_stMu_relECALIso_EE", "", 1000, 0, 10);
+    TH1D* h_stMu_relECALIso_EB = new TH1D("h_stMu_relECALIso_EB", "", 1000, 0, 10);
+
+    TH1D* h_stMu_HCALIso_EE = new TH1D("h_stMu_HCALIso_EE", "", 10000, 0, 10000);
+    TH1D* h_stMu_HCALIso_EB = new TH1D("h_stMu_HCALIso_EB", "", 10000, 0, 10000);
+    TH1D* h_stMu_relHCALIso_EE = new TH1D("h_stMu_relHCALIso_EE", "", 1000, 0, 10);
+    TH1D* h_stMu_relHCALIso_EB = new TH1D("h_stMu_relHCALIso_EB", "", 1000, 0, 10);
+
+    TH1D* h_stMu_trkIso_EE = new TH1D("h_stMu_trkIso_EE", "", 10000, 0, 10000);
+    TH1D* h_stMu_trkIso_EB = new TH1D("h_stMu_trkIso_EB", "", 10000, 0, 10000);
+    TH1D* h_stMu_relTrkIso_EE = new TH1D("h_stMu_relTrkIso_EE", "", 1000, 0, 10);
+    TH1D* h_stMu_relTrkIso_EB = new TH1D("h_stMu_relTrkIso_EB", "", 1000, 0, 10);
+
+
+
+
+
     Int_t nEvent = chain->GetEntries();
     std::cout << "[Total event: " << nEvent << "]" << std::endl;
 
@@ -97,6 +121,35 @@ public:
           h_pt->Fill( L3Mu.pt, weight );
           h_trkPt->Fill( L3Mu.trkPt, weight );
 
+          // -- for the strange muons with trkIso/pT > 0.07
+          if( relTrkIso > 0.07 )
+          {
+            h_stMu_pt->Fill( L3Mu.pt, weight );
+            h_stMu_eta->Fill( L3Mu.eta, weight );
+            h_stMu_phi->Fill( L3Mu.phi, weight );
+
+            if( fabs(obj.eta) < 1.479 )
+            {
+              h_stMu_ECALIso_EB->Fill( ECALIso, weight );
+              h_stMu_HCALIso_EB->Fill( HCALIso, weight );
+              h_stMu_trkIso_EB->Fill( trkIso, weight );
+
+              h_stMu_relECALIso_EB->Fill( relECALIso, weight );
+              h_stMu_relHCALIso_EB->Fill( relHCALIso, weight );
+              h_stMu_relTrkIso_EB->Fill( relTrkIso, weight );
+            }
+            else
+            {
+              h_stMu_ECALIso_EE->Fill( ECALIso, weight );
+              h_stMu_HCALIso_EE->Fill( HCALIso, weight );
+              h_stMu_trkIso_EE->Fill( trkIso, weight );
+
+              h_stMu_relECALIso_EE->Fill( relECALIso, weight );
+              h_stMu_relHCALIso_EE->Fill( relHCALIso, weight );
+              h_stMu_relTrkIso_EE->Fill( relTrkIso, weight );
+            }
+          }
+
         } // -- end of Find_CorrespondingL3Muon(obj, L3Mu)
         else
         {
@@ -135,6 +188,25 @@ public:
 
     h_pt->Write();
     h_trkPt->Write();
+
+    h_stMu_pt->Write();
+    h_stMu_eta->Write();
+    h_stMu_phi->Write();
+
+    h_stMu_ECALIso_EE->Write();
+    h_stMu_ECALIso_EB->Write();
+    h_stMu_relECALIso_EE->Write(); 
+    h_stMu_relECALIso_EB->Write();
+
+    h_stMu_HCALIso_EE->Write(); 
+    h_stMu_HCALIso_EB->Write();
+    h_stMu_relHCALIso_EE->Write(); 
+    h_stMu_relHCALIso_EB->Write();
+
+    h_stMu_trkIso_EE->Write(); 
+    h_stMu_trkIso_EB->Write();
+    h_stMu_relTrkIso_EE->Write(); 
+    h_stMu_relTrkIso_EB->Write();
 
     f_output->Close();
 
