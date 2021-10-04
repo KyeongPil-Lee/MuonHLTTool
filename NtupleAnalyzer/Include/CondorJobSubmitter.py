@@ -45,17 +45,17 @@ class MultiCondorJobSubmitter:
             submitter.condorScriptName = self.condorScriptName
             submitter.baseName_ntupleList = self.baseName_ntupleList
 
-            submitter.ROOTCodeName = self.ROOTCodeName
+            ROOTCodePath = "%s/%s" % (self.cwd, self.ROOTCodeName)
+            submitter.ROOTCodePath = ROOTCodePath
             submitter.sampleInfoYAML = self.sampleInfoYAML
             submitter.sampleType = sampleType
-            submitter.nJob = dic_sample_nJob[sampleType]
+            submitter.nJob = self.dic_sample_nJob[sampleType]
 
             submitter.baseDirPath = self.baseDirPath
 
             submitter.Submit()
 
-        print "[MultiCondorJobSubmitter] Submission: Done"
-        GenerateScript_hadd()
+        self.GenerateScript_hadd()
 
 
     def GenerateBaseDir(self):
@@ -73,8 +73,8 @@ class MultiCondorJobSubmitter:
         f_script.write("#!/bin/bash\n")
 
         for sampleType in self.dic_sample_nJob.keys():
-            mergedROOTFileName = "ROOTFile_%s.root" % (sampleType)
-            mergedROOTFilePath = "%s/%s" (self.cwd, mergedROOTFileName)
+            mergedROOTFileName = "ROOTFile_%s_%s.root" % (self.ROOTCodeName.split(".cxx")[0], sampleType)
+            mergedROOTFilePath = "%s/%s" % (self.cwd, mergedROOTFileName)
 
             sampleWorkingDirPath = "%s/%s" % (self.baseDirPath, sampleType)
 
@@ -91,7 +91,7 @@ class MultiCondorJobSubmitter:
 
 class CondorJobSubmitter:
     def __init__(self):
-        self.ROOTCodeName = ""
+        self.ROOTCodePath = ""
         self.sampleInfoYAML = ""
         self.nJob = -1
         self.sampleType = ""
@@ -120,6 +120,9 @@ class CondorJobSubmitter:
 
         # -- base name of the text file with the ntuple path lists (full name: baseName_ntupleList_$(Process).txt)
         self.baseName_ntupleList = "ntuplePathList"
+
+        # -- list of directories that contains ntuples
+        self.list_ntupleDirPath = []
 
         # -- list of full paths to each ntuple in self.list_ntupleDirPath
         self.list_ntuplePath = []
@@ -161,14 +164,15 @@ class CondorJobSubmitter:
 
         yamlParser = ""
         with open(path_sampleInfoYAML) as f:
-            yamlParser = yaml.load(f, Loader=yaml.FullLoader)
+            yamlParser = yaml.load(f)
+            # yamlParser = yaml.load(f, Loader=yaml.FullLoader)
 
-        list_sampleInfo = yamlParser["sampleInfo"]
+        list_sampleInfo = yamlParser["list_sampleInfo"]
 
         isFound = False
         for sampleInfo in list_sampleInfo:
             if self.sampleType == sampleInfo["sampleType"]:
-                self.list_ntuplePath = sampleInfo["ntuplePath"]
+                self.list_ntupleDirPath = sampleInfo["list_ntupleDirPath"]
                 self.xSec = sampleInfo["xSec"]
                 self.sumWeight = sampleInfo["sumWeight"]
                 isFound = True
@@ -194,8 +198,12 @@ executable = {scriptPathToRun_}
 universe   = vanilla
 log        = condor/condor.log
 getenv     = True
-should_transfer_files = NO # -- output files will be directly copied in the shell script
-# when_to_transfer_output = ON_EXIT
+# -- to transfer input files
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+# -- output files will directly be copied in the shell script
+# -- to avoid to transfer some (unnecessary) temp. files
+Transfer_Output_Files = ""
 
 accounting_group=group_cms
 
@@ -209,7 +217,7 @@ queue {nJob_}
 """.format(scriptPathToRun_ = "%s/%s" % (self.workingDirPath, self.scriptNameToRun), 
            textFileDirPath = "%s/%s" % (self.workingDirPath, self.textFileDirName), 
            baseName_ntupleList_ = self.baseName_ntupleList, 
-           ROOTCodePath_ = "%s/%s" % (self.workingDirPath, self.ROOTCodeName), 
+           ROOTCodePath_ = self.ROOTCodePath, 
            nJob_ = self.nJob)
         )
 
@@ -217,9 +225,10 @@ queue {nJob_}
 
 
     def GenerateCommonShellScript(self):
-
         scriptPathToRun = "%s/%s" % (self.workingDirPath, self.scriptNameToRun)
         f_script = open(scriptPathToRun, "w")
+
+        ROOTCodeName = self.ROOTCodePath.split("/")[-1]
         f_script.write(
 """#!/bin/bash
 
@@ -232,15 +241,15 @@ cp *.root %s {workingDirPath_}
 
 echo "finished"
 
-""".format(ROOTCodeName_ = self.ROOTCodeName, workingDirPath_=self.workingDirPath)
+""".format(ROOTCodeName_ = ROOTCodeName, workingDirPath_=self.workingDirPath)
         )
 
         f_script.close()
 
 
     def GenerateTextFile_NtuplePathList(self):
-        for ntuplePath in self.list_ntupleDirPath:
-            list_temp = self.GetList_NtuplePath(ntuplePath)
+        for ntupleDirPath in self.list_ntupleDirPath:
+            list_temp = self.GetList_NtuplePath(ntupleDirPath)
             self.list_ntuplePath.extend( list_temp )
 
         nFile = len(self.list_ntuplePath)
