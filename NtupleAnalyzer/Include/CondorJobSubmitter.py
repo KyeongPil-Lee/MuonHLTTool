@@ -1,21 +1,28 @@
 import os
 import sys
 import shutil
+import yaml
 
-class CondorJobSubmitter:
+class MultiCondorJobSubmitter:
     def __init__(self):
         self.ROOTCodeName = ""
-        self.list_ntupleDirPath = []
-        self.nJob = 0
-        self.removeTempDirAfterSubmit = False
+        self.sampleInfoYAML = ""
+        self.dic_sample_nJob = {}
 
+        # -- automatically merge the output files from binned samples
+        self.doMergeBinnedSample = False
 
-        # -- internal variable
+        ###########################
+        # -- internal variable -- #
+        ###########################
+        self.cwd = os.getcwd() # -- where the job submitter is executed: the final ROOT files should come here
 
-        # -- # files per job
-        self.nFilePerJob = 0
-        # -- temp. directory for the text files with the ntuple paths
-        self.tempDir = "temp"
+        # -- base directory for all condor-job related files (condor log & err files, text files w/ ntuple path, all ROOT files before merging...)
+        self.baseDirPath = ""
+
+        # -- define below to have a coherent file names for all multiple jobs
+        # -- directory for the text files with the ntuple paths
+        self.textFileDirName = "textFiles"
 
         # -- shell script name to run (executable in the condor script)
         self.scriptNameToRun = "script_condorRun.sh"
@@ -24,56 +31,186 @@ class CondorJobSubmitter:
         self.condorScriptName = "condorscript_submit.jds"
 
         # -- base name of the text file with the ntuple path lists (full name: baseName_ntupleList_$(Process).txt)
-        self.baseName_ntupleList = "ntuplePathList";
+        self.baseName_ntupleList = "ntuplePathList"
+
+
+    def Submit(self):
+        self.GenerateBaseDir()
+
+        for sampleType in self.dic_sample_nJob.keys():
+            submitter = CondorJobSubmitter()
+
+            submitter.textFileDirName = self.textFileDirName
+            submitter.scriptNameToRun = self.scriptNameToRun
+            submitter.condorScriptName = self.condorScriptName
+            submitter.baseName_ntupleList = self.baseName_ntupleList
+
+            submitter.ROOTCodeName = self.ROOTCodeName
+            submitter.sampleInfoYAML = self.sampleInfoYAML
+            submitter.sampleType = sampleType
+            submitter.nJob = dic_sample_nJob[sampleType]
+
+            submitter.baseDirPath = self.baseDirPath
+
+            submitter.Submit()
+
+        print "[MultiCondorJobSubmitter] Submission: Done"
+        GenerateScript_hadd()
+
+
+    def GenerateBaseDir(self):
+        i = 1
+        while "condorJob_v%02d" % i in os.listdir(self.cwd):
+            i = i+1
+
+        # -- create in the current directory
+        self.baseDirPath = "%s/condorJob_v%02d" % (self.cwd, i)
+        os.mkdir(self.baseDirPath)
+
+    def GenerateScript_hadd(self):
+        scriptPath = "%s/hadd_allSamples.sh" % self.baseDirPath
+        f_script = open(scriptPath, "w")
+        f_script.write("#!/bin/bash\n")
+
+        for sampleType in self.dic_sample_nJob.keys():
+            mergedROOTFileName = "ROOTFile_%s.root" % (sampleType)
+            mergedROOTFilePath = "%s/%s" (self.cwd, mergedROOTFileName)
+
+            sampleWorkingDirPath = "%s/%s" % (self.baseDirPath, sampleType)
+
+            command_hadd = "hadd %s %s/*.root" % (mergedROOTFilePath, sampleWorkingDirPath)
+            f_script.write(command_hadd+"\n")
+
+        f_script.write("\n")
+        f_script.close()
+
+        print "[MultiCondorJobSubmitter] Get merged ROOT files after the condor jobs are finished"
+        print "source %s\n" % scriptPath
+
+
+
+class CondorJobSubmitter:
+    def __init__(self):
+        self.ROOTCodeName = ""
+        self.sampleInfoYAML = ""
+        self.nJob = -1
+        self.sampleType = ""
+
+        ############################
+        # -- internal variables -- #
+        ############################
+        # -- # files per job
+        self.nFilePerJob = 0
+
+        # -- directory contains "condor" directory (log & err) and "textFiles" directory (text files for the ntuple paths)
+        # -- it will be provided by MultiCondorJobSubmitter
+        self.baseDirPath = ""
+
+        # -- working directory path: baseDirPath + "/" + sampleType
+        self.workingDirPath = "";
+
+        # -- directory for the text files with the ntuple paths
+        self.textFileDirName = "textFiles"
+
+        # -- shell script name to run (executable in the condor script)
+        self.scriptNameToRun = "script_condorRun.sh"
+
+        # -- condor script name
+        self.condorScriptName = "condorscript_submit.jds"
+
+        # -- base name of the text file with the ntuple path lists (full name: baseName_ntupleList_$(Process).txt)
+        self.baseName_ntupleList = "ntuplePathList"
 
         # -- list of full paths to each ntuple in self.list_ntupleDirPath
         self.list_ntuplePath = []
 
+        # -- cross section & sum(weight) from yaml file
+        self.xSec = -1.0
+        self.sumWeight = -1.0
+
 
     def Submit(self):
+        self.GenerateWorkingDir()
+
+        self.GetSampleInfoFromYAML()
+
         self.GenerateTextFile_NtuplePathList()
 
         self.GenerateCommonShellScript()
 
         self.GenerateCondorScript()
 
-        cmd_submit = "condor_submit %s" % self.condorScriptName
+        condorScriptPath = "%s/%s" % (self.workingDirPath, self.condorScriptName)
+        cmd_submit = "condor_submit %s" % condorScriptPath
         os.system(cmd_submit)
         # print cmd_submit
         print "All jobs are submitted"
 
-        if self.removeTempDirAfterSubmit:
-            shutil.rmtree(self.tempDir)
-            print "%s is successfully removed" % self.tempDir
+    def GenerateWorkingDir(self):
+        if self.sampleType not in os.listdir(self.baseDirPath):
+            self.workingDirPath = "%s/%s" % (self.baseDirPath, self.sampleType)
+            os.mkdir(self.workingDirPath)
+        else:
+            print "%s exists in %s ... the jobs are not created. please check" % (self.sampleType, self.baseDirPath)
+            sys.exit()
 
+    def GetSampleInfoFromYAML(self):
+        analyzerPath = os.getenv("MUONHLT_ANALYZER_PATH")
+        includePath = "%s/Include" % analyzerPath
+        path_sampleInfoYAML = "%s/%s" % (includePath, self.sampleInfoYAML)
 
+        yamlParser = ""
+        with open(path_sampleInfoYAML) as f:
+            yamlParser = yaml.load(f, Loader=yaml.FullLoader)
+
+        list_sampleInfo = yamlParser["sampleInfo"]
+
+        isFound = False
+        for sampleInfo in list_sampleInfo:
+            if self.sampleType == sampleInfo["sampleType"]:
+                self.list_ntuplePath = sampleInfo["ntuplePath"]
+                self.xSec = sampleInfo["xSec"]
+                self.sumWeight = sampleInfo["sumWeight"]
+                isFound = True
+                break
+
+        if not isFound:
+            print "Sample type = %s is not found!" % self.sampleType
+            sys.exit()
+
+    # -- all files are written with its absolute paths to avoid any confusion
     def GenerateCondorScript(self):
 
         # -- directory for condor log files
-        if "condor" not in os.listdir("."):
-            os.mkdir("condor")
+        if "condor" not in os.listdir(self.workingDirPath):
+            os.mkdir("%s/condor" % self.workingDirPath)
 
-        f_script = open(self.condorScriptName, "w")
+        condorScriptPath = "%s/%s" % (self.workingDirPath, self.condorScriptName)
+        f_script = open(condorScriptPath, "w")
         # -- $(Process): 0, 1, 2, ... nJob-1
         f_script.write(
 """
-executable = {scriptNameToRun_}
+executable = {scriptPathToRun_}
 universe   = vanilla
 log        = condor/condor.log
 getenv     = True
-should_transfer_files = YES
-when_to_transfer_output = ON_EXIT
+should_transfer_files = NO # -- output files will be directly copied in the shell script
+# when_to_transfer_output = ON_EXIT
 
 accounting_group=group_cms
 
-transfer_input_files = {tempDir_}/{baseName_ntupleList_}_$(Process).txt,{ROOTCodeName_}
+transfer_input_files = {textFileDirPath}/{baseName_ntupleList_}_$(Process).txt,{ROOTCodePath_}
 Arguments            = "{baseName_ntupleList_}_$(Process).txt"
 output               = condor/condor_output_$(Process).log
 error                = condor/condor_error_$(Process).log
 
 queue {nJob_}
 
-""".format(scriptNameToRun_ = self.scriptNameToRun, tempDir_=self.tempDir, baseName_ntupleList_=self.baseName_ntupleList, ROOTCodeName_=self.ROOTCodeName, nJob_=self.nJob)
+""".format(scriptPathToRun_ = "%s/%s" % (self.workingDirPath, self.scriptNameToRun), 
+           textFileDirPath = "%s/%s" % (self.workingDirPath, self.textFileDirName), 
+           baseName_ntupleList_ = self.baseName_ntupleList, 
+           ROOTCodePath_ = "%s/%s" % (self.workingDirPath, self.ROOTCodeName), 
+           nJob_ = self.nJob)
         )
 
         f_script.close()
@@ -81,7 +218,8 @@ queue {nJob_}
 
     def GenerateCommonShellScript(self):
 
-        f_script = open(self.scriptNameToRun, "w")
+        scriptPathToRun = "%s/%s" % (self.workingDirPath, self.scriptNameToRun)
+        f_script = open(scriptPathToRun, "w")
         f_script.write(
 """#!/bin/bash
 
@@ -89,9 +227,12 @@ fileName_ntuplePathList=$1
 
 root -l -b -q '{ROOTCodeName_}++("'$fileName_ntuplePathList'")'
 
+# -- copy the output ROOT files to the working directory
+cp *.root %s {workingDirPath_}
+
 echo "finished"
 
-""".format(ROOTCodeName_ = self.ROOTCodeName)
+""".format(ROOTCodeName_ = self.ROOTCodeName, workingDirPath_=self.workingDirPath)
         )
 
         f_script.close()
@@ -110,23 +251,24 @@ echo "finished"
         self.nFilePerJob = int( float(nFile) / float(self.nJob) )
         print "nJob = %d, nFile = %d -> nFilePerJob = %d\n" % (self.nJob, nFile, self.nFilePerJob)
 
-        self.MakeTempDir()
+        self.MakeTextFileDir()
 
         for i_job in range(0, self.nJob):
             list_ntuplePath_iJob = self.GetNtupleListPerJob(i_job)
 
-            textFileName = "%s/%s_%d.txt" % (self.tempDir, self.baseName_ntupleList, i_job)
+            textFileName = "%s/%s/%s_%d.txt" % (self.workingDirPath, self.textFileDirName, self.baseName_ntupleList, i_job)
             f_textFile = open(textFileName, "w")
             for fileName in list_ntuplePath_iJob:
                 f_textFile.write( fileName + "\n" )
             f_textFile.close()
 
 
-    def MakeTempDir(self):
-        if self.tempDir not in os.listdir("."):
-            os.mkdir(self.tempDir)
+    def MakeTextFileDir(self):
+        if self.textFileDirName not in os.listdir(self.workingDirPath):
+            textFileDirPath = "%s/%s" % (self.workingDirPath, self.textFileDirName)
+            os.mkdir(textFileDirPath)
         else:
-            print "[CondorJobSubmitter] %s exists in this directory... please check" % self.tempDir
+            print "[CondorJobSubmitter] %s exists in this directory... please check" % self.textFileDirName
             sys.exit()
 
 

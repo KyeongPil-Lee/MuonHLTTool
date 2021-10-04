@@ -1,0 +1,73 @@
+# -- sample infomation read by CondorJobSubmitter
+
+list_sampleInfo:
+  - sampleType: ZMuMu_M50to120_Default
+    list_ntuplePath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v01/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8/crab_ZToMuMu_M50to120_Powheg_FlatPU30to80/210922_100725/0000
+      # -- add more paths if necessary...
+    xSec: -1.0
+    sumWeight: -1.0
+
+  - sampleType: ZMuMu_M50to120
+    list_ntuplePath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v02/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8/crab_ZToMuMu_M50to120_Powheg_FlatPU30to80/210922_125120/0000
+    xSec: -1.0
+    sumWeight: -1.0
+
+  - sampleType: ZMuMu_M120to200
+    list_ntuplePath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v02/ZToMuMu_M-120To200_TuneCP5_14TeV-powheg-pythia8/crab_ZToMuMu_M120to200_Powheg_FlatPU30to80/210922_124954/0000
+    xSec: -1.0
+    sumWeight: -1.0
+
+  - sampleType: ZMuMu_M200to400
+    list_ntuplePath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v02/ZToMuMu_M-200To400_TuneCP5_14TeV-powheg-pythia8/crab_ZToMuMu_M200to400_Powheg_FlatPU30to80/210922_125037/0000
+    xSec: -1.0
+    sumWeight: -1.0
+
+  - sampleType: ttbar
+    list_ntuplePath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v02/TT_TuneCP5_14TeV-powheg-pythia8/crab_TT_Powheg_FlatPU30to80/210922_124825/0000
+    xSec: -1.0
+    sumWeight: -1.0
+
+  - sampleType: WJets
+    list_ntuplePath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v02/WJetsToLNu_TuneCP5_14TeV-amcatnloFXFX-pythia8/crab_WJetsToLNu_aMCNLO_FlatPU30to80/210922_124910/0000
+    xSec: -1.0
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt20to30
+    list_ntuplePath: 
+      - none
+    xSec: -1.0
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt30to50
+    list_ntuplePath: 
+      - none
+    xSec: -1.0
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt50to80
+    list_ntuplePath: 
+      - none
+    xSec: -1.0
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt80to120
+    list_ntuplePath: 
+      - none
+    xSec: -1.0
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt120to170
+    list_ntuplePath: 
+      - none
+    xSec: -1.0
+    sumWeight: -1.0
+
+binnedSampleList:
+  - [ZMuMu_M50to120, ZMuMu_M120to200, ZMuMu_M200to400]
+  - [QCDMuEnriched_Pt20to30, QCDMuEnriched_Pt30to50, QCDMuEnriched_Pt50to80, QCDMuEnriched_Pt80to120, QCDMuEnriched_Pt120to170]
