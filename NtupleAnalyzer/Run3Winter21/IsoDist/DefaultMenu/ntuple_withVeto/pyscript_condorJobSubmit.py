@@ -2,7 +2,7 @@ from Include.CondorJobSubmitter import *
 
 submitter = MultiCondorJobSubmitter()
 
-submitter.ROOTCodeName = "MakeHist_Validation_CustomIsoFilter.cxx"
+submitter.ROOTCodeName = "MakeHist_Isolation_IsoMu24.cxx"
 
 submitter.sampleInfoYAML = "sampleInfo_v1.yml" # -- $MUONHLT_ANALYZER_PATH/Include
 submitter.dic_sample_nJob = {
