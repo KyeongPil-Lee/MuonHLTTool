@@ -4,7 +4,7 @@ submitter = MultiCondorJobSubmitter()
 
 submitter.ROOTCodeName = "MakeHist_Validation_CustomIsoFilter.cxx"
 
-submitter.sampleInfoYAML = "sampleInfo_v0.yml" # -- $MUONHLT_ANALYZER_PATH/Include
+submitter.sampleInfoYAML = "sampleInfo_v1.yml" # -- $MUONHLT_ANALYZER_PATH/Include
 submitter.dic_sample_nJob = {
     "ZMuMu_M50to120": 5,
     "ZMuMu_M120to200": 2,
