@@ -196,7 +196,7 @@ class CondorJobSubmitter:
 """
 executable = {scriptPathToRun_}
 universe   = vanilla
-log        = condor/condor.log
+log        = {workingDirPath_}/condor/condor.log
 getenv     = True
 # -- to transfer input files
 should_transfer_files = YES
@@ -209,12 +209,13 @@ accounting_group=group_cms
 
 transfer_input_files = {textFileDirPath}/{baseName_ntupleList_}_$(Process).txt,{ROOTCodePath_}
 Arguments            = "{baseName_ntupleList_}_$(Process).txt"
-output               = condor/condor_output_$(Process).log
-error                = condor/condor_error_$(Process).log
+output               = {workingDirPath_}/condor/condor_output_$(Process).log
+error                = {workingDirPath_}/condor/condor_error_$(Process).log
 
 queue {nJob_}
 
-""".format(scriptPathToRun_ = "%s/%s" % (self.workingDirPath, self.scriptNameToRun), 
+""".format(scriptPathToRun_ = "%s/%s" % (self.workingDirPath, self.scriptNameToRun),
+           workingDirPath_ = self.workingDirPath,
            textFileDirPath = "%s/%s" % (self.workingDirPath, self.textFileDirName), 
            baseName_ntupleList_ = self.baseName_ntupleList, 
            ROOTCodePath_ = self.ROOTCodePath, 
