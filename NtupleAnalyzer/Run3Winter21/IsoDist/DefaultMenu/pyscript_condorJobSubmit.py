@@ -1,12 +1,12 @@
 from Include.CondorJobSubmitter import *
 
-submitter = CondorJobSubmitter()
+submitter = MultiCondorJobSubmitter()
 
 submitter.ROOTCodeName = "MakeHist_Isolation_IsoMu24.cxx"
-submitter.list_ntupleDirPath = [
-"/pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v01/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8/crab_ZToMuMu_M50to120_Powheg_FlatPU30to80/210922_100725/0000"
-]
-submitter.nJob = 5
+
+submitter.sampleInfoYAML = "sampleInfo_v1.yml" # -- $MUONHLT_ANALYZER_PATH/Include
+submitter.dic_sample_nJob = {
+    "ZMuMu_M50to120_Default": 5,
+}
 
 submitter.Submit()
-

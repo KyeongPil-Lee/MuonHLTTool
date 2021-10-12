@@ -3,7 +3,7 @@
 // -- region: EB or EE
 void DrawIsolation(TString region, Bool_t isRelative)
 {
-  TString fileName = "ROOTFile_MakeHist_Validation_CustomIsoFilter_ZMuMu_M50to120_Default.root";
+  TString fileName = "ROOTFile_MakeHist_Isolation_IsoMu24.root";
 
   TString histName_ECALIso = "";
   TString histName_HCALIso = "";
