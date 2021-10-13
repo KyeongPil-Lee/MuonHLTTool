@@ -218,6 +218,7 @@ void AddNtupleToChain(TChain* chain, TString textFileName)
   cout << "==================================" << endl;
 }
 
+// -- find the same L3 muon with the given MYHLT object
 Bool_t Find_CorrespondingL3Muon(MuonHLT::MYHLTObject HLTObj, MuonHLT::NtupleHandle* ntuple, MuonHLT::L3Muon& theL3Muon)
 {
   Bool_t isFound = kFALSE;
@@ -238,6 +239,71 @@ Bool_t Find_CorrespondingL3Muon(MuonHLT::MYHLTObject HLTObj, MuonHLT::NtupleHand
   }
 
   return isFound;
+}
+
+Bool_t Pass_HLTIsolationFilter(MuonHLT::MYHLTObject HLTObj)
+{
+  Bool_t flag = kFALSE;
+
+  if( !HLTObj.isIsoValid ) return flag;
+
+  if( fabs(HLTObj.eta) < 1.479 ) // -- barrel
+  {
+    if( HLTObj.relECALIso < 0.14 && HLTObj.relHCALIso < 0.16 && HLTObj.relTrkIso < 0.07 ) flag = kTRUE;
+  }
+  else // -- endcap
+  {
+    if( HLTObj.relECALIso < 0.10 && HLTObj.relHCALIso < 0.20 && HLTObj.relTrkIso < 0.07 ) flag = kTRUE;
+  }
+
+  return flag;
+}
+
+Bool_t Pass_HLTIsoFilter_ECAL(MuonHLT::MYHLTObject HLTObj)
+{
+  Bool_t flag = kFALSE;
+
+  if( !HLTObj.isIsoValid ) return flag;
+
+  if( fabs(HLTObj.eta) < 1.479 ) // -- barrel
+  {
+    if( HLTObj.relECALIso < 0.14 ) flag = kTRUE;
+  }
+  else // -- endcap
+  {
+    if( HLTObj.relECALIso < 0.10 ) flag = kTRUE;
+  }
+
+  return flag;
+}
+
+Bool_t Pass_HLTIsoFilter_HCAL(MuonHLT::MYHLTObject HLTObj)
+{
+  Bool_t flag = kFALSE;
+
+  if( !HLTObj.isIsoValid ) return flag;
+
+  if( fabs(HLTObj.eta) < 1.479 ) // -- barrel
+  {
+    if( HLTObj.relHCALIso < 0.16 ) flag = kTRUE;
+  }
+  else // -- endcap
+  {
+    if( HLTObj.relHCALIso < 0.20 ) flag = kTRUE;
+  }
+
+  return flag;
+}
+
+Bool_t Pass_HLTIsoFilter_Tracker(MuonHLT::MYHLTObject HLTObj)
+{
+  Bool_t flag = kFALSE;
+
+  if( !HLTObj.isIsoValid ) return flag;
+
+  if( HLTObj.relTrkIso < 0.07 ) flag = kTRUE;
+
+  return flag;
 }
 
 

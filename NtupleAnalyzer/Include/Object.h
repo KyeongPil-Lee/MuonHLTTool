@@ -884,6 +884,17 @@ class MYHLTObject : public Object
 public:
   TString filterName;
 
+  // -- filled only when there is a corresponding L3 muon with the isolation information
+  Bool_t isIsoValid; // -- default: false
+
+  Double_t ECALIso;
+  Double_t HCALIso;
+  Double_t trkIso;
+
+  Double_t relECALIso;
+  Double_t relHCALIso;
+  Double_t relTrkIso;
+
   MYHLTObject()
   {
     Init();
@@ -905,6 +916,38 @@ public:
     vecP.SetPtEtaPhiM(pt, eta, phi, mass);
   }
 
+  void FillIsolationVariable(MuonHLT::NtupleHandle* ntuple)
+  {
+    Bool_t isFound = kFALSE;
+    MuonHLT::L3Muon theL3Muon;
+
+    for(Int_t i_L3=0; i_L3<ntuple->nL3Muon; i_L3++)
+    {
+      MuonHLT::L3Muon L3Muon(ntuple, i_L3);
+
+      Double_t relDiff_pt = (L3Muon.pt - pt) / pt;
+      Double_t dR = vecP.DeltaR( L3Muon.vecP );
+
+      if( relDiff_pt < 0.001 && dR < 0.01 )
+      {
+        theL3Muon = L3Muon;
+        isFound = kTRUE;
+        break;
+      }
+    }
+
+    if( !isFound ) return;
+
+    isIsoValid = kTRUE;
+    ECALIso = theL3Muon.ECALIso;
+    HCALIso = theL3Muon.HCALIso;
+    trkIso  = theL3Muon.trkIso;
+
+    relECALIso = theL3Muon.relECALIso;
+    relHCALIso = theL3Muon.relHCALIso;
+    relTrkIso  = theL3Muon.relTrkIso;
+  }
+
 private:
   void Init()
   {
@@ -913,6 +956,17 @@ private:
     eta = -999;
     phi = -999;
     mass = -999;
+
+    isIsoValid = kFALSE;
+
+    ECALIso = -999;
+    HCALIso = -999;
+    trkIso = -999;
+
+    relECALIso = -999;
+    relHCALIso = -999;
+    relTrkIso = -999;
+
   }
 };
 

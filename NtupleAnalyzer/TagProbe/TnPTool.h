@@ -369,6 +369,13 @@ public:
 
       Double_t nEventFail = CountEvent( vec_failHist[i] );
       Double_t nEventTotal = nEventPass + nEventFail;
+
+      if( nEventTotal < nEventPass )
+      {
+        printf("[%d bin] (nEventTotal = %.1lf < nEventPass = %.1lf: something strange happens...need to check; set as nEventTotal=nEventPass\n", i_bin, nEventTotal, nEventPass);
+        nEventTotal = nEventPass;
+      }
+      
       h_nTotal->SetBinContent(i_bin, nEventTotal );
       h_nTotal->SetBinError(i_bin, sqrt(nEventTotal) );
 

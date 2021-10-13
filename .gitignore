@@ -2,6 +2,7 @@ Local/
 CRABDir/
 *.log
 *.pyc
+*.pdf
 
 # Prerequisites
 *.d
