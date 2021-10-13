@@ -16,7 +16,7 @@ Bool_t IsTag(MuonHLT::Muon mu, MuonHLT::NtupleHandle* ntuple)
   // -- tagging to HLT object (not MYHLT object)
   Bool_t flag = kFALSE;
 
-  if( MuonHLT::dRMatching_HLTObj(mu.vecP, ntuple, "hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07::HLT", 0.1) &&
+  if( MuonHLT::dRMatching_HLTObj(mu.vecP, ntuple, "hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07", 0.1) &&
       mu.pt > 26 &&
       fabs(mu.eta) < 2.4 &&
       mu.isTight && 

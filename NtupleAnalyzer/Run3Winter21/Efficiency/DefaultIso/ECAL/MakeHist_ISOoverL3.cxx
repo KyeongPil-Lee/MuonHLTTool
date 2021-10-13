@@ -16,7 +16,7 @@ Bool_t IsTag(MuonHLT::Muon mu, MuonHLT::NtupleHandle* ntuple)
   // -- tagging to HLT object (not MYHLT object)
   Bool_t flag = kFALSE;
 
-  if( MuonHLT::dRMatching_HLTObj(mu.vecP, ntuple, "hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07::HLT", 0.1) &&
+  if( MuonHLT::dRMatching_HLTObj(mu.vecP, ntuple, "hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07", 0.1) &&
       mu.pt > 26 &&
       fabs(mu.eta) < 2.4 &&
       mu.isTight && 
@@ -26,6 +26,7 @@ Bool_t IsTag(MuonHLT::Muon mu, MuonHLT::NtupleHandle* ntuple)
   return flag;
 }
 
+// -- rerun HLT filter object: "::MYHLT" tag is needed
 Bool_t IsProbe(MuonHLT::Muon mu, MuonHLT::NtupleHandle* ntuple)
 {
   Bool_t flag = kFALSE;
@@ -41,9 +42,9 @@ Bool_t IsProbe(MuonHLT::Muon mu, MuonHLT::NtupleHandle* ntuple)
 
 Bool_t IsPassingProbe_ECAL(MuonHLT::Muon mu, MuonHLT::NtupleHandle* ntuple)
 {
-  // -- ECAL filter: hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3pfecalIsoRhoFilteredEB0p14EE0p10
-  // -- HCAL filter: hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3pfhcalIsoRhoFilteredHB0p16HE0p20
-  // -- Tracker filter (final filter): hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07
+  // -- ECAL filter: hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3pfecalIsoRhoFilteredEB0p14EE0p10::MYHLT
+  // -- HCAL filter: hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3pfhcalIsoRhoFilteredHB0p16HE0p20::MYHLT
+  // -- Tracker filter (final filter): hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07::MYHLT
   Bool_t flag = kFALSE;
   if( MuonHLT::dRMatching_MYHLTObj(mu.vecP, ntuple, "hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3pfecalIsoRhoFilteredEB0p14EE0p10::MYHLT", 0.1) )
     flag = kTRUE;
@@ -107,6 +108,8 @@ public:
 class HistProducer
 {
 public:
+  Bool_t debug_ = kFALSE;
+
   void Set_OutputFileName( TString outputFileName )
   {
     outputFileName_ = outputFileName;
@@ -147,12 +150,42 @@ public:
       MuonHLT::loadBar(i_ev+1, nEvent, 100, 100);
       ntuple->GetEvent(i_ev);
 
+      if( debug_ ) cout << TString::Format("[%dth event]", i_ev) << endl;
+
+      // if( debug_ )
+      // {
+      //   cout << "All HLT objects in the event ..." << endl;
+      //   vector<MuonHLT::HLTObject> vec_HLTObj = MuonHLT::GetAllHLTObject(ntuple);
+      //   for(auto& HLTObj: vec_HLTObj)
+      //     cout << TString::Format("  [HLT object] (pt, eta, phi, filterName) = (%.1lf, %.3lf, %.3lf, %s)", HLTObj.pt, HLTObj.eta, HLTObj.phi, HLTObj.filterName.Data()) << endl;
+
+      //   cout << endl;
+
+      //   cout << "All MYHLT objects in the event ..." << endl;
+      //   vector<MuonHLT::MYHLTObject> vec_MYHLTObj = MuonHLT::GetAllMYHLTObject(ntuple);
+      //   for(auto& HLTObj: vec_MYHLTObj)
+      //     cout << TString::Format("  [MYHLT object] (pt, eta, phi, filterName) = (%.1lf, %.3lf, %.3lf, %s)", HLTObj.pt, HLTObj.eta, HLTObj.phi, HLTObj.filterName.Data()) << endl;
+
+      //   cout << endl;
+      // }
+
+
       Double_t weight = ntuple->isRealData? 1.0 : ntuple->genEventWeight;
 
       // -- make tag&pobe pair
       for(Int_t i_tagCand=0; i_tagCand<ntuple->nMuon; i_tagCand++)
       {
         MuonHLT::Muon mu_tagCand( ntuple, i_tagCand );
+
+        if( debug_ )
+        {
+          cout << TString::Format("   [tag candidate (%dth muon)] (pt, eta, phi) = (%.1lf, %.3lf, %.3lf)", i_tagCand, mu_tagCand.pt, mu_tagCand.eta, mu_tagCand.phi);
+          if( !TnPTool::IsTag(mu_tagCand, ntuple) )
+            cout << " ---> failed to pass tag condition" << endl;
+          else
+            cout << " ---> pass tag condition" << endl;
+        }
+
         if( !TnPTool::IsTag(mu_tagCand, ntuple) ) continue; // -- check here to save runtime
 
         // -- collect the probes sharing same tag
@@ -164,6 +197,16 @@ public:
           if( i_tagCand == i_probeCand ) continue;
 
           MuonHLT::Muon mu_probeCand( ntuple, i_probeCand );
+
+          if( debug_ )
+          {
+            cout << TString::Format("      [probe candidate (%dth muon)] (pt, eta, phi) = (%.1lf, %.3lf, %.3lf)", i_probeCand, mu_probeCand.pt, mu_probeCand.eta, mu_probeCand.phi);
+            if( !TnPTool::IsProbe(mu_probeCand, ntuple) )
+              cout << " ---> failed to pass probe condition" << endl;
+            else
+              cout << " ---> pass probe condition" << endl;
+          }
+
           if( !TnPTool::IsProbe(mu_probeCand, ntuple) ) continue; // -- check here to save runtime
 
           TnPPair *tnpPair_ij = new TnPPair( mu_tagCand, mu_probeCand, ntuple );
