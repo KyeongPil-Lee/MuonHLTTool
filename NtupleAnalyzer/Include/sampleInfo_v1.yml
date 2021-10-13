@@ -6,26 +6,26 @@ list_sampleInfo:
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v03/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8/crab_ZToMuMu_M50to120_Powheg_FlatPU30to80/210930_210258/0000
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v03/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8/crab_ZToMuMu_M50to120_Powheg_FlatPU30to80/210930_210258/0001
-    xSec: 5795.0 # -- M50-Inf
+    xSec: 2288.0 # -- from Minseok's value
     sumWeight: 2947800.0
 
   - sampleType: ZMuMu_M50to120
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v04/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8/crab_ZToMuMu_M50to120_Powheg_FlatPU30to80/210930_210558/0000
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v04/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8/crab_ZToMuMu_M50to120_Powheg_FlatPU30to80/210930_210558/0001
-    xSec: 5795.0 # -- M50-Inf
+    xSec: 2288.0 # -- from Minseok's value
     sumWeight: 2947800.0
 
   - sampleType: ZMuMu_M120to200
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v04/ZToMuMu_M-120To200_TuneCP5_14TeV-powheg-pythia8/crab_ZToMuMu_M120to200_Powheg_FlatPU30to80/210930_210525/0000
-    xSec: -1.0
+    xSec: 22.39 # -- from Minseok's value
     sumWeight: 94224.0
 
   - sampleType: ZMuMu_M200to400
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v04/ZToMuMu_M-200To400_TuneCP5_14TeV-powheg-pythia8/crab_ZToMuMu_M200to400_Powheg_FlatPU30to80/210930_210541/0000
-    xSec: -1.0
+    xSec: 3.174 # -- from Minseok's value
     sumWeight: 100000.0
 
   - sampleType: ttbar
