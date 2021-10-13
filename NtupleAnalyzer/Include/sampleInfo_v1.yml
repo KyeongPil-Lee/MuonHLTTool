@@ -1,31 +1,32 @@
 # -- sample infomation read by CondorJobSubmitter
+# -- cross section information: https://twiki.cern.ch/twiki/bin/view/CMS/HighLevelTriggerPhase2#Rate_calculations
 
 list_sampleInfo:
   - sampleType: ZMuMu_M50to120_Default
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v03/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8/crab_ZToMuMu_M50to120_Powheg_FlatPU30to80/210930_210258/0000
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v03/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8/crab_ZToMuMu_M50to120_Powheg_FlatPU30to80/210930_210258/0001
-    xSec: -1.0
-    sumWeight: -1.0
+    xSec: 5795.0 # -- M50-Inf
+    sumWeight: 2947800.0
 
   - sampleType: ZMuMu_M50to120
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v04/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8/crab_ZToMuMu_M50to120_Powheg_FlatPU30to80/210930_210558/0000
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v04/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8/crab_ZToMuMu_M50to120_Powheg_FlatPU30to80/210930_210558/0001
-    xSec: -1.0
-    sumWeight: -1.0
+    xSec: 5795.0 # -- M50-Inf
+    sumWeight: 2947800.0
 
   - sampleType: ZMuMu_M120to200
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v04/ZToMuMu_M-120To200_TuneCP5_14TeV-powheg-pythia8/crab_ZToMuMu_M120to200_Powheg_FlatPU30to80/210930_210525/0000
     xSec: -1.0
-    sumWeight: -1.0
+    sumWeight: 94224.0
 
   - sampleType: ZMuMu_M200to400
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v04/ZToMuMu_M-200To400_TuneCP5_14TeV-powheg-pythia8/crab_ZToMuMu_M200to400_Powheg_FlatPU30to80/210930_210541/0000
     xSec: -1.0
-    sumWeight: -1.0
+    sumWeight: 100000.0
 
   - sampleType: ttbar
     list_ntupleDirPath: 
@@ -34,44 +35,44 @@ list_sampleInfo:
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v04/TT_TuneCP5_14TeV-powheg-pythia8/crab_TT_Powheg_FlatPU30to80/210930_210452/0002
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v04/TT_TuneCP5_14TeV-powheg-pythia8/crab_TT_Powheg_FlatPU30to80/210930_210452/0003
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v04/TT_TuneCP5_14TeV-powheg-pythia8/crab_TT_Powheg_FlatPU30to80/210930_210452/0004
-    xSec: -1.0
-    sumWeight: -1.0
+    xSec: 984.50
+    sumWeight: 8543927.0
 
   - sampleType: WJets
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v04/WJetsToLNu_TuneCP5_14TeV-amcatnloFXFX-pythia8/crab_WJetsToLNu_aMCNLO_FlatPU30to80/210930_210508/0000
-    xSec: -1.0
-    sumWeight: -1.0
+    xSec: 56990.0
+    sumWeight: 1451383.0
 
   - sampleType: QCDMuEnriched_Pt20to30
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v04/QCD_Pt-20To30_MuEnrichedPt5_TuneCP5_14TeV-pythia8/crab_QCDMuEnriched_Pt20to30_Pythia8_FlatPU30to80/210930_210340/0000
-    xSec: -1.0
-    sumWeight: -1.0
+    xSec: 436000000.0
+    sumWeight: 106288.0
 
   - sampleType: QCDMuEnriched_Pt30to50
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v04/QCD_Pt-30To50_MuEnrichedPt5_TuneCP5_14TeV-pythia8/crab_QCDMuEnriched_Pt30to50_Pythia8_FlatPU30to80/210930_210357/0000
-    xSec: -1.0
-    sumWeight: -1.0
+    xSec: 118400000.0
+    sumWeight: 100622.0
 
   - sampleType: QCDMuEnriched_Pt50to80
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v04/QCD_Pt-50To80_MuEnrichedPt5_TuneCP5_14TeV-pythia8/crab_QCDMuEnriched_Pt50to80_Pythia8_FlatPU30to80/210930_210419/0000
-    xSec: -1.0
-    sumWeight: -1.0
+    xSec: 17650000.0
+    sumWeight: 51248.0
 
   - sampleType: QCDMuEnriched_Pt80to120
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v04/QCD_Pt-80To120_MuEnrichedPt5_TuneCP5_14TeV-pythia8/crab_QCDMuEnriched_Pt80to120_Pythia8_FlatPU30to80/210930_210436/0000
-    xSec: -1.0
-    sumWeight: -1.0
+    xSec: 2671000.0
+    sumWeight: 49021.0
 
   - sampleType: QCDMuEnriched_Pt120to170
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v04/QCD_Pt-120To170_MuEnrichedPt5_TuneCP5_14TeV-pythia8/crab_QCDMuEnriched_Pt120to170_Pythia8_FlatPU30to80/210930_210323/0000
-    xSec: -1.0
-    sumWeight: -1.0
+    xSec: 469700.0
+    sumWeight: 50646.0
 
 binnedSampleList:
   - [ZMuMu_M50to120, ZMuMu_M120to200, ZMuMu_M200to400]
