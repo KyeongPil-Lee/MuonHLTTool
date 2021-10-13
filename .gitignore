@@ -1,5 +1,6 @@
 Local/
 CRABDir/
+condorJob*/
 *.log
 *.pyc
 *.pdf
