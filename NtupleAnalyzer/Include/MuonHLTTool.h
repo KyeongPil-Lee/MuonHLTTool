@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <TH1.h>
+#include <TSystem.h>
 
 namespace MuonHLT
 {
