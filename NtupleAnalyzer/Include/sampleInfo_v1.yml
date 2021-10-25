@@ -74,6 +74,17 @@ list_sampleInfo:
     xSec: 469700.0
     sumWeight: 50646.0
 
-binnedSampleList:
-  - [ZMuMu_M50to120, ZMuMu_M120to200, ZMuMu_M200to400]
-  - [QCDMuEnriched_Pt20to30, QCDMuEnriched_Pt30to50, QCDMuEnriched_Pt50to80, QCDMuEnriched_Pt80to120, QCDMuEnriched_Pt120to170]
+list_binnedSample:
+  - name: ZMuMu_M50to400
+    list_sampleType:
+      - ZMuMu_M50to120
+      - ZMuMu_M120to200
+      - ZMuMu_M200to400
+
+  - name: QCDMuEnriched_Pt20to170
+    list_sampleType:
+      - QCDMuEnriched_Pt20to30
+      - QCDMuEnriched_Pt30to50
+      - QCDMuEnriched_Pt50to80
+      - QCDMuEnriched_Pt80to120
+      - QCDMuEnriched_Pt120to170
