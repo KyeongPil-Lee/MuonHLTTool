@@ -82,10 +82,67 @@ class MultiCondorJobSubmitter:
             f_script.write(command_hadd+"\n")
 
         f_script.write("\n")
+
+        if self.doMergeBinnedSample:
+            self.WriteMergingCommand(f_script)
+
         f_script.close()
 
         print "[MultiCondorJobSubmitter] Get merged ROOT files after the condor jobs are finished"
         print "source %s\n" % scriptPath
+
+
+    def WriteMergingCommand(self, f_script):
+        f_script.write("# -- merge binned samples -- #\n")
+
+        yamlParser = ""
+        with open(path_sampleInfoYAML) as f:
+            yamlParser = yaml.load(f)
+            # yamlParser = yaml.load(f, Loader=yaml.FullLoader)
+
+        list_binnedSample = yamlParser["list_binnedSample"]
+        for binnedSample in list_binnedSample:
+            binMergedSampleName = binnedSample["name"]
+
+            binMergedFileName = "ROOTFile_%s_%s.root" % (self.ROOTCodeName.split(".cxx")[0], binMergedSampleName)
+            binMergedFilePath = "%s/%s" % (self.cwd, binMergedFileName)
+
+            list_targetROOTFilePath = []
+            for sampleType in binnedSample["list_sampleType"]:
+                targetROOTFileName = "ROOTFile_%s_%s.root" % (self.ROOTCodeName.split(".cxx")[0], sampleType)
+                list_targetROOTFilePath.append( "%s/%s" % (self.cwd, targetROOTFileName) )
+
+            cmd_hadd = "hadd %s \\\n" % binMergedFilePath
+
+            for targetROOTFilePath in list_targetROOTFilePath:
+                if targetROOTFilePath == list_targetROOTFilePath[-1]:
+                    cmd_hadd = cmd_hadd + "%s " % targetROOTFilePath
+                else:
+                    cmd_hadd = cmd_hadd + "%s \\\n" % targetROOTFilePath
+
+            f_script.write(cmd_hadd)
+            f_script.write("\n")
+
+            # -- remove already merged files
+            cmd_rm = "rm \\\n"
+            for targetROOTFilePath in list_targetROOTFilePath:
+                if targetROOTFilePath == list_targetROOTFilePath[-1]:
+                    cmd_rm = "%s" % targetROOTFilePath
+                else:
+                    cmd_rm = "%s \\\n" % targetROOTFilePath
+
+            f_script.write(cmd_rm)
+            f_script.write("\n")
+
+
+
+
+
+
+
+
+
+
 
 
 
