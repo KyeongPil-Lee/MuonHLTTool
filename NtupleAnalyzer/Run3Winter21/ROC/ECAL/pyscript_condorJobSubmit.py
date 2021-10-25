@@ -17,4 +17,6 @@ submitter.dic_sample_nJob = {
     "QCDMuEnriched_Pt120to170": 3,
 }
 
+submitter.doMergeBinnedSample = True
+
 submitter.Submit()
