@@ -95,6 +95,10 @@ class MultiCondorJobSubmitter:
     def WriteMergingCommand(self, f_script):
         f_script.write("# -- merge binned samples -- #\n")
 
+        analyzerPath = os.getenv("MUONHLT_ANALYZER_PATH")
+        includePath = "%s/Include" % analyzerPath
+        path_sampleInfoYAML = "%s/%s" % (includePath, self.sampleInfoYAML)
+
         yamlParser = ""
         with open(path_sampleInfoYAML) as f:
             yamlParser = yaml.load(f)
@@ -121,18 +125,18 @@ class MultiCondorJobSubmitter:
                     cmd_hadd = cmd_hadd + "%s \\\n" % targetROOTFilePath
 
             f_script.write(cmd_hadd)
-            f_script.write("\n")
+            f_script.write("\n\n")
 
             # -- remove already merged files
             cmd_rm = "rm \\\n"
             for targetROOTFilePath in list_targetROOTFilePath:
                 if targetROOTFilePath == list_targetROOTFilePath[-1]:
-                    cmd_rm = "%s" % targetROOTFilePath
+                    cmd_rm = cmd_rm + "%s" % targetROOTFilePath
                 else:
-                    cmd_rm = "%s \\\n" % targetROOTFilePath
+                    cmd_rm = cmd_rm + "%s \\\n" % targetROOTFilePath
 
             f_script.write(cmd_rm)
-            f_script.write("\n")
+            f_script.write("\n\n\n")
 
 
 
