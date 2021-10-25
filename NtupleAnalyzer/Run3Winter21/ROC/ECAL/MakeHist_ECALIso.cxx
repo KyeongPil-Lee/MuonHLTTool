@@ -92,7 +92,7 @@ private:
 };
 
 
-void MakeHist_GenLevel(TString textFile_ntupleList)
+void MakeHist_ECALIso(TString textFile_ntupleList)
 {
   TString tag = textFile_ntupleList.Data();
   tag = gSystem->BaseName(tag);
