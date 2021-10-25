@@ -17,6 +17,10 @@ public:
     TH1D* h_ECALIso    = new TH1D("h_ECALIso", "", 10000, 0, 10000);
     TH1D* h_relECALIso = new TH1D("h_relECALIso", "", 10000, 0, 10);
 
+    // -- finer bins for ROC curve
+    TH1D* h_relECALIso_fineBin     = new TH1D("h_relECALIso_fineBin", "", 10000, 0, 1);
+    TH1D* h_relECALIso_low_fineBin = new TH1D("h_relECALIso_low_fineBin", "", 10000, 0, 0.1);
+
     TChain* chain = new TChain("ntupler/ntuple");
     MuonHLT::AddNtupleToChain( chain, fileName_ntupleList_ );
 
@@ -51,6 +55,8 @@ public:
         MYHLTObj.FillIsolationVariable(ntuple);
         h_ECALIso->Fill( MYHLTObj.ECALIso, totWeight );
         h_relECALIso->Fill( MYHLTObj.relECALIso, totWeight );
+        h_relECALIso_fineBin->Fill( MYHLTObj.relECALIso, totWeight );
+        h_relECALIso_low_fineBin->Fill( MYHLTObj.relECALIso, totWeight );
       }
 
     } // -- end of event iteration
@@ -58,6 +64,8 @@ public:
     TFile *f_output = TFile::Open(outputFileName_, "RECREATE");
     h_ECALIso->Write();
     h_relECALIso->Write();
+    h_relECALIso_fineBin->Write();
+    h_relECALIso_low_fineBin->Write();
     f_output->Close();
 
     delete ntuple;
