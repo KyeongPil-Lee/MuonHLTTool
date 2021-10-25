@@ -100,6 +100,61 @@ vector<MuonHLT::IterL3MuonNoID> GetAllIterL3MuonNoID(NtupleHandle* ntuple, Doubl
   return vec_muon;
 }
 
+vector<MuonHLT::Muon> GetAllOfflineMuon(NtupleHandle* ntuple, Double_t minPt = -1 )
+{
+  vector<MuonHLT::Muon> vec_muon;
+  for(Int_t i_obj=0; i_obj<ntuple->nMuon; i_obj++)
+  {
+    MuonHLT::Muon mu(ntuple, i_obj);
+    if( mu.pt > minPt )
+      vec_muon.push_back( mu );
+  }
+
+  return vec_muon;
+}
+
+vector<MuonHLT::GenParticle> GetAllGenLeptons(NtupleHandle *ntuple, Int_t pdgID, TString genFlagName)
+{
+  vector< MuonHLT::GenParticle > vec_genLepton;
+  vec_genLepton.clear();
+
+  if( genFlagName != "isHardProcess" && 
+      genFlagName != "fromHardProcessFinalState" )
+  {
+    cout << "[MuonHLT::GetAllGenLeptons] genFlagName = " << genFlagName << " is not supported -> empty vector is returned" << endl;
+    cout << "  Update the code if you want to use " << genFlagName << endl;
+    return vec_genLepton;
+  }
+
+  if( pdgID != 11 && pdgID != 13 )
+  {
+    cout << "[MuonHLT::GetAllGenLeptons] pdgID = " << pdgID << "is not supported -> empty vector is returned" << endl;
+    cout << "  Update the code if you want to use " << pdgID << endl;
+    return vec_genLepton;
+  }
+
+  for(Int_t i_gen=0; i_gen<ntuple->nGenParticle; i_gen++)
+  {
+    MuonHLT::GenParticle genLepton( ntuple, i_gen );
+
+    if( abs(genLepton.ID) == pdgID )
+    {
+      if( genFlagName == "isHardProcess" )
+      {
+        if( genLepton.isHardProcess ) 
+          vec_genLepton.push_back( genLepton );
+      }
+      else if( genFlagName == "fromHardProcessFinalState" )
+      {
+        if( genLepton.fromHardProcessFinalState ) 
+          vec_genLepton.push_back( genLepton );
+      }
+    }
+  }
+
+  return vec_genLepton;
+}
+
 Bool_t dRMatching( TLorentzVector vecP_ref, vector<TLorentzVector> vec_vecP, Double_t minDR )
 {
   bool flag = kFALSE;
@@ -196,6 +251,16 @@ static inline void loadBar(int x, int n, int r, int w)
 
 }
 
+Double_t GetArg(TString fullArg)
+{
+  // -- extract the part with the numbers only from the full argument
+  // -- example
+  // ---- fullArg = "cross section: 1976.0"
+  // ---- subArg = "1976.0" (the strings after : )
+  TString subArg = fullArg(fullArg.Index(":") + 1, fullArg.Length());
+  return TString(subArg).Atof();
+}
+
 void AddNtupleToChain(TChain* chain, TString textFileName)
 {
   ifstream openFile( textFileName.Data() );
@@ -209,7 +274,10 @@ void AddNtupleToChain(TChain* chain, TString textFileName)
     while(getline(openFile, line))
     {
       cout << line << endl;
-      chain->Add(line.data());
+
+      TString tstr_line(line);
+      if( !tstr_line.BeginsWith("#") ) // -- ignore the lines starting with # (these lines could have cross section & sum(weight) info.)
+        chain->Add(line.data());
     }
     openFile.close();
   }
@@ -217,6 +285,71 @@ void AddNtupleToChain(TChain* chain, TString textFileName)
   cout << "==================================" << endl;
   cout << "All ROOT Files are put into TChain" << endl;
   cout << "==================================" << endl;
+}
+
+// -- type = "xSec", "sumWeight"
+Double_t GetInfo(TString type, TString textFileName)
+{
+  Bool_t isFound = kFALSE;
+  Double_t value = -1.0;
+
+  ifstream openFile( textFileName.Data() );
+
+  if( openFile.is_open() )
+  {
+    string line;
+    while(getline(openFile, line))
+    {
+      TString tstr_line(line);
+      if( tstr_line.Contains("#") )
+      {
+        if( (type == "xSec"      && tstr_line.Contains("cross section")) ||
+            (type == "sumWeight" && tstr_line.Contains("sum of weights")) )
+        {
+          value = GetArg(tstr_line);
+          isFound = kTRUE;
+        }
+      }
+    }
+    openFile.close();
+  }
+
+  if( !isFound )
+    cout << "[MuonHLT::GetInfo] Information for type " << type << " in " << textFileName << " is not found! ... return -1.0" << endl;
+
+  return value;
+}
+
+// -- type = "sampleType"
+TString GetInfo_String(TString type, TString textFileName)
+{
+  Bool_t isFound = kFALSE;
+  TString value = "";
+
+  ifstream openFile( textFileName.Data() );
+
+  if( openFile.is_open() )
+  {
+    string line;
+    while(getline(openFile, line))
+    {
+      TString tstr_line(line);
+      if( tstr_line.Contains("#") )
+      {
+        if( (type == "sampleType" && tstr_line.Contains("sample type")) )
+        {
+          value = tstr_line(tstr_line.Index(":") + 2, tstr_line.Length()); // -- +2, not +1: remove an empty space
+          isFound = kTRUE;
+        }
+      }
+    }
+    openFile.close();
+  }
+
+  if( !isFound )
+    cout << "[MuonHLT::GetInfo_String] Information for type " << type << " in " << textFileName << " is not found! ... return empty string" << endl;
+
+  return value;
 }
 
 // -- find the same L3 muon with the given MYHLT object

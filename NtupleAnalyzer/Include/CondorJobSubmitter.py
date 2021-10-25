@@ -268,8 +268,20 @@ echo "finished"
 
             textFileName = "%s/%s/%s_%d.txt" % (self.workingDirPath, self.textFileDirName, self.baseName_ntupleList, i_job)
             f_textFile = open(textFileName, "w")
+
+            str_info_sampleType = "# -- sample type: %s" % self.sampleType
+            str_info_xSec       = "# -- cross section: %s" % self.xSec
+            str_info_sumWeight  = "# -- sum of weights: %s" % self.sumWeight 
+
+            # -- put some information about the sample at first
+            f_textFile.write(str_info_sampleType+"\n")
+            f_textFile.write(str_info_xSec+"\n")
+            f_textFile.write(str_info_sumWeight+"\n")
+
+            # -- and put the ntuple paths
             for fileName in list_ntuplePath_iJob:
                 f_textFile.write( fileName + "\n" )
+
             f_textFile.close()
 
 
