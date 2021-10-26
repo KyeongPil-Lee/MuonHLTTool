@@ -14,18 +14,19 @@ public:
   {
     StartTimer();
 
-    TH1D* h_ECALIso    = new TH1D("h_ECALIso", "", 10000, 0, 10000);
-    TH1D* h_relECALIso = new TH1D("h_relECALIso", "", 10000, 0, 10);
+    TH1D* h_ECALIso    = new TH1D("h_ECALIso", "", 20000, -10000, 10000);
+    TH1D* h_relECALIso = new TH1D("h_relECALIso", "", 20000, -10, 10);
 
-    TH1D* h_ECALIso_EB    = new TH1D("h_ECALIso_EB", "", 10000, 0, 10000);
-    TH1D* h_ECALIso_EE    = new TH1D("h_ECALIso_EE", "", 10000, 0, 10000);
+    TH1D* h_ECALIso_EB    = new TH1D("h_ECALIso_EB", "", 20000, -10000, 10000);
+    TH1D* h_ECALIso_EE    = new TH1D("h_ECALIso_EE", "", 20000, -10000, 10000);
 
-    TH1D* h_relECALIso_EB = new TH1D("h_relECALIso_EB", "", 10000, 0, 10);
-    TH1D* h_relECALIso_EE = new TH1D("h_relECALIso_EE", "", 10000, 0, 10);
+    TH1D* h_relECALIso_EB = new TH1D("h_relECALIso_EB", "", 20000, -10, 10);
+    TH1D* h_relECALIso_EE = new TH1D("h_relECALIso_EE", "", 20000, -10, 10);
 
     // -- finer bins for ROC curve
-    TH1D* h_relECALIso_low_fineBin_EB = new TH1D("h_relECALIso_low_fineBin_EB", "", 10000, 0, 0.1);
-    TH1D* h_relECALIso_low_fineBin_EE = new TH1D("h_relECALIso_low_fineBin_EE", "", 10000, 0, 0.1);
+    // -- include minus region: some isolation values can be negative due to rho*effArea correction (iso - rho*effArea)
+    TH1D* h_relECALIso_low_fineBin_EB = new TH1D("h_relECALIso_low_fineBin_EB", "", 20000, -0.1, 0.1);
+    TH1D* h_relECALIso_low_fineBin_EE = new TH1D("h_relECALIso_low_fineBin_EE", "", 20000, -0.1, 0.1);
 
     TH1D* h_relECALIso_high_fineBin_EB = new TH1D("h_relECALIso_high_fineBin_EB", "", 9000, 0.1, 1);
     TH1D* h_relECALIso_high_fineBin_EE = new TH1D("h_relECALIso_high_fineBin_EE", "", 9000, 0.1, 1);
@@ -68,7 +69,7 @@ public:
         if( debug_ )
         {
           if( MYHLTObj.ECALIso < 0.0 )
-            cout << TString::Format("  [Isolation is negative] (pt, eta, phi, ECALIso, relECALIso, relHCALIso, relTrkIso) = (%.1lf, %.3lf, %3.lf, %.3lf, %.3lf, %.3lf, %.3lf)", MYHLTObj.pt, MYHLTObj.eta, MYHLTObj.phi, MYHLTObj.ECALIso, MYHLTObj.relECALIso, MYHLTObj.relHCALIso, MYHLTObj.relTrkIso) << endl;
+            cout << TString::Format("  [Isolation is negative] (pt, eta, phi, ECALIso, relECALIso, relHCALIso, relTrkIso) = (%.1lf, %.3lf, %.3lf, %.3lf, %.3lf, %.3lf, %.3lf)", MYHLTObj.pt, MYHLTObj.eta, MYHLTObj.phi, MYHLTObj.ECALIso, MYHLTObj.relECALIso, MYHLTObj.relHCALIso, MYHLTObj.relTrkIso) << endl;
         }
 
 
@@ -127,7 +128,8 @@ private:
 
   TString fileName_ntupleList_ = "";
 
-  Bool_t debug_ = kTRUE;
+  // Bool_t debug_ = kTRUE;
+  Bool_t debug_ = kFALSE;
 
   void StartTimer()
   {
@@ -153,7 +155,7 @@ void MakeHist_ECALIso(TString textFile_ntupleList)
   TString tag = textFile_ntupleList.Data();
   tag = gSystem->BaseName(tag);
   tag.ReplaceAll(".txt", "");
-  TString outputFileName = TString::Format("ROOTFile__%s.root", tag.Data());
+  TString outputFileName = TString::Format("ROOTFile_%s.root", tag.Data());
 
   HistProducer* histProducer = new HistProducer();
   histProducer->Set_OutputFileName(outputFileName);
