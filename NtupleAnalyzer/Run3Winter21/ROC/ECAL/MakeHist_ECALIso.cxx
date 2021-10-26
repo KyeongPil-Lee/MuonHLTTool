@@ -54,6 +54,8 @@ public:
       MuonHLT::loadBar(i_ev+1, nEvent, 100, 100);
       ntuple->GetEvent(i_ev);
 
+      if( debug_ ) cout << "[" << i_ev << "th event]" << endl;
+
       Double_t genWeight = ntuple->isRealData? 1.0 : ntuple->genEventWeight;
       Double_t totWeight = normFactor * genWeight;
 
@@ -62,6 +64,14 @@ public:
       for(auto& MYHLTObj : vec_MYHLTObj )
       {
         MYHLTObj.FillIsolationVariable(ntuple);
+
+        if( debug_ )
+        {
+          if( MYHLTObj.ECALIso < 0.0 )
+            cout << TString::Format("  [Isolation is negative] (pt, eta, phi, ECALIso, relECALIso, relHCALIso, relTrkIso) = (%.1lf, %.3lf, %3.lf, %.3lf, %.3lf, %.3lf, %.3lf)", MYHLTObj.pt, MYHLTObj.eta, MYHLTObj.phi, MYHLTObj.ECALIso, MYHLTObj.relECALIso, MYHLTObj.relHCALIso, MYHLTObj.relTrkIso) << endl;
+        }
+
+
         h_ECALIso->Fill( MYHLTObj.ECALIso, totWeight );
         h_relECALIso->Fill( MYHLTObj.relECALIso, totWeight );
 
@@ -82,6 +92,8 @@ public:
           h_relECALIso_high_fineBin_EE->Fill( MYHLTObj.relECALIso, totWeight );
         }
       }
+
+      if( debug_ ) cout << endl;
 
     } // -- end of event iteration
 
@@ -114,6 +126,8 @@ private:
   TString outputFileName_;
 
   TString fileName_ntupleList_ = "";
+
+  Bool_t debug_ = kTRUE;
 
   void StartTimer()
   {
