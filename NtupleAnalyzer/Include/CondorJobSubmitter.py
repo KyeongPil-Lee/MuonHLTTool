@@ -358,10 +358,16 @@ echo "finished"
     def GetList_NtuplePath(self, baseNtupleDir):
         list_rootFile = []
 
-        list_file = os.listdir(baseNtupleDir)
-        for fileName in list_file:
+        # list_file = os.listdir(baseNtupleDir)
+        # for fileName in list_file:
+        #     if ".root" in fileName:
+        #         ntuplePath = "%s/%s" % (baseNtupleDir, fileName)
+        #         list_rootFile.append( ntuplePath )
+
+        # -- search for all subdirectories
+        for (path, dirName, fileName) in os.walk(baseNtupleDir):
             if ".root" in fileName:
-                ntuplePath = "%s/%s" % (baseNtupleDir, fileName)
+                ntuplePath = "%s/%s" % (path, fileName)
                 list_rootFile.append( ntuplePath )
 
         if len(list_rootFile) == 0:

@@ -1,0 +1,79 @@
+# -- sample infomation read by CondorJobSubmitter
+# -- cross section information: https://twiki.cern.ch/twiki/bin/view/CMS/HighLevelTriggerPhase2#Rate_calculations
+# -- MuonHLTTree_v06: update rho value from PF rechit (not calo tower). Different rho value for ECAL and HCAL
+
+list_sampleInfo:
+  - sampleType: ZMuMu_M50to120
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v06/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8/crab_ZToMuMu_M50to120_Powheg_FlatPU30to80
+    xSec: 2288.0 # -- from Minseok's value
+    sumWeight: 2947800.0
+
+  - sampleType: ZMuMu_M120to200
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v06/ZToMuMu_M-120To200_TuneCP5_14TeV-powheg-pythia8/crab_ZToMuMu_M120to200_Powheg_FlatPU30to80
+    xSec: 22.39 # -- from Minseok's value
+    sumWeight: 94224.0
+
+  - sampleType: ZMuMu_M200to400
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v06/ZToMuMu_M-200To400_TuneCP5_14TeV-powheg-pythia8/crab_ZToMuMu_M200to400_Powheg_FlatPU30to80
+    xSec: 3.174 # -- from Minseok's value
+    sumWeight: 100000.0
+
+  - sampleType: ttbar
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v06/TT_TuneCP5_14TeV-powheg-pythia8/crab_TT_Powheg_FlatPU30to80
+    xSec: 984.50
+    sumWeight: 8543927.0
+
+  - sampleType: WJets
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v06/WJetsToLNu_TuneCP5_14TeV-amcatnloFXFX-pythia8/crab_WJetsToLNu_aMCNLO_FlatPU30to80
+    xSec: 56990.0
+    sumWeight: 1451383.0
+
+  - sampleType: QCDMuEnriched_Pt20to30
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v06/QCD_Pt-20To30_MuEnrichedPt5_TuneCP5_14TeV-pythia8/crab_QCDMuEnriched_Pt20to30_Pythia8_FlatPU30to80
+    xSec: 436000000.0
+    sumWeight: 106288.0
+
+  - sampleType: QCDMuEnriched_Pt30to50
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v06/QCD_Pt-30To50_MuEnrichedPt5_TuneCP5_14TeV-pythia8/crab_QCDMuEnriched_Pt30to50_Pythia8_FlatPU30to80
+    xSec: 118400000.0
+    sumWeight: 100622.0
+
+  - sampleType: QCDMuEnriched_Pt50to80
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v06/QCD_Pt-50To80_MuEnrichedPt5_TuneCP5_14TeV-pythia8/crab_QCDMuEnriched_Pt50to80_Pythia8_FlatPU30to80
+    xSec: 17650000.0
+    sumWeight: 51248.0
+
+  - sampleType: QCDMuEnriched_Pt80to120
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v06/QCD_Pt-80To120_MuEnrichedPt5_TuneCP5_14TeV-pythia8/crab_QCDMuEnriched_Pt80to120_Pythia8_FlatPU30to80
+    xSec: 2671000.0
+    sumWeight: 49021.0
+
+  - sampleType: QCDMuEnriched_Pt120to170
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v06/QCD_Pt-120To170_MuEnrichedPt5_TuneCP5_14TeV-pythia8/crab_QCDMuEnriched_Pt120to170_Pythia8_FlatPU30to80
+    xSec: 469700.0
+    sumWeight: 50646.0
+
+list_binnedSample:
+  - name: ZMuMu_M50to400
+    list_sampleType:
+      - ZMuMu_M50to120
+      - ZMuMu_M120to200
+      - ZMuMu_M200to400
+
+  - name: QCDMuEnriched_Pt20to170
+    list_sampleType:
+      - QCDMuEnriched_Pt20to30
+      - QCDMuEnriched_Pt30to50
+      - QCDMuEnriched_Pt50to80
+      - QCDMuEnriched_Pt80to120
+      - QCDMuEnriched_Pt120to170
