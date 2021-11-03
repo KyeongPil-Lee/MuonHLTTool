@@ -29,7 +29,7 @@ config.Site.storageSite = 'T2_BE_IIHE'
 
 # config.JobType.allowUndistributedCMSSW = True
 
-version = 'v04'
+version = 'v05'
 config.Data.outLFNDirBase = '/store/user/kplee/MuonHLTTree_%s' % version
 
 config.General.requestName = 'QCDMuEnriched_Pt120to170_Pythia8_FlatPU30to80'

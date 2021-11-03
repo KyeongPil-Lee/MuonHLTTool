@@ -17,11 +17,8 @@ config.Data.inputDBS = 'global'
 config.Data.publication = False
 
 # config.Data.splitting = 'Automatic' # -- it is not preferred: test job is frequently failed due to memory
-# config.Data.splitting = 'FileBased'
-# config.Data.unitsPerJob = 1
-
-config.Data.splitting = 'EventAwareLumiBased'
-config.Data.unitsPerJob = 3000 # -- ~3000 events per job --> 1000 jobs for ZMuMu_M50to120 (3M events)
+config.Data.splitting = 'FileBased'
+config.Data.unitsPerJob = 1
 
 config.Site.storageSite = 'T2_BE_IIHE'
 
@@ -29,7 +26,7 @@ config.Site.storageSite = 'T2_BE_IIHE'
 
 # config.JobType.allowUndistributedCMSSW = True
 
-version = 'v05'
+version = 'v07'
 config.Data.outLFNDirBase = '/store/user/kplee/MuonHLTTree_%s' % version
 
 config.General.requestName = 'TT_Powheg_FlatPU30to80'

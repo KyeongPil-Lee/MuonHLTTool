@@ -17,11 +17,8 @@ config.Data.inputDBS = 'global'
 config.Data.publication = False
 
 # config.Data.splitting = 'Automatic' # -- it is not preferred: test job is frequently failed due to memory
-# config.Data.splitting = 'FileBased'
-# config.Data.unitsPerJob = 1
-
-config.Data.splitting = 'EventAwareLumiBased'
-config.Data.unitsPerJob = 3000 # -- ~3000 events per job --> 1000 jobs for ZMuMu_M50to120 (3M events)
+config.Data.splitting = 'FileBased'
+config.Data.unitsPerJob = 1
 
 config.Site.storageSite = 'T2_BE_IIHE'
 
@@ -29,10 +26,9 @@ config.Site.storageSite = 'T2_BE_IIHE'
 
 # config.JobType.allowUndistributedCMSSW = True
 
-version = 'v05'
+version = 'v07'
 config.Data.outLFNDirBase = '/store/user/kplee/MuonHLTTree_%s' % version
 
-config.General.requestName = 'TT_Powheg_FlatPU30to80'
-config.Data.inputDataset = '/TT_TuneCP5_14TeV-powheg-pythia8/Run3Winter21DRMiniAOD-FlatPU30to80FEVT_112X_mcRun3_2021_realistic_v16-v2/MINIAODSIM'
-config.Data.secondaryInputDataset = '/TT_TuneCP5_14TeV-powheg-pythia8/Run3Winter21DRMiniAOD-FlatPU30to80FEVT_112X_mcRun3_2021_realistic_v16-v2/GEN-SIM-DIGI-RAW'
-
+config.General.requestName = 'ZToMuMu_M200to400_Powheg_FlatPU30to80'
+config.Data.inputDataset = '/ZToMuMu_M-200To400_TuneCP5_14TeV-powheg-pythia8/Run3Winter21DRMiniAOD-FlatPU30to80FEVT_112X_mcRun3_2021_realistic_v16-v2/MINIAODSIM'
+config.Data.secondaryInputDataset = '/ZToMuMu_M-200To400_TuneCP5_14TeV-powheg-pythia8/Run3Winter21DRMiniAOD-FlatPU30to80FEVT_112X_mcRun3_2021_realistic_v16-v2/GEN-SIM-DIGI-RAW'

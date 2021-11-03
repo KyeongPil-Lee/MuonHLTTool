@@ -93,6 +93,8 @@ private:
   edm::EDGetTokenT< trigger::TriggerEvent >                  t_myTriggerEvent_;
 
   edm::EDGetTokenT< reco::RecoChargedCandidateCollection >   t_L3Muon_;
+  edm::EDGetTokenT< double >                                 t_rho_ECAL_;
+  edm::EDGetTokenT< double >                                 t_rho_HCAL_;
   edm::EDGetTokenT< reco::RecoChargedCandidateIsolationMap > t_ECALIsoMap_;
   edm::EDGetTokenT< reco::RecoChargedCandidateIsolationMap > t_HCALIsoMap_;
   edm::EDGetTokenT< reco::IsoDepositMap >                    t_trkIsoMap_;
@@ -142,6 +144,9 @@ private:
   double offlineBunchLumi_;
   int truePU_;
   double genEventWeight_;
+
+  double rho_ECAL_;
+  double rho_HCAL_;
 
   // -- generator level particles (only MC)
   int nGenParticle_;

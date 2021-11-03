@@ -66,6 +66,8 @@ t_triggerEvent_      ( mayConsume< trigger::TriggerEvent >                (iConf
 t_myTriggerResults_  ( consumes< edm::TriggerResults >                    (iConfig.getUntrackedParameter<edm::InputTag>("myTriggerResults"  )) ),
 t_myTriggerEvent_    ( mayConsume< trigger::TriggerEvent >                (iConfig.getUntrackedParameter<edm::InputTag>("myTriggerEvent"    )) ), // -- not used in miniAOD case
 t_L3Muon_            ( consumes< reco::RecoChargedCandidateCollection >   (iConfig.getUntrackedParameter<edm::InputTag>("L3Muon"            )) ),
+t_rho_ECAL_          ( consumes< double >                                 (iConfig.getUntrackedParameter<edm::InputTag>("rho_ECAL"          )) ),
+t_rho_HCAL_          ( consumes< double >                                 (iConfig.getUntrackedParameter<edm::InputTag>("rho_HCAL"          )) ),
 t_ECALIsoMap_        ( consumes< reco::RecoChargedCandidateIsolationMap > (iConfig.getUntrackedParameter<edm::InputTag>("ECALIsoMap"        )) ),
 t_HCALIsoMap_        ( consumes< reco::RecoChargedCandidateIsolationMap > (iConfig.getUntrackedParameter<edm::InputTag>("HCALIsoMap"        )) ),
 t_trkIsoMap_         ( consumes< reco::IsoDepositMap >                    (iConfig.getUntrackedParameter<edm::InputTag>("trkIsoMap"         )) ),
@@ -116,6 +118,16 @@ void MuonHLTNtupler::analyze(const edm::Event &iEvent, const edm::EventSetup &iS
 
     nVertex_ = nGoodVtx;
   }
+
+  // -- rho
+  edm::Handle<double> h_rho_ECAL;
+  if( iEvent.getByToken(t_rho_ECAL_, h_rho_ECAL) ) 
+    rho_ECAL_ = *(h_rho_ECAL.product());
+
+  edm::Handle<double> h_rho_HCAL;
+  if( iEvent.getByToken(t_rho_HCAL_, h_rho_HCAL) ) 
+    rho_HCAL_ = *(h_rho_HCAL.product());
+
 
   if( isRealData_ )
   {
@@ -197,6 +209,9 @@ void MuonHLTNtupler::Init()
   dataPU_    = -999;
   dataPURMS_ = -999;
   bunchLumi_ = -999;
+
+  rho_ECAL_ = -999;
+  rho_HCAL_ = -999;
 
   offlineInstLumi_  = -999;
   offlineDataPU_    = -999;
@@ -458,6 +473,9 @@ void MuonHLTNtupler::Make_Branch()
   ntuple_->Branch("offlineDataPURMS", &offlineDataPURMS_, "offlineDataPURMS/D");
   ntuple_->Branch("offlineBunchLumi", &offlineBunchLumi_, "offlineBunchLumi/D");
   ntuple_->Branch("truePU", &truePU_, "truePU/I");
+
+  ntuple_->Branch("rho_ECAL", &rho_ECAL_, "rho_ECAL/D");
+  ntuple_->Branch("rho_HCAL", &rho_HCAL_, "rho_HCAL/D");
 
   ntuple_->Branch("genEventWeight", &genEventWeight_, "genEventWeight/D");
   ntuple_->Branch("nGenParticle", &nGenParticle_, "nGenParticle/I");
