@@ -233,8 +233,8 @@ private:
     h_Mu24Obj_passEHCAL_relTrkIso_EE_ = new TH1D("h_Mu24Obj_passEHCAL_relTrkIso_EE", "", 20000, -10, 10); vec_hist_.push_back( h_Mu24Obj_passEHCAL_relTrkIso_EE_ );
 
 
-    h_Mu24Obj_relECALIso_low_fineBin_EB_ = new TH1D("h_Mu24Obj_relECALIso_low_fineBin_EB", "", 20000, -0.1, 0.1); vec_hist_.push_back( h_Mu24Obj_relECALIso_low_fineBin_EB_ );
-    h_Mu24Obj_relECALIso_low_fineBin_EE_ = new TH1D("h_Mu24Obj_relECALIso_low_fineBin_EE", "", 20000, -0.1, 0.1); vec_hist_.push_back( h_Mu24Obj_relECALIso_low_fineBin_EE_ );
+    h_Mu24Obj_relECALIso_low_fineBin_EB_ = new TH1D("h_Mu24Obj_relECALIso_low_fineBin_EB", "", 110000, -1, 0.1); vec_hist_.push_back( h_Mu24Obj_relECALIso_low_fineBin_EB_ );
+    h_Mu24Obj_relECALIso_low_fineBin_EE_ = new TH1D("h_Mu24Obj_relECALIso_low_fineBin_EE", "", 110000, -1, 0.1); vec_hist_.push_back( h_Mu24Obj_relECALIso_low_fineBin_EE_ );
 
     h_Mu24Obj_relECALIso_high_fineBin_EB_ = new TH1D("h_Mu24Obj_relECALIso_high_fineBin_EB", "", 9000, 0.1, 1); vec_hist_.push_back( h_Mu24Obj_relECALIso_high_fineBin_EB_ );
     h_Mu24Obj_relECALIso_high_fineBin_EE_ = new TH1D("h_Mu24Obj_relECALIso_high_fineBin_EE", "", 9000, 0.1, 1); vec_hist_.push_back( h_Mu24Obj_relECALIso_high_fineBin_EE_ );
