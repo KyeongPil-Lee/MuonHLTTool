@@ -139,7 +139,7 @@ public:
 
     MuonHLT::TnPHistProducer* tnpHist           = new MuonHLT::TnPHistProducer(minPt_);
     MuonHLT::TnPHistProducer* tnpHist_belowPU50 = new MuonHLT::TnPHistProducer(minPt_);
-    MuonHLT::TnPHistProducer* tnpHist_overPU50  = new MuonHLT::TnPHistProducer(minPt_);
+    MuonHLT::TnPHistProducer* tnpHist_abovePU50  = new MuonHLT::TnPHistProducer(minPt_);
 
     Int_t nEvent = chain->GetEntries();
     std::cout << "[Total event: " << nEvent << "]" << std::endl;
