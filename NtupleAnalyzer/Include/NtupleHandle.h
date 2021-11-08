@@ -34,6 +34,9 @@ public:
   Int_t           truePU;
   Double_t        genEventWeight;
 
+  Double_t rho_ECAL;
+  Double_t rho_HCAL;
+
   // -- generator inforomation
   Int_t           nGenParticle;
   Int_t           genParticle_ID[ArrSize];
@@ -281,6 +284,8 @@ public:
     chain_->SetBranchStatus("offlineBunchLumi", 1);
     chain_->SetBranchStatus("truePU", 1);
     chain_->SetBranchStatus("genEventWeight", 1);
+    chain_->SetBranchStatus("rho_ECAL", 1);
+    chain_->SetBranchStatus("rho_HCAL", 1);
 
     chain_->SetBranchAddress("isRealData", &isRealData);
     chain_->SetBranchAddress("runNum", &runNum);
@@ -298,6 +303,8 @@ public:
     chain_->SetBranchAddress("offlineBunchLumi", &offlineBunchLumi);
     chain_->SetBranchAddress("truePU", &truePU);
     chain_->SetBranchAddress("genEventWeight", &genEventWeight);
+    chain_->SetBranchAddress("rho_ECAL", &rho_ECAL);
+    chain_->SetBranchAddress("rho_HCAL", &rho_HCAL);
   }
 
   void TurnOnBranches_Trigger()
