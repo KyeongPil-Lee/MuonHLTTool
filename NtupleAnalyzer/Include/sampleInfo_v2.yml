@@ -8,13 +8,13 @@ list_sampleInfo:
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v05/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8/crab_ZToMuMu_M50to120_Powheg_FlatPU30to80/211101_171437/0000
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v05/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8/crab_ZToMuMu_M50to120_Powheg_FlatPU30to80/211101_171437/0001
     xSec: 2288.0 # -- from Minseok's value
-    sumWeight: 2947800.0
+    sumWeight: 2700120.0
 
   - sampleType: ZMuMu_M120to200
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v05/ZToMuMu_M-120To200_TuneCP5_14TeV-powheg-pythia8/crab_ZToMuMu_M120to200_Powheg_FlatPU30to80/211101_171339/0000
     xSec: 22.39 # -- from Minseok's value
-    sumWeight: 94224.0
+    sumWeight: 82672.0
 
   - sampleType: ZMuMu_M200to400
     list_ntupleDirPath: 
@@ -30,13 +30,13 @@ list_sampleInfo:
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v05/TT_TuneCP5_14TeV-powheg-pythia8/crab_TT_Powheg_FlatPU30to80/211101_171249/0003
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v05/TT_TuneCP5_14TeV-powheg-pythia8/crab_TT_Powheg_FlatPU30to80/211101_171249/0004
     xSec: 984.50
-    sumWeight: 8543927.0
+    sumWeight: 7964038.0
 
   - sampleType: WJets
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v05/WJetsToLNu_TuneCP5_14TeV-amcatnloFXFX-pythia8/crab_WJetsToLNu_aMCNLO_FlatPU30to80/211101_171315/0000
     xSec: 56990.0
-    sumWeight: 1451383.0
+    sumWeight: 1454311.0
 
   - sampleType: QCDMuEnriched_Pt20to30
     list_ntupleDirPath: 
@@ -54,13 +54,13 @@ list_sampleInfo:
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v05/QCD_Pt-50To80_MuEnrichedPt5_TuneCP5_14TeV-pythia8/crab_QCDMuEnriched_Pt50to80_Pythia8_FlatPU30to80/211101_171148/0000
     xSec: 17650000.0
-    sumWeight: 51248.0
+    sumWeight: 45438.0
 
   - sampleType: QCDMuEnriched_Pt80to120
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v05/QCD_Pt-80To120_MuEnrichedPt5_TuneCP5_14TeV-pythia8/crab_QCDMuEnriched_Pt80to120_Pythia8_FlatPU30to80/211101_171219/0000
     xSec: 2671000.0
-    sumWeight: 49021.0
+    sumWeight: 43551.0
 
   - sampleType: QCDMuEnriched_Pt120to170
     list_ntupleDirPath: 
