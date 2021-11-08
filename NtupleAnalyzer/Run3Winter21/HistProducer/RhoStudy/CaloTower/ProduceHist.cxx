@@ -1,6 +1,6 @@
 #include <Run3Winter21/HistProducer/HistProducer.h>
 
-void ProducePlot(TString textFile_ntupleList)
+void ProduceHist(TString textFile_ntupleList)
 {
   TString tag = textFile_ntupleList.Data();
   tag = gSystem->BaseName(tag);
