@@ -139,7 +139,9 @@ public:
     ntuple->TurnOnBranches_HLTMuon();
     ntuple->TurnOnBranches_IterL3Muon();
 
-    MuonHLT::TnPHistProducer* tnpHist = new MuonHLT::TnPHistProducer(minPt_);
+    MuonHLT::TnPHistProducer* tnpHist           = new MuonHLT::TnPHistProducer(minPt_);
+    MuonHLT::TnPHistProducer* tnpHist_belowPU50 = new MuonHLT::TnPHistProducer(minPt_);
+    MuonHLT::TnPHistProducer* tnpHist_overPU50  = new MuonHLT::TnPHistProducer(minPt_);
 
     Int_t nEvent = chain->GetEntries();
     std::cout << "[Total event: " << nEvent << "]" << std::endl;
@@ -217,7 +219,12 @@ public:
 
         // -- fill TnP histogram only when probeMultiplicity == 1
         if( (Int_t)vec_tnpPairs_sameTag.size() == 1 ) 
+        {
           tnpHist->Fill( vec_tnpPairs_sameTag[0], weight );
+
+          if( ntuple->truePU >= 50 ) tnpHist_abovePU50->Fill( vec_tnpPairs_sameTag[0], weight );
+          else                       tnpHist_belowPU50->Fill( vec_tnpPairs_sameTag[0], weight );
+        }
 
         for( auto tnpPair : vec_tnpPairs_sameTag )
           delete tnpPair;
@@ -227,7 +234,19 @@ public:
     } // -- end of event iteration
 
     TFile *f_output = TFile::Open(outputFileName_, "RECREATE");
+    f_output->cd();
     tnpHist->Save( f_output );
+
+    f_output->cd();
+    f_output->mkdir("belowPU50");
+    f_output->cd("belowPU50");
+    tnpHist_belowPU50->Save( f_output );
+
+    f_output->cd();
+    f_output->mkdir("abovePU50");
+    f_output->cd("abovePU50");
+    tnpHist_abovePU50->Save( f_output );
+
     f_output->Close();
 
     delete ntuple;
