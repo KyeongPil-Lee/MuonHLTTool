@@ -365,10 +365,12 @@ echo "finished"
         #         list_rootFile.append( ntuplePath )
 
         # -- search for all subdirectories
-        for (path, dirName, fileName) in os.walk(baseNtupleDir):
-            if ".root" in fileName:
-                ntuplePath = "%s/%s" % (path, fileName)
-                list_rootFile.append( ntuplePath )
+        for (path, list_dirName, list_fileName) in os.walk(baseNtupleDir):
+            # print "fileName = %s" % list_fileName
+            for fileName in list_fileName:
+                if ".root" in fileName:
+                    ntuplePath = "%s/%s" % (path, fileName)
+                    list_rootFile.append( ntuplePath )
 
         if len(list_rootFile) == 0:
             print "[GetList_NtuplePath] no root file under %s ... exit" % baseNtupleDir
