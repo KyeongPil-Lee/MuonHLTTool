@@ -15,6 +15,9 @@ submitter.dic_sample_nJob = {
     "QCDMuEnriched_Pt50to80": 3,
     "QCDMuEnriched_Pt80to120": 3,
     "QCDMuEnriched_Pt120to170": 3,
+
+    "ttbar": 20,
+    "WJets": 10,
 }
 
 submitter.doMergeBinnedSample = True
