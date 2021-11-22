@@ -16,6 +16,11 @@ public:
   {
     h_rho_ECAL_->Fill( ntuple->rho_ECAL, weight );
     h_rho_HCAL_->Fill( ntuple->rho_HCAL, weight );
+
+    // -- if at least one fiinal trigger object exists: trigger is fired
+    vector<MuonHLT::MYHLTObject> vec_MYHLTObj_IsoMu24 = MuonHLT::GetAllMYHLTObject(ntuple, "hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07::MYHLT");
+    if( vec_MYHLTObj_IsoMu24.size() > 0 ) h_IsoMu24_->Fill( 1.5, weight );
+    else                                  h_IsoMu24_->Fill( 0.5, weight );
   }
 
   void Fill_Mu24Obj(MuonHLT::MYHLTObject Mu24Obj, MuonHLT::NtupleHandle* ntuple, Double_t weight)
@@ -122,6 +127,9 @@ private:
   TH1D* h_rho_ECAL_;
   TH1D* h_rho_HCAL_;
 
+  // -- is IsoMu24 fired
+  TH1D* h_IsoMu24_;
+
   //////////////////////////
   // -- muon by muon   -- //
   //////////////////////////
@@ -190,6 +198,8 @@ private:
   {
     h_rho_ECAL_ = new TH1D("h_rho_ECAL", "", 10000, 0, 1000); vec_hist_.push_back( h_rho_ECAL_ );
     h_rho_HCAL_ = new TH1D("h_rho_HCAL", "", 10000, 0, 1000); vec_hist_.push_back( h_rho_HCAL_ );
+
+    h_IsoMu24_ = new TH1D("h_IsoMu24", "", 2, 0, 2); vec_hist_.push_back( h_IsoMu24_ );
 
     h_Mu24Obj_ECALIso_ = new TH1D("h_Mu24Obj_ECALIso", "", 20000, -10000, 10000); vec_hist_.push_back( h_Mu24Obj_ECALIso_ );
     h_Mu24Obj_ECALIso_EB_ = new TH1D("h_Mu24Obj_ECALIso_EB", "", 20000, -10000, 10000); vec_hist_.push_back( h_Mu24Obj_ECALIso_EB_ );
