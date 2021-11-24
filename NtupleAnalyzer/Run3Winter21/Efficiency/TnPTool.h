@@ -348,15 +348,19 @@ public:
     maxMass_ = max;
   }
 
-  TGraphAsymmErrors* CalcTnPEff_CutAndCount( TString varName )
+  TGraphAsymmErrors* CalcTnPEff_CutAndCount( TString varName, TString dirName = "" )
   {
-    TH1D* hEffTemp = PlotTool::Get_Hist( inputFileName_, "hEffTemplate"+varName, "hEff"+varName);
+    TString hEffTempName = "hEffTemplate"+varName;
+    if( dirName != "" ) hEffTempName = dirName+"/hEffTemplate"+varName;
+
+    TH1D* hEffTemp = PlotTool::Get_Hist( inputFileName_, hEffTempName, "hEff"+varName);
     Int_t nBin = hEffTemp->GetNbinsX();
 
     vector< TH1D* > vec_passHist;
     vector< TH1D* > vec_failHist;
 
     TString histNameBase = TString::Format("h%s", varName.Data());
+    if( dirName != "" ) histNameBase = TString::Format("%s/h%s", dirName.Data(), varName.Data());
 
     for(Int_t i=0; i<nBin; i++)
     {

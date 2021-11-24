@@ -2,7 +2,7 @@
 
 * Reference: https://github.com/khaosmos93/MuonHLTForRun3
 
-```
+```shell
 cmsrel CMSSW_12_0_1
 cd CMSSW_12_0_1
 cmsenv
@@ -24,7 +24,7 @@ scram b -j 8 >&scram.log&
 * works only in **lxplus** (as far as I know)
   * ```/afs/cern.ch/user/k/kplee/work/private/Detector/MuonHLTTool/Run3_IDIso/CMSSW_12_0_1/src```
 
-```
+```shell
 hltGetConfiguration /dev/CMSSW_12_0_0/GRun/V6 --type GRun \
 --path HLTriggerFirstPath,HLT_IsoMu24_v*,HLT_Mu50_v*,HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v*,HLTriggerFinalPath,HLTAnalyzerEndpath \
 --unprescale --cff >$CMSSW_BASE/src/HLTrigger/Configuration/python/HLT_MuonHLT_cff.py
@@ -38,7 +38,7 @@ hltGetConfiguration /dev/CMSSW_12_0_0/GRun/V6 --type GRun \
 
 ### for MC:
 
-```
+```shell
 cmsDriver.py hlt_muon \
 --python_filename=hlt_muon_Run3_mc.py \
 --step HLT:MuonHLT \
@@ -56,7 +56,7 @@ cmsDriver.py hlt_muon \
 
 ### for DATA:
 
-```
+```shell
 cmsDriver.py hlt_muon \
 --python_filename=hlt_muon_Run3_data.py \
 --step HLT:MuonHLT \
@@ -68,5 +68,53 @@ cmsDriver.py hlt_muon \
 --customise=HLTrigger/Configuration/MuonHLTForRun3/customizeMuonHLTForRun3.customizeMuonHLTForCscSegment \
 --filein=/store/data/Run2018D/EphemeralHLTPhysics1/RAW/v1/000/323/775/00000/D5D2CF9C-2557-4243-B42E-4345100839DA.root \
 -n 100 --no_output --no_exec
+```
+
+
+
+## use of PF rechit for rho calculation 
+
+### Rho producer from PF rechit
+
+[FixedGridRhoProducerFastjetFromRecHit.cc](https://github.com/swagata87/cmssw/blob/3f4de291f884946e3ed3866473e843c0b7abc159/RecoJets/JetProducers/plugins/FixedGridRhoProducerFastjetFromRecHit.cc)
+
+
+
+### Setup in CMSSW
+
+```shell
+# -- under $CMSSW_BASE/src
+
+git cms-addpkg RecoJets/JetProducers
+
+# -- copy FixedGridRhoProducerFastjetFromRecHit.cc under RecoJets/JetProducers/plugin
+# -- update RecoJets/JetProducers/buildFile.xml
+# ---- add <use name="CondFormats/EcalObjects"/>
+
+scram b -j 10 >&scram.log&
+```
+
+
+
+### Customizer to use the rho from PF rechit in muon HLT isolation
+
+Use ```Run3_IDIso/MuonHLTNtupler/python/customizerForMuonHLTIsolation_rhoFromPFRechit.py```
+
+
+
+**Case 1: different rho value for ECAL and HCAL isolation**
+
+```python
+from MuonHLTTool.MuonHLTNtupler.customizerForMuonHLTIsolation_rhoFromPFRechit import *
+process = customizeForMuonHLTIsolation_differentRhoForECALHCAL(process)
+```
+
+
+
+**Case 2: same rho value for ECAL and HCAL isolation**
+
+```python
+from MuonHLTTool.MuonHLTNtupler.customizerForMuonHLTIsolation_rhoFromPFRechit import *
+process = customizeForMuonHLTIsolation_sameRhoForECALHCAL(process)
 ```
 
