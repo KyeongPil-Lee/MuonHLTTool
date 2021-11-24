@@ -33,9 +33,9 @@ def addRhoProducerFromPFRechit(process):
     # -- keep the same module name with the legacy one
 
     process.hltFixedGridRhoFastjetECALMFForMuons = cms.EDProducer( "FixedGridRhoProducerFastjetFromRecHit",
-        hbheRecHitsTag1 = cms.InputTag( "hltHbhereco" ),
-        ecalRecHitsTag1 = cms.InputTag( 'hltEcalRecHit','EcalRecHitsEB' ),
-        ecalRecHitsTag2 = cms.InputTag( 'hltEcalRecHit','EcalRecHitsEE' ),
+        hbheRecHitsTag = cms.InputTag( "hltHbhereco" ),
+        ebRecHitsTag = cms.InputTag( 'hltEcalRecHit','EcalRecHitsEB' ),
+        eeRecHitsTag = cms.InputTag( 'hltEcalRecHit','EcalRecHitsEE' ),
         eThresHB = cms.vdouble(0.1, 0.2, 0.3, 0.3),
         eThresHE = cms.vdouble(0.1, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2),
         maxRapidity = cms.double( 2.5 ),
@@ -45,9 +45,9 @@ def addRhoProducerFromPFRechit(process):
     )
 
     process.hltFixedGridRhoFastjetHCAL = cms.EDProducer( "FixedGridRhoProducerFastjetFromRecHit",
-        hbheRecHitsTag1 = cms.InputTag( "hltHbhereco" ),
-        ecalRecHitsTag1 = cms.InputTag( 'hltEcalRecHit','EcalRecHitsEB' ),
-        ecalRecHitsTag2 = cms.InputTag( 'hltEcalRecHit','EcalRecHitsEE' ),
+        hbheRecHitsTag = cms.InputTag( "hltHbhereco" ),
+        ebRecHitsTag = cms.InputTag( 'hltEcalRecHit','EcalRecHitsEB' ),
+        eeRecHitsTag = cms.InputTag( 'hltEcalRecHit','EcalRecHitsEE' ),
         eThresHB = cms.vdouble(0.1, 0.2, 0.3, 0.3),
         eThresHE = cms.vdouble(0.1, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2),
         maxRapidity = cms.double( 2.5 ),
@@ -78,9 +78,9 @@ def customizeForMuonHLTIsolation_sameRhoForECALHCAL(process):
     process = removeCaloTowerInfo(process)
 
     process.hltFixedGridRhoFastjetForMuons = cms.EDProducer( "FixedGridRhoProducerFastjetFromRecHit",
-        hbheRecHitsTag1 = cms.InputTag( "hltHbhereco" ),
-        ecalRecHitsTag1 = cms.InputTag( 'hltEcalRecHit','EcalRecHitsEB' ),
-        ecalRecHitsTag2 = cms.InputTag( 'hltEcalRecHit','EcalRecHitsEE' ),
+        hbheRecHitsTag = cms.InputTag( "hltHbhereco" ),
+        ebRecHitsTag = cms.InputTag( 'hltEcalRecHit','EcalRecHitsEB' ),
+        eeRecHitsTag = cms.InputTag( 'hltEcalRecHit','EcalRecHitsEE' ),
         eThresHB = cms.vdouble(0.1, 0.2, 0.3, 0.3),
         eThresHE = cms.vdouble(0.1, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2),
         maxRapidity = cms.double( 2.5 ),
