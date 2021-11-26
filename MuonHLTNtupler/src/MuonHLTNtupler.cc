@@ -90,7 +90,7 @@ t_genParticle_       ( consumes< reco::GenParticleCollection >            (iConf
 isMiniAOD_               ( iConfig.existsAs<bool>("isMiniAOD")         ? iConfig.getParameter<bool>("isMiniAOD")         : false),
 doSaveRerunObject_       ( iConfig.existsAs<bool>("doSaveRerunObject") ? iConfig.getParameter<bool>("doSaveRerunObject") : false),
 t_triggerObject_miniAOD_ ( mayConsume< std::vector<pat::TriggerObjectStandAlone> > (iConfig.getUntrackedParameter<edm::InputTag>("triggerObject_miniAOD")) ), // -- not used in AOD case
-propagatorToMuon(iConfig)
+propagatorToMuon(iConfig, consumesCollector())
 {
   cout << "isMiniAOD_ = " << isMiniAOD_ << endl;
 }
