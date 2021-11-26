@@ -11,7 +11,7 @@ To produce rechit-based rho value in muon HLT
 Two files should be copied under ```RecoJets/JetProducers```
 
 ```
-cd $CMSSW_BASE/src/MuonHLTTool/Run3_IDIso/MuonHLTNtupler/test/Run3Winter21/File_RechitBasedRho
+cd $CMSSW_BASE/src/MuonHLTTool/MuonHLTNtupler/test/Run3Winter21/File_RechitBasedRho
 cp BuildFile.xml FixedGridRhoProducerFastjetFromRecHit \
 $CMSSW_BASE/src/RecoJets/JetProducers/plugins
 ```
