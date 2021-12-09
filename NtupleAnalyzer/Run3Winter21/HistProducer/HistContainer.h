@@ -152,8 +152,8 @@ public:
         }
 
         h_Mu24Obj_passEHCAL_newWP_relTrkIso_fineBin_->Fill( Mu24Obj.relTrkIso, weight );
-    } // -- end of new isolation WP
-
+      } // -- end of new HCAL isolation WP
+    } // -- end of new ECAL isolation WP
   }
 
   void Save()
