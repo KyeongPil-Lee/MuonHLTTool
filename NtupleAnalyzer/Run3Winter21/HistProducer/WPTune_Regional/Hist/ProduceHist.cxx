@@ -11,5 +11,8 @@ void ProduceHist(TString textFile_ntupleList)
   histProducer->Set_OutputFileName(outputFileName);
   histProducer->Set_ntupleListFile(textFile_ntupleList);
 
+  histProducer->SetRange_PU_LowPU( 0, 40 );
+  histProducer->SetRange_PU_HighPU( 40, 60 );
+
   histProducer->Produce();
 }

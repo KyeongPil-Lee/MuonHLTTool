@@ -12,11 +12,23 @@ public:
 
   void Set_ntupleListFile( TString fileName ) { fileName_ntupleList_ = fileName; }
 
+  void SetRange_PU_LowPU(Double_t min, Double_t max) {
+    minPU_lowPU_ = min;
+    maxPU_lowPU_ = max;
+  }
+
+  void SetRange_PU_HighPU(Double_t min, Double_t max) {
+    minPU_highPU_ = min;
+    maxPU_highPU_ = max;
+  }
+
   void Produce()
   {
     StartTimer();
 
     HistContainer *histContainer = new HistContainer();
+    HistContainer *histContainer_lowPU  = new HistContainer("lowPU");
+    HistContainer *histContainer_highPU = new HistContainer("highPU");
 
     TChain* chain = new TChain("ntupler/ntuple");
     MuonHLT::AddNtupleToChain( chain, fileName_ntupleList_ );
@@ -47,7 +59,11 @@ public:
       Double_t genWeight = ntuple->isRealData? 1.0 : ntuple->genEventWeight;
       Double_t totWeight = normFactor * genWeight;
 
+      Double_t truePU = ntuple->truePU;
+
       histContainer->Fill_Event(ntuple, totWeight );
+      if( minPU_lowPU_ < truePU  && truePU < maxPU_lowPU_ )  histContainer_lowPU->Fill_Event(ntuple, totWeight );
+      if( minPU_highPU_ < truePU && truePU < maxPU_highPU_ ) histContainer_highPU->Fill_Event(ntuple, totWeight );
 
       vector<MuonHLT::MYHLTObject> vec_MYHLTObj = MuonHLT::GetAllMYHLTObject(ntuple, "hltL3fL1sSingleMu22L1f0L2f10QL3Filtered24Q::MYHLT");
 
@@ -56,12 +72,16 @@ public:
         MYHLTObj.FillIsolationVariable(ntuple);
 
         histContainer->Fill_Mu24Obj( MYHLTObj, ntuple, totWeight );
+        if( minPU_lowPU_ < truePU  && truePU < maxPU_lowPU_ )  histContainer_lowPU->Fill_Mu24Obj( MYHLTObj, ntuple, totWeight );
+        if( minPU_highPU_ < truePU && truePU < maxPU_highPU_ ) histContainer_highPU->Fill_Mu24Obj( MYHLTObj, ntuple, totWeight );
       }
     } // -- end of event iteration
 
     TFile *f_output = TFile::Open(outputFileName_, "RECREATE");
     f_output->cd();
     histContainer->Save();
+    histContainer_lowPU->Save();
+    histContainer_highPU->Save();
     f_output->Close();
     
     delete ntuple;
@@ -78,6 +98,12 @@ private:
   TString fileName_ntupleList_ = "";
 
   Bool_t debug_ = kFALSE;
+
+  Double_t minPU_lowPU_ = 0;
+  Double_t maxPU_lowPU_ = 40;
+
+  Double_t minPU_highPU_ = 40;
+  Double_t maxPU_highPU_ = 60;
 
   void StartTimer()
   {
