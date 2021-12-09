@@ -22,6 +22,16 @@ public:
     maxPU_highPU_ = max;
   }
 
+  void Set_NewWP_ECAL( Double_t WP_EB, Double_t WP_EE ) {
+    WP_new_ECAL_EB_ = WP_EB;
+    WP_new_ECAL_EE_ = WP_EE;
+  }
+
+  void Set_NewWP_HCAL( Double_t WP_EB, Double_t WP_EE ) {
+    WP_new_HCAL_EB_ = WP_EB;
+    WP_new_HCAL_EE_ = WP_EE;
+  }
+
   void Produce()
   {
     StartTimer();
@@ -29,6 +39,14 @@ public:
     HistContainer *histContainer = new HistContainer();
     HistContainer *histContainer_lowPU  = new HistContainer("lowPU");
     HistContainer *histContainer_highPU = new HistContainer("highPU");
+
+    histContainer->Set_NewWP_ECAL( WP_new_ECAL_EB_, WP_new_ECAL_EE_ );
+    histContainer_lowPU->Set_NewWP_ECAL( WP_new_ECAL_EB_, WP_new_ECAL_EE_ );
+    histContainer_highPU->Set_NewWP_ECAL( WP_new_ECAL_EB_, WP_new_ECAL_EE_ );
+
+    histContainer->Set_NewWP_HCAL( WP_new_HCAL_EB_, WP_new_HCAL_EE_ );
+    histContainer_lowPU->Set_NewWP_HCAL( WP_new_HCAL_EB_, WP_new_HCAL_EE_ );
+    histContainer_highPU->Set_NewWP_HCAL( WP_new_HCAL_EB_, WP_new_HCAL_EE_ );
 
     TChain* chain = new TChain("ntupler/ntuple");
     MuonHLT::AddNtupleToChain( chain, fileName_ntupleList_ );
@@ -104,6 +122,12 @@ private:
 
   Double_t minPU_highPU_ = 40;
   Double_t maxPU_highPU_ = 60;
+
+  Double_t WP_new_ECAL_EB_ = 0;
+  Double_t WP_new_ECAL_EE_ = 0;
+
+  Double_t WP_new_HCAL_EB_ = 0;
+  Double_t WP_new_HCAL_EE_ = 0;
 
   void StartTimer()
   {

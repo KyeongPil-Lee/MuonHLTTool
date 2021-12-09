@@ -393,7 +393,7 @@ Bool_t Pass_HLTIsolationFilter(MuonHLT::MYHLTObject HLTObj)
   return flag;
 }
 
-Bool_t Pass_HLTIsoFilter_ECAL(MuonHLT::MYHLTObject HLTObj)
+Bool_t Pass_HLTIsoFilter_ECAL(MuonHLT::MYHLTObject HLTObj, Double_t WP_EB = 0.14, Double_t WP_EE = 0.10)
 {
   Bool_t flag = kFALSE;
 
@@ -401,17 +401,17 @@ Bool_t Pass_HLTIsoFilter_ECAL(MuonHLT::MYHLTObject HLTObj)
 
   if( fabs(HLTObj.eta) < 1.479 ) // -- barrel
   {
-    if( HLTObj.relECALIso < 0.14 ) flag = kTRUE;
+    if( HLTObj.relECALIso < WP_EB ) flag = kTRUE;
   }
   else // -- endcap
   {
-    if( HLTObj.relECALIso < 0.10 ) flag = kTRUE;
+    if( HLTObj.relECALIso < WP_EE ) flag = kTRUE;
   }
 
   return flag;
 }
 
-Bool_t Pass_HLTIsoFilter_HCAL(MuonHLT::MYHLTObject HLTObj)
+Bool_t Pass_HLTIsoFilter_HCAL(MuonHLT::MYHLTObject HLTObj, Double_t WP_EB = 0.16, Double_t WP_EE = 0.20)
 {
   Bool_t flag = kFALSE;
 
@@ -419,23 +419,23 @@ Bool_t Pass_HLTIsoFilter_HCAL(MuonHLT::MYHLTObject HLTObj)
 
   if( fabs(HLTObj.eta) < 1.479 ) // -- barrel
   {
-    if( HLTObj.relHCALIso < 0.16 ) flag = kTRUE;
+    if( HLTObj.relHCALIso < WP_EB ) flag = kTRUE;
   }
   else // -- endcap
   {
-    if( HLTObj.relHCALIso < 0.20 ) flag = kTRUE;
+    if( HLTObj.relHCALIso < WP_EE ) flag = kTRUE;
   }
 
   return flag;
 }
 
-Bool_t Pass_HLTIsoFilter_Tracker(MuonHLT::MYHLTObject HLTObj)
+Bool_t Pass_HLTIsoFilter_Tracker(MuonHLT::MYHLTObject HLTObj, Double_t WP = 0.07)
 {
   Bool_t flag = kFALSE;
 
   if( !HLTObj.isIsoValid ) return flag;
 
-  if( HLTObj.relTrkIso < 0.07 ) flag = kTRUE;
+  if( HLTObj.relTrkIso < WP ) flag = kTRUE;
 
   return flag;
 }

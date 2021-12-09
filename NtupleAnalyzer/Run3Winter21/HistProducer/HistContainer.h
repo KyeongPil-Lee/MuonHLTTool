@@ -12,6 +12,16 @@ public:
     Init_Hist();
   }
 
+  void Set_NewWP_ECAL( Double_t WP_EB, Double_t WP_EE ) {
+    WP_new_ECAL_EB_ = WP_EB;
+    WP_new_ECAL_EE_ = WP_EE;
+  }
+
+  void Set_NewWP_HCAL( Double_t WP_EB, Double_t WP_EE ) {
+    WP_new_HCAL_EB_ = WP_EB;
+    WP_new_HCAL_EE_ = WP_EE;
+  }
+
   void Fill_Event(MuonHLT::NtupleHandle* ntuple, Double_t weight)
   {
     h_rho_ECAL_->Fill( ntuple->rho_ECAL, weight );
@@ -102,6 +112,48 @@ public:
       } // -- end of HCAL isolation cut
 
     } // -- end of ECAL isolation cut
+
+    // -- if it passes new isolation WP
+    if( MuonHLT::Pass_HLTIsoFilter_ECAL(Mu24Obj, WP_new_ECAL_EB_, WP_new_ECAL_EE_) ) {
+
+      h_Mu24Obj_passECAL_newWP_HCALIso_->Fill( Mu24Obj.HCALIso, weight );
+      h_Mu24Obj_passECAL_newWP_relHCALIso_->Fill( Mu24Obj.relHCALIso, weight );
+
+      if( fabs(Mu24Obj.eta) < 1.479 ) // -- barrel
+      {
+        h_Mu24Obj_passECAL_newWP_HCALIso_EB_->Fill( Mu24Obj.HCALIso, weight );
+        h_Mu24Obj_passECAL_newWP_relHCALIso_EB_->Fill( Mu24Obj.relHCALIso, weight );
+
+        h_Mu24Obj_passECAL_newWP_relHCALIso_fineBin_EB_->Fill( Mu24Obj.relHCALIso, weight );
+      }
+      else // -- endcap
+      {
+        h_Mu24Obj_passECAL_newWP_HCALIso_EE_->Fill( Mu24Obj.HCALIso, weight );
+        h_Mu24Obj_passECAL_newWP_relHCALIso_EE_->Fill( Mu24Obj.relHCALIso, weight );
+
+        h_Mu24Obj_passECAL_newWP_relHCALIso_fineBin_EE_->Fill( Mu24Obj.relHCALIso, weight );
+      }
+
+      // -- if it also passes HCAL isolation
+      if( MuonHLT::Pass_HLTIsoFilter_HCAL(Mu24Obj, WP_new_HCAL_EB_, WP_new_HCAL_EE_) )
+      {
+        h_Mu24Obj_passEHCAL_newWP_trkIso_->Fill( Mu24Obj.trkIso, weight );
+        h_Mu24Obj_passEHCAL_newWP_relTrkIso_->Fill( Mu24Obj.relTrkIso, weight );
+
+        if( fabs(Mu24Obj.eta) < 1.479 ) // -- barrel
+        {
+          h_Mu24Obj_passEHCAL_newWP_trkIso_EB_->Fill( Mu24Obj.trkIso, weight );
+          h_Mu24Obj_passEHCAL_newWP_relTrkIso_EB_->Fill( Mu24Obj.relTrkIso, weight );
+        }
+        else // -- endcap
+        {
+          h_Mu24Obj_passEHCAL_newWP_trkIso_EE_->Fill( Mu24Obj.trkIso, weight );
+          h_Mu24Obj_passEHCAL_newWP_relTrkIso_EE_->Fill( Mu24Obj.relTrkIso, weight );
+        }
+
+        h_Mu24Obj_passEHCAL_newWP_relTrkIso_fineBin_->Fill( Mu24Obj.relTrkIso, weight );
+    } // -- end of new isolation WP
+
   }
 
   void Save()
@@ -112,6 +164,12 @@ public:
 
 private:
   TString type_ = "";
+
+  Double_t WP_new_ECAL_EB_ = 0;
+  Double_t WP_new_ECAL_EE_ = 0;
+
+  Double_t WP_new_HCAL_EB_ = 0;
+  Double_t WP_new_HCAL_EE_ = 0;
 
   vector<TH1D*> vec_hist_;
 
@@ -181,6 +239,30 @@ private:
   // -- no separation for tracker isolation
   TH1D* h_Mu24Obj_passEHCAL_relTrkIso_fineBin_;
 
+  // -- histogram passing new WP
+  TH1D* h_Mu24Obj_passECAL_newWP_HCALIso_;
+  TH1D* h_Mu24Obj_passECAL_newWP_HCALIso_EB_;
+  TH1D* h_Mu24Obj_passECAL_newWP_HCALIso_EE_;
+
+  TH1D* h_Mu24Obj_passECAL_newWP_relHCALIso_;
+  TH1D* h_Mu24Obj_passECAL_newWP_relHCALIso_EB_;
+  TH1D* h_Mu24Obj_passECAL_newWP_relHCALIso_EE_;
+
+  TH1D* h_Mu24Obj_passECAL_newWP_relHCALIso_fineBin_EB_;
+  TH1D* h_Mu24Obj_passECAL_newWP_relHCALIso_fineBin_EE_;
+
+
+  TH1D* h_Mu24Obj_passEHCAL_newWP_trkIso_;
+  TH1D* h_Mu24Obj_passEHCAL_newWP_trkIso_EB_;
+  TH1D* h_Mu24Obj_passEHCAL_newWP_trkIso_EE_;
+
+  TH1D* h_Mu24Obj_passEHCAL_newWP_relTrkIso_;
+  TH1D* h_Mu24Obj_passEHCAL_newWP_relTrkIso_EB_;
+  TH1D* h_Mu24Obj_passEHCAL_newWP_relTrkIso_EE_;
+
+  TH1D* h_Mu24Obj_passEHCAL_newWP_relTrkIso_fineBin_;
+
+
   void Init_Hist()
   {
     h_rho_ECAL_ = new TH1D("h_rho_ECAL", "", 10000, 0, 1000); vec_hist_.push_back( h_rho_ECAL_ );
@@ -249,6 +331,29 @@ private:
     h_Mu24Obj_passECAL_relHCALIso_fineBin_EE_ = new TH1D("h_Mu24Obj_passECAL_relHCALIso_fineBin_EE", "", nBin, arr_binEdge); vec_hist_.push_back( h_Mu24Obj_passECAL_relHCALIso_fineBin_EE_ );
 
     h_Mu24Obj_passEHCAL_relTrkIso_fineBin_ = new TH1D("h_Mu24Obj_passEHCAL_relTrkIso_fineBin", "", nBin, arr_binEdge); vec_hist_.push_back( h_Mu24Obj_passEHCAL_relTrkIso_fineBin_ );
+
+
+    h_Mu24Obj_passECAL_newWP_HCALIso_ = new TH1D("h_Mu24Obj_passECAL_newWP_HCALIso", "", 20000, -10000, 10000); vec_hist_.push_back( h_Mu24Obj_passECAL_newWP_HCALIso_ );
+    h_Mu24Obj_passECAL_newWP_HCALIso_EB_ = new TH1D("h_Mu24Obj_passECAL_newWP_HCALIso_EB", "", 20000, -10000, 10000); vec_hist_.push_back( h_Mu24Obj_passECAL_newWP_HCALIso_EB_ );
+    h_Mu24Obj_passECAL_newWP_HCALIso_EE_ = new TH1D("h_Mu24Obj_passECAL_newWP_HCALIso_EE", "", 20000, -10000, 10000); vec_hist_.push_back( h_Mu24Obj_passECAL_newWP_HCALIso_EE_ );
+
+    h_Mu24Obj_passECAL_newWP_relHCALIso_ = new TH1D("h_Mu24Obj_passECAL_newWP_relHCALIso", "", 20000, -10, 10); vec_hist_.push_back( h_Mu24Obj_passECAL_newWP_relHCALIso_ );
+    h_Mu24Obj_passECAL_newWP_relHCALIso_EB_ = new TH1D("h_Mu24Obj_passECAL_newWP_relHCALIso_EB", "", 20000, -10, 10); vec_hist_.push_back( h_Mu24Obj_passECAL_newWP_relHCALIso_EB_ );
+    h_Mu24Obj_passECAL_newWP_relHCALIso_EE_ = new TH1D("h_Mu24Obj_passECAL_newWP_relHCALIso_EE", "", 20000, -10, 10); vec_hist_.push_back( h_Mu24Obj_passECAL_newWP_relHCALIso_EE_ );
+
+    h_Mu24Obj_passECAL_newWP_relHCALIso_fineBin_EB_ = new TH1D("h_Mu24Obj_passECAL_newWP_relHCALIso_fineBin_EB", "", nBin, arr_binEdge); vec_hist_.push_back( h_Mu24Obj_passECAL_newWP_relHCALIso_fineBin_EB_ );
+    h_Mu24Obj_passECAL_newWP_relHCALIso_fineBin_EE_ = new TH1D("h_Mu24Obj_passECAL_newWP_relHCALIso_fineBin_EE", "", nBin, arr_binEdge); vec_hist_.push_back( h_Mu24Obj_passECAL_newWP_relHCALIso_fineBin_EE_ );
+
+
+    h_Mu24Obj_passEHCAL_newWP_trkIso_ = new TH1D("h_Mu24Obj_passEHCAL_newWP_trkIso", "", 20000, -10000, 10000); vec_hist_.push_back( h_Mu24Obj_passEHCAL_newWP_trkIso_ );
+    h_Mu24Obj_passEHCAL_newWP_trkIso_EB_ = new TH1D("h_Mu24Obj_passEHCAL_newWP_trkIso_EB", "", 20000, -10000, 10000); vec_hist_.push_back( h_Mu24Obj_passEHCAL_newWP_trkIso_EB_ );
+    h_Mu24Obj_passEHCAL_newWP_trkIso_EE_ = new TH1D("h_Mu24Obj_passEHCAL_newWP_trkIso_EE", "", 20000, -10000, 10000); vec_hist_.push_back( h_Mu24Obj_passEHCAL_newWP_trkIso_EE_ );
+
+    h_Mu24Obj_passEHCAL_newWP_relTrkIso_ = new TH1D("h_Mu24Obj_passEHCAL_newWP_relTrkIso", "", 20000, -10, 10); vec_hist_.push_back( h_Mu24Obj_passEHCAL_newWP_relTrkIso_ );
+    h_Mu24Obj_passEHCAL_newWP_relTrkIso_EB_ = new TH1D("h_Mu24Obj_passEHCAL_newWP_relTrkIso_EB", "", 20000, -10, 10); vec_hist_.push_back( h_Mu24Obj_passEHCAL_newWP_relTrkIso_EB_ );
+    h_Mu24Obj_passEHCAL_newWP_relTrkIso_EE_ = new TH1D("h_Mu24Obj_passEHCAL_newWP_relTrkIso_EE", "", 20000, -10, 10); vec_hist_.push_back( h_Mu24Obj_passEHCAL_newWP_relTrkIso_EE_ );
+
+    h_Mu24Obj_passEHCAL_newWP_relTrkIso_fineBin_ = new TH1D("h_Mu24Obj_passEHCAL_newWP_relTrkIso_fineBin", "", nBin, arr_binEdge); vec_hist_.push_back( h_Mu24Obj_passEHCAL_newWP_relTrkIso_fineBin_ );
 
     for(auto& h : vec_hist_ )
     {
