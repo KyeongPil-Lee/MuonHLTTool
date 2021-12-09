@@ -238,7 +238,7 @@ private:
     Double_t* arr_binEdge = new Double_t[nBinEdge]; // -- dynamic allocation   
     for(Int_t i=0; i<nBinEdge; i++) {
       arr_binEdge[i] = vec_binEdge[i];
-      cout << TString::Format("[%d] %lf", i, arr_binEdge[i]) << endl;
+      // cout << TString::Format("[%d] %lf", i, arr_binEdge[i]) << endl;
     }
     Int_t nBin = nBinEdge-1; // -- # bin = # bin edge - 1
 
