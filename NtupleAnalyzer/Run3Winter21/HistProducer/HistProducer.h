@@ -36,9 +36,17 @@ public:
   {
     StartTimer();
 
-    HistContainer *histContainer = new HistContainer();
-    HistContainer *histContainer_lowPU  = new HistContainer("lowPU");
-    HistContainer *histContainer_highPU = new HistContainer("highPU");
+    // -- basic information of the sample
+    Double_t xSec      = MuonHLT::GetInfo("xSec", fileName_ntupleList_);
+    Double_t sumWeight = MuonHLT::GetInfo("sumWeight", fileName_ntupleList_);
+    TString sampleType = MuonHLT::GetInfo_String("sampleType", fileName_ntupleList_);
+    cout << TString::Format("[Sample information] Sample type = %s, (xSec, sumWeight) = (%.3lf, %.1lf)", sampleType.Data(), xSec, sumWeight) << endl;
+    Double_t normFactor = (1.0 * xSec ) / sumWeight; // -- norm. to 1 /pb data ---> easliy scale to arbitrary lumi.
+
+    // -- define the histograms
+    HistContainer *histContainer = new HistContainer("", sampleType);
+    HistContainer *histContainer_lowPU  = new HistContainer("lowPU", sampleType);
+    HistContainer *histContainer_highPU = new HistContainer("highPU", sampleType);
 
     histContainer->Set_GenMatchingForDYSample();
     histContainer_lowPU->Set_GenMatchingForDYSample();
@@ -58,17 +66,6 @@ public:
 
     TChain* chain = new TChain("ntupler/ntuple");
     MuonHLT::AddNtupleToChain( chain, fileName_ntupleList_ );
-
-    Double_t xSec      = MuonHLT::GetInfo("xSec", fileName_ntupleList_);
-    Double_t sumWeight = MuonHLT::GetInfo("sumWeight", fileName_ntupleList_);
-    TString sampleType = MuonHLT::GetInfo_String("sampleType", fileName_ntupleList_);
-    cout << TString::Format("[Sample information] Sample type = %s, (xSec, sumWeight) = (%.3lf, %.1lf)", sampleType.Data(), xSec, sumWeight);
-
-    Double_t normFactor = (1.0 * xSec ) / sumWeight; // -- norm. to 1 /pb data ---> easliy scale to arbitrary lumi.
-
-    histContainer->Set_SampleType( sampleType );
-    histContainer_lowPU->Set_SampleType( sampleType );
-    histContainer_highPU->Set_SampleType( sampleType );
 
     MuonHLT::NtupleHandle* ntuple = new MuonHLT::NtupleHandle( chain );
     ntuple->TurnOnBranches_GenParticle();
@@ -91,11 +88,17 @@ public:
 
       Double_t truePU = ntuple->truePU;
 
+      if( debug_ ) cout << "  before Fill_Event histContainer..." << endl;
+
       histContainer->Fill_Event(ntuple, totWeight );
       if( minPU_lowPU_ < truePU  && truePU < maxPU_lowPU_ )  histContainer_lowPU->Fill_Event(ntuple, totWeight );
       if( minPU_highPU_ < truePU && truePU < maxPU_highPU_ ) histContainer_highPU->Fill_Event(ntuple, totWeight );
 
+      if( debug_ ) cout << "  after Fill_Event histContainer..." << endl;
+
       vector<MuonHLT::MYHLTObject> vec_MYHLTObj = MuonHLT::GetAllMYHLTObject(ntuple, "hltL3fL1sSingleMu22L1f0L2f10QL3Filtered24Q::MYHLT");
+
+      if( debug_ ) cout << "  before Fill_Mu24Obj histContainer..." << endl;
 
       for(auto& MYHLTObj : vec_MYHLTObj )
       {
@@ -105,6 +108,8 @@ public:
         if( minPU_lowPU_ < truePU  && truePU < maxPU_lowPU_ )  histContainer_lowPU->Fill_Mu24Obj( MYHLTObj, ntuple, totWeight );
         if( minPU_highPU_ < truePU && truePU < maxPU_highPU_ ) histContainer_highPU->Fill_Mu24Obj( MYHLTObj, ntuple, totWeight );
       }
+
+      if( debug_ ) cout << "  after Fill_Mu24Obj histContainer..." << endl;
     } // -- end of event iteration
 
     TFile *f_output = TFile::Open(outputFileName_, "RECREATE");

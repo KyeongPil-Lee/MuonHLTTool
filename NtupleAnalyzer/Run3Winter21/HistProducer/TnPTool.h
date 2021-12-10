@@ -176,11 +176,11 @@ public:
   void Fill( MuonHLT::TnPPairBase* pair, Double_t value, Double_t weight = 1.0 )
   {
     if( pair->ProbePt() < minPtCut_ ) return;
-
     Int_t i_hist = FindBinNumber(value);
     if( i_hist < 0 ) return; // -- out of bin range
 
     Double_t mass = pair->Mass();
+
     if( pair->Get_isPassingProbe() )
       vec_passHist_[i_hist]->Fill( mass, weight );
     else

@@ -7,9 +7,10 @@
 class HistContainer
 {
 public:
-  HistContainer(TString tag = "")
+  HistContainer(TString tag, TString sampleType)
   {
     tag_ = tag;
+    Set_SampleType(sampleType);
     Init_Hist();
   }
 
@@ -464,19 +465,22 @@ private:
         if( i_tagCand == i_probeCand ) continue;
 
         MuonHLT::Muon mu_probeCand( ntuple, i_probeCand );
+
         if( !tnpPair_test->IsProbe(mu_probeCand, ntuple) ) continue; // -- check here to save runtime
 
         // -- make the TnP pair candidate
         TnPPairTemp *tnpPair_ij = new TnPPairTemp( mu_tagCand, mu_probeCand, ntuple );
-        if( tnpPair_ij->IsValid() )
+        if( tnpPair_ij->IsValid() ) {
           vec_tnpPairs_sameTag.push_back( tnpPair_ij );
+        }
         else
           delete tnpPair_ij;
       } // -- end of iteration for the probe candidate
 
       // -- fill TnP histogram only when probeMultiplicity == 1
-      if( (Int_t)vec_tnpPairs_sameTag.size() == 1 ) 
-        tnpHist->Fill( vec_tnpPairs_sameTag[0], weight );
+      if( (Int_t)vec_tnpPairs_sameTag.size() == 1 )  {
+        tnpHist->Fill( static_cast<MuonHLT::TnPPairBase*>(vec_tnpPairs_sameTag[0]), weight );
+      }
 
       for( auto tnpPair : vec_tnpPairs_sameTag )
         delete tnpPair;
