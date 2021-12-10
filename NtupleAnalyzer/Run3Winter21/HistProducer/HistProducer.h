@@ -40,6 +40,10 @@ public:
     HistContainer *histContainer_lowPU  = new HistContainer("lowPU");
     HistContainer *histContainer_highPU = new HistContainer("highPU");
 
+    histContainer->Set_GenMatchingForDYSample();
+    histContainer_lowPU->Set_GenMatchingForDYSample();
+    histContainer_highPU->Set_GenMatchingForDYSample();
+
     histContainer->Set_NewWP_ECAL( WP_new_ECAL_EB_, WP_new_ECAL_EE_ );
     histContainer_lowPU->Set_NewWP_ECAL( WP_new_ECAL_EB_, WP_new_ECAL_EE_ );
     histContainer_highPU->Set_NewWP_ECAL( WP_new_ECAL_EB_, WP_new_ECAL_EE_ );
@@ -57,6 +61,10 @@ public:
     cout << TString::Format("[Sample information] Sample type = %s, (xSec, sumWeight) = (%.3lf, %.1lf)", sampleType.Data(), xSec, sumWeight);
 
     Double_t normFactor = (1.0 * xSec ) / sumWeight; // -- norm. to 1 /pb data ---> easliy scale to arbitrary lumi.
+
+    histContainer->Set_SampleType( sampleType );
+    histContainer_lowPU->Set_SampleType( sampleType );
+    histContainer_highPU->Set_SampleType( sampleType );
 
     MuonHLT::NtupleHandle* ntuple = new MuonHLT::NtupleHandle( chain );
     ntuple->TurnOnBranches_GenParticle();

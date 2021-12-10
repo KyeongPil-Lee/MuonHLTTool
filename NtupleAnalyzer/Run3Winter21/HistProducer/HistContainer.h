@@ -22,6 +22,10 @@ public:
     WP_new_HCAL_EE_ = WP_EE;
   }
 
+  void Set_SampleType( TString type ) { sampleType_ = type; }
+
+  void Set_GenMatchingForDYSample( Bool_t flag = kTRUE) { doGenMatchingForDY_ = flag; }
+
   void Fill_Event(MuonHLT::NtupleHandle* ntuple, Double_t weight)
   {
     h_rho_ECAL_->Fill( ntuple->rho_ECAL, weight );
@@ -36,6 +40,12 @@ public:
   void Fill_Mu24Obj(MuonHLT::MYHLTObject Mu24Obj, MuonHLT::NtupleHandle* ntuple, Double_t weight)
   {
     if( !Mu24Obj.isIsoValid ) Mu24Obj.FillIsolationVariable(ntuple);
+
+    if( doGenMatchingForDY_ && 
+        (sampleType_.Contains("ZMuMu") || sampleType_.Contains("DYLL")) ) { // -- DY sample: check gen matching; only the object matched to a gen lepton will be filled
+
+      if( !GenMatching(Mu24Obj.vecP, ntuple) ) return;
+    }
 
     h_Mu24Obj_ECALIso_->Fill( Mu24Obj.ECALIso, weight );
     h_Mu24Obj_HCALIso_->Fill( Mu24Obj.HCALIso, weight );
@@ -170,6 +180,10 @@ private:
 
   Double_t WP_new_HCAL_EB_ = 0;
   Double_t WP_new_HCAL_EE_ = 0;
+
+  TString sampleType_ = "";
+
+  Bool_t doGenMatchingForDY_ = kFALSE;
 
   vector<TH1D*> vec_hist_;
 
@@ -375,6 +389,18 @@ private:
 
     if( isLast )
       vec_binEdge.push_back( max );
+  }
+
+  Bool_t GenMatching(TLorentzVector vecP_target, MuonHLT::NtupleHandle* ntuple) {
+
+    vector<MuonHLT::GenParticle> vec_genMuon_HPFS = MuonHLT::GetAllGenLeptons(ntuple, 13, "fromHardProcessFinalState");
+    vector<TLorentzVector> vec_vecP_genMuon;
+    for(auto& genMuon : vec_genMuon_HPFS )
+      vec_vecP_genMuon.push_back( genMuon.vecP );
+
+    Double_t dRCut = 0.3;
+
+    return MuonHLT::dRMatching( vecP_target, vec_vecP_genMuon, dRCut);
   }
 
 };
