@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Include/Object.h>
 #include <fstream>
 #include <iostream>

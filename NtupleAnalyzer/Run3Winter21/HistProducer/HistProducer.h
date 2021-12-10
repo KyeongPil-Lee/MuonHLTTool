@@ -52,6 +52,10 @@ public:
     histContainer_lowPU->Set_NewWP_HCAL( WP_new_HCAL_EB_, WP_new_HCAL_EE_ );
     histContainer_highPU->Set_NewWP_HCAL( WP_new_HCAL_EB_, WP_new_HCAL_EE_ );
 
+    histContainer->Set_MinPt_ForTnPEff( 26 );
+    histContainer_lowPU->Set_MinPt_ForTnPEff( 26 );
+    histContainer_highPU->Set_MinPt_ForTnPEff( 26 );
+
     TChain* chain = new TChain("ntupler/ntuple");
     MuonHLT::AddNtupleToChain( chain, fileName_ntupleList_ );
 

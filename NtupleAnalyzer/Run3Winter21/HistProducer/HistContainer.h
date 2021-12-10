@@ -1,4 +1,5 @@
 #include <Include/MuonHLTTool.h>
+#include <Run3Winter21/HistProducer/Utility_TnPHist.h>
 
 #include <TStopwatch.h>
 #include <TSystem.h>
@@ -6,9 +7,9 @@
 class HistContainer
 {
 public:
-  HistContainer(TString type = "")
+  HistContainer(TString tag = "")
   {
-    type_ = type;
+    tag_ = tag;
     Init_Hist();
   }
 
@@ -22,9 +23,16 @@ public:
     WP_new_HCAL_EE_ = WP_EE;
   }
 
-  void Set_SampleType( TString type ) { sampleType_ = type; }
+  void Set_SampleType( TString type ) { 
+    sampleType_ = type;
+
+    if( sampleType_.Contains("ZMuMu") || sampleType_.Contains("DYLL") ) isDY_ = kTRUE;
+    if( sampleType_.Contains("QCD") )                                   isQCD_ = kTRUE;
+  }
 
   void Set_GenMatchingForDYSample( Bool_t flag = kTRUE) { doGenMatchingForDY_ = flag; }
+
+  void Set_MinPt_ForTnPEff(Double_t minPt ) { minPt_ = minPt; }
 
   void Fill_Event(MuonHLT::NtupleHandle* ntuple, Double_t weight)
   {
@@ -35,17 +43,20 @@ public:
     vector<MuonHLT::MYHLTObject> vec_MYHLTObj_IsoMu24 = MuonHLT::GetAllMYHLTObject(ntuple, "hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07::MYHLT");
     if( vec_MYHLTObj_IsoMu24.size() > 0 ) h_IsoMu24_->Fill( 1.5, weight );
     else                                  h_IsoMu24_->Fill( 0.5, weight );
+
+    if( isDY_ ) {
+      Fill_TnPHist<TnPTool::TnPPair_FullIsoOverMu24_OldWP>(ntuple, weight, tnpHist_IsoOverL3_oldWP_);
+      Fill_TnPHist<TnPTool::TnPPair_FullIsoOverMu24_NewWP>(ntuple, weight, tnpHist_IsoOverL3_newWP_);
+    }
   }
 
   void Fill_Mu24Obj(MuonHLT::MYHLTObject Mu24Obj, MuonHLT::NtupleHandle* ntuple, Double_t weight)
   {
-    if( !Mu24Obj.isIsoValid ) Mu24Obj.FillIsolationVariable(ntuple);
-
-    if( doGenMatchingForDY_ && 
-        (sampleType_.Contains("ZMuMu") || sampleType_.Contains("DYLL")) ) { // -- DY sample: check gen matching; only the object matched to a gen lepton will be filled
-
+    if( isDY_ && doGenMatchingForDY_ ) { // -- DY sample: check gen matching; only the object matched to a gen lepton will be filled
       if( !GenMatching(Mu24Obj.vecP, ntuple) ) return;
     }
+
+    if( !Mu24Obj.isIsoValid ) Mu24Obj.FillIsolationVariable(ntuple);
 
     h_Mu24Obj_ECALIso_->Fill( Mu24Obj.ECALIso, weight );
     h_Mu24Obj_HCALIso_->Fill( Mu24Obj.HCALIso, weight );
@@ -170,10 +181,15 @@ public:
   {
     for(auto& h : vec_hist_ )
       h->Write();
+
+    if( isDY_ ) {
+      for(auto& tnpHist : vec_tnpHist_ )
+        tnpHist->Save();
+    }
   }
 
 private:
-  TString type_ = "";
+  TString tag_ = "";
 
   Double_t WP_new_ECAL_EB_ = 0;
   Double_t WP_new_ECAL_EE_ = 0;
@@ -182,8 +198,13 @@ private:
   Double_t WP_new_HCAL_EE_ = 0;
 
   TString sampleType_ = "";
+  Bool_t isDY_ = kFALSE;
+  Bool_t isQCD_ = kFALSE;
 
   Bool_t doGenMatchingForDY_ = kFALSE;
+
+  // -- for TnP efficiency histograms vs. eta, phi, #vtx...
+  Double_t minPt_ = -999;
 
   vector<TH1D*> vec_hist_;
 
@@ -275,6 +296,10 @@ private:
   TH1D* h_Mu24Obj_passEHCAL_newWP_relTrkIso_EE_;
 
   TH1D* h_Mu24Obj_passEHCAL_newWP_relTrkIso_fineBin_;
+
+  vector<MuonHLT::TnPHistProducer*> vec_tnpHist_;
+  MuonHLT::TnPHistProducer* tnpHist_IsoOverL3_oldWP_;
+  MuonHLT::TnPHistProducer* tnpHist_IsoOverL3_newWP_;  
 
 
   void Init_Hist()
@@ -372,12 +397,27 @@ private:
     for(auto& h : vec_hist_ )
     {
       // -- add "type" at the end of the histogram name
-      if( type_ != "" )
+      if( tag_ != "" )
       {
         TString histName_before = h->GetName();
-        TString histName_after = histName_before+"_"+type_;
+        TString histName_after = histName_before+"_"+tag_;
         h->SetName(histName_after);
       }
+    }
+
+    // -- TnPHist: only needed for DY sample
+    if( isDY_ ) {
+      if( tag_ == "" ) {
+        tnpHist_IsoOverL3_oldWP_ = new MuonHLT::TnPHistProducer("oldWP", minPt_);
+        tnpHist_IsoOverL3_newWP_ = new MuonHLT::TnPHistProducer("newWP", minPt_);
+      }
+      else {
+        tnpHist_IsoOverL3_oldWP_ = new MuonHLT::TnPHistProducer("oldWP_"+tag_, minPt_);
+        tnpHist_IsoOverL3_newWP_ = new MuonHLT::TnPHistProducer("newWP_"+tag_, minPt_);
+      }
+
+      vec_tnpHist_.push_back( tnpHist_IsoOverL3_oldWP_ );
+      vec_tnpHist_.push_back( tnpHist_IsoOverL3_newWP_ );
     }
   }
 
@@ -401,6 +441,48 @@ private:
     Double_t dRCut = 0.3;
 
     return MuonHLT::dRMatching( vecP_target, vec_vecP_genMuon, dRCut);
+  }
+
+  template <class TnPPairTemp>
+  void Fill_TnPHist(MuonHLT::NtupleHandle* ntuple, Double_t weight, MuonHLT::TnPHistProducer* tnpHist) {
+
+    // -- make tag&pobe pair
+    for(Int_t i_tagCand=0; i_tagCand<ntuple->nMuon; i_tagCand++)
+    {
+      MuonHLT::Muon mu_tagCand( ntuple, i_tagCand );
+
+      // -- tnpPair_test: class to use IsTag() and IsProbe() earlier than making full TnP pair candidate
+      TnPPairTemp *tnpPair_test = new TnPPairTemp();
+      if( !tnpPair_test->IsTag(mu_tagCand, ntuple) ) continue; // -- check here to save runtime
+
+      // -- collect the probes sharing same tag
+      vector<TnPPairTemp*> vec_tnpPairs_sameTag;
+
+      for(Int_t i_probeCand=0; i_probeCand<ntuple->nMuon; i_probeCand++)
+      {
+        // -- remove the case when tag muon == probe muon
+        if( i_tagCand == i_probeCand ) continue;
+
+        MuonHLT::Muon mu_probeCand( ntuple, i_probeCand );
+        if( !tnpPair_test->IsProbe(mu_probeCand, ntuple) ) continue; // -- check here to save runtime
+
+        // -- make the TnP pair candidate
+        TnPPairTemp *tnpPair_ij = new TnPPairTemp( mu_tagCand, mu_probeCand, ntuple );
+        if( tnpPair_ij->IsValid() )
+          vec_tnpPairs_sameTag.push_back( tnpPair_ij );
+        else
+          delete tnpPair_ij;
+      } // -- end of iteration for the probe candidate
+
+      // -- fill TnP histogram only when probeMultiplicity == 1
+      if( (Int_t)vec_tnpPairs_sameTag.size() == 1 ) 
+        tnpHist->Fill( vec_tnpPairs_sameTag[0], weight );
+
+      for( auto tnpPair : vec_tnpPairs_sameTag )
+        delete tnpPair;
+
+      delete tnpPair_test;
+    } // -- end of iteration for tag candidate
   }
 
 };
