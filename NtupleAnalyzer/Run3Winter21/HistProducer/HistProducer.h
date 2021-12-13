@@ -22,6 +22,8 @@ public:
     maxPU_highPU_ = max;
   }
 
+  void Set_NewWP_ReadFromUtil( Bool_t flag = kTRUE ) { newWP_readFromUtil_ = flag; };
+
   void Set_NewWP_ECAL( Double_t WP_EB, Double_t WP_EE ) {
     WP_new_ECAL_EB_ = WP_EB;
     WP_new_ECAL_EE_ = WP_EE;
@@ -54,13 +56,21 @@ public:
     histContainer_lowPU->Set_GenMatchingForDYSample();
     histContainer_highPU->Set_GenMatchingForDYSample();
 
-    histContainer->Set_NewWP_ECAL( WP_new_ECAL_EB_, WP_new_ECAL_EE_ );
-    histContainer_lowPU->Set_NewWP_ECAL( WP_new_ECAL_EB_, WP_new_ECAL_EE_ );
-    histContainer_highPU->Set_NewWP_ECAL( WP_new_ECAL_EB_, WP_new_ECAL_EE_ );
+    if( newWP_readFromUtil_ ) {
+      histContainer->Set_NewWP_ReadFromUtil();
+      histContainer_lowPU->Set_NewWP_ReadFromUtil();
+      histContainer_highPU->Set_NewWP_ReadFromUtil();
+    }
+    else {
+      histContainer->Set_NewWP_ECAL( WP_new_ECAL_EB_, WP_new_ECAL_EE_ );
+      histContainer_lowPU->Set_NewWP_ECAL( WP_new_ECAL_EB_, WP_new_ECAL_EE_ );
+      histContainer_highPU->Set_NewWP_ECAL( WP_new_ECAL_EB_, WP_new_ECAL_EE_ );
 
-    histContainer->Set_NewWP_HCAL( WP_new_HCAL_EB_, WP_new_HCAL_EE_ );
-    histContainer_lowPU->Set_NewWP_HCAL( WP_new_HCAL_EB_, WP_new_HCAL_EE_ );
-    histContainer_highPU->Set_NewWP_HCAL( WP_new_HCAL_EB_, WP_new_HCAL_EE_ );
+      histContainer->Set_NewWP_HCAL( WP_new_HCAL_EB_, WP_new_HCAL_EE_ );
+      histContainer_lowPU->Set_NewWP_HCAL( WP_new_HCAL_EB_, WP_new_HCAL_EE_ );
+      histContainer_highPU->Set_NewWP_HCAL( WP_new_HCAL_EB_, WP_new_HCAL_EE_ );
+    }
+
 
     // -- produce TnP hist (only for DY; sample type is recognized in HistContainer)
     if( produceTnPHist_ ) {
@@ -148,6 +158,8 @@ private:
 
   Double_t minPU_highPU_ = 40;
   Double_t maxPU_highPU_ = 60;
+
+  Bool_t newWP_readFromUtil_ = kFALSE;
 
   Double_t WP_new_ECAL_EB_ = 0;
   Double_t WP_new_ECAL_EE_ = 0;
