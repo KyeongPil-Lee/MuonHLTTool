@@ -15,7 +15,7 @@ void ProduceHist(TString textFile_ntupleList)
   histProducer->SetRange_PU_HighPU( 40, 60 );
 
   histProducer->Set_NewWP_ECAL( 0.23020, 0.19300 ); // -- 99% singal efficiency in high PU
-  histProducer->Set_NewWP_HCAL( 0.16, 0.20 ); // -- default value for now
+  histProducer->Set_NewWP_HCAL( 0.20590, 0.26710 ); // -- 99% singal efficiency in high PU
 
   // histProducer->ProduceTnPHist(); // -- produce TnP hists for DY samples also
 
