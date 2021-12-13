@@ -32,6 +32,8 @@ public:
     WP_new_HCAL_EE_ = WP_EE;
   }
 
+  void ProduceTnPHist( Bool_t flag = kTRUE ) { produceTnPHist_ = flag; };
+
   void Produce()
   {
     StartTimer();
@@ -60,9 +62,16 @@ public:
     histContainer_lowPU->Set_NewWP_HCAL( WP_new_HCAL_EB_, WP_new_HCAL_EE_ );
     histContainer_highPU->Set_NewWP_HCAL( WP_new_HCAL_EB_, WP_new_HCAL_EE_ );
 
-    histContainer->Set_MinPt_ForTnPEff( 26 );
-    histContainer_lowPU->Set_MinPt_ForTnPEff( 26 );
-    histContainer_highPU->Set_MinPt_ForTnPEff( 26 );
+    // -- produce TnP hist (only for DY; sample type is recognized in HistContainer)
+    if( produceTnPHist_ ) {
+      histContainer->Set_ProduceTnPHist();
+      histContainer_lowPU->Set_ProduceTnPHist();
+      histContainer_highPU->Set_ProduceTnPHist();
+
+      histContainer->Set_MinPt_ForTnPEff( 26 );
+      histContainer_lowPU->Set_MinPt_ForTnPEff( 26 );
+      histContainer_highPU->Set_MinPt_ForTnPEff( 26 );
+    }
 
     TChain* chain = new TChain("ntupler/ntuple");
     MuonHLT::AddNtupleToChain( chain, fileName_ntupleList_ );
@@ -145,6 +154,8 @@ private:
 
   Double_t WP_new_HCAL_EB_ = 0;
   Double_t WP_new_HCAL_EE_ = 0;
+
+  Bool_t produceTnPHist_ = kFALSE;
 
   void StartTimer()
   {

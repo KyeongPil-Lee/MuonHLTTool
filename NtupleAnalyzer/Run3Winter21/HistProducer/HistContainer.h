@@ -35,6 +35,8 @@ public:
 
   void Set_MinPt_ForTnPEff(Double_t minPt ) { minPt_ = minPt; }
 
+  void Set_ProduceTnPHist( Bool_t flag = kTRUE ) { produceTnPHist_ = flag; }
+
   void Fill_Event(MuonHLT::NtupleHandle* ntuple, Double_t weight)
   {
     h_rho_ECAL_->Fill( ntuple->rho_ECAL, weight );
@@ -45,7 +47,7 @@ public:
     if( vec_MYHLTObj_IsoMu24.size() > 0 ) h_IsoMu24_->Fill( 1.5, weight );
     else                                  h_IsoMu24_->Fill( 0.5, weight );
 
-    if( isDY_ ) {
+    if( produceTnPHist_ && isDY_ ) {
       Fill_TnPHist<TnPTool::TnPPair_FullIsoOverMu24_OldWP>(ntuple, weight, tnpHist_IsoOverL3_oldWP_);
       Fill_TnPHist<TnPTool::TnPPair_FullIsoOverMu24_NewWP>(ntuple, weight, tnpHist_IsoOverL3_newWP_);
     }
@@ -183,7 +185,7 @@ public:
     for(auto& h : vec_hist_ )
       h->Write();
 
-    if( isDY_ ) {
+    if( produceTnPHist_ && isDY_ ) {
       for(auto& tnpHist : vec_tnpHist_ )
         tnpHist->Save();
     }
@@ -204,6 +206,7 @@ private:
 
   Bool_t doGenMatchingForDY_ = kFALSE;
 
+  Bool_t produceTnPHist_ = kFALSE;
   // -- for TnP efficiency histograms vs. eta, phi, #vtx...
   Double_t minPt_ = -999;
 
@@ -407,7 +410,7 @@ private:
     }
 
     // -- TnPHist: only needed for DY sample
-    if( isDY_ ) {
+    if( produceTnPHist_ && isDY_ ) {
       if( tag_ == "" ) {
         tnpHist_IsoOverL3_oldWP_ = new MuonHLT::TnPHistProducer("oldWP", minPt_);
         tnpHist_IsoOverL3_newWP_ = new MuonHLT::TnPHistProducer("newWP", minPt_);

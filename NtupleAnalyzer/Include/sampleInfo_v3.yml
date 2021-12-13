@@ -1,6 +1,7 @@
 # -- sample infomation read by CondorJobSubmitter
 # -- cross section information: https://twiki.cern.ch/twiki/bin/view/CMS/HighLevelTriggerPhase2#Rate_calculations
 # -- MuonHLTTree_v08: update to CMSSW_12_1_0 including patatrack (regional tracking for isolation)
+# -- 2021.12.13: update sum(weight)
 
 list_sampleInfo:
   - sampleType: ZMuMu_M50to120
