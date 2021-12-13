@@ -83,6 +83,11 @@ public:
       histContainer_highPU->Set_MinPt_ForTnPEff( 26 );
     }
 
+    // -- initialze internal histograms after getting all conditions (by "Set_" functions)
+    histContainer->Initialize();
+    histContainer_lowPU->Initialize();
+    histContainer_highPU->Initialize();
+
     TChain* chain = new TChain("ntupler/ntuple");
     MuonHLT::AddNtupleToChain( chain, fileName_ntupleList_ );
 

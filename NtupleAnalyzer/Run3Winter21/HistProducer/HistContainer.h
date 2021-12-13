@@ -7,11 +7,15 @@
 class HistContainer
 {
 public:
+  HistContainer(TString tag)
+  {
+    tag_ = tag;
+  }
+
   HistContainer(TString tag, TString sampleType)
   {
     tag_ = tag;
     Set_SampleType(sampleType);
-    Init_Hist();
   }
 
   void Set_NewWP_ReadFromUtil( Bool_t flag = kTRUE ) { 
@@ -60,8 +64,20 @@ public:
 
   void Set_ProduceTnPHist( Bool_t flag = kTRUE ) { produceTnPHist_ = flag; }
 
+  // -- should be called before filling the histograms
+  // -- initialze histograms after all conditions are provided by "Set_" functions
+  void Initialize() { 
+    Init_Hist();
+    isInit_ = kTRUE;
+  }
+
   void Fill_Event(MuonHLT::NtupleHandle* ntuple, Double_t weight)
   {
+    if( !isInit_ ) {
+      cout << "HistContainer::Initialize is not called before filling the histograms! return" << endl;
+      return;
+    }
+
     h_rho_ECAL_->Fill( ntuple->rho_ECAL, weight );
     h_rho_HCAL_->Fill( ntuple->rho_HCAL, weight );
 
@@ -87,6 +103,11 @@ public:
 
   void Fill_Mu24Obj(MuonHLT::MYHLTObject Mu24Obj, MuonHLT::NtupleHandle* ntuple, Double_t weight)
   {
+    if( !isInit_ ) {
+      cout << "HistContainer::Initialize is not called before filling the histograms! return" << endl;
+      return;
+    }
+
     if( isDY_ && doGenMatchingForDY_ ) { // -- DY sample: check gen matching; only the object matched to a gen lepton will be filled
       if( !GenMatching(Mu24Obj.vecP, ntuple) ) return;
     }
@@ -243,6 +264,8 @@ private:
   Bool_t produceTnPHist_ = kFALSE;
   // -- for TnP efficiency histograms vs. eta, phi, #vtx...
   Double_t minPt_ = -999;
+
+  Bool_t isInit_ = kFALSE;
 
   vector<TH1D*> vec_hist_;
 
@@ -447,6 +470,9 @@ private:
       }
     }
 
+    // cout << "[HistContainer::Init_Hist] produceTnPHist_ = " << produceTnPHist_ << endl;
+    // cout << "[HistContainer::Init_Hist] isDY_ =           " << isDY_ << endl;
+
     // -- TnPHist: only needed for DY sample
     if( produceTnPHist_ && isDY_ ) {
       if( tag_ == "" ) {
@@ -488,14 +514,18 @@ private:
   template <class TnPPairTemp>
   void Fill_TnPHist(MuonHLT::NtupleHandle* ntuple, Double_t weight, MuonHLT::TnPHistProducer* tnpHist) {
 
+    // cout << "  [Fill_TnPHist] start..." << endl;
     // -- make tag&pobe pair
     for(Int_t i_tagCand=0; i_tagCand<ntuple->nMuon; i_tagCand++)
     {
       MuonHLT::Muon mu_tagCand( ntuple, i_tagCand );
+      // cout << "    consider " << i_tagCand << "th muon" << endl;
 
       // -- tnpPair_test: class to use IsTag() and IsProbe() earlier than making full TnP pair candidate
       TnPPairTemp *tnpPair_test = new TnPPairTemp();
       if( !tnpPair_test->IsTag(mu_tagCand, ntuple) ) continue; // -- check here to save runtime
+
+      // cout << "    pass tag condition" << endl;
 
       // -- collect the probes sharing same tag
       vector<TnPPairTemp*> vec_tnpPairs_sameTag;
@@ -507,21 +537,32 @@ private:
 
         MuonHLT::Muon mu_probeCand( ntuple, i_probeCand );
 
+        // cout << "      check " << i_probeCand << "th muon as probe" << endl;
+
         if( !tnpPair_test->IsProbe(mu_probeCand, ntuple) ) continue; // -- check here to save runtime
+
+        // cout << "      pass the probe condition" << endl;
 
         // -- make the TnP pair candidate
         TnPPairTemp *tnpPair_ij = new TnPPairTemp( mu_tagCand, mu_probeCand, ntuple );
         if( tnpPair_ij->IsValid() ) {
+          // cout << "      pass the tag & probe pair condition" << endl;
           vec_tnpPairs_sameTag.push_back( tnpPair_ij );
         }
-        else
+        else {
+          // cout << "      fail to pass the tag & probe pair condition" << endl;
           delete tnpPair_ij;
+        }
       } // -- end of iteration for the probe candidate
 
       // -- fill TnP histogram only when probeMultiplicity == 1
       if( (Int_t)vec_tnpPairs_sameTag.size() == 1 )  {
+        // cout << "      --->fill the tnpHist" << endl;
         tnpHist->Fill( static_cast<MuonHLT::TnPPairBase*>(vec_tnpPairs_sameTag[0]), weight );
       }
+      // else {
+      //   cout << "      --->multiple pairs on same tag: skip" << endl;
+      // }
 
       for( auto tnpPair : vec_tnpPairs_sameTag )
         delete tnpPair;

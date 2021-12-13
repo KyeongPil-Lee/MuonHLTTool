@@ -164,6 +164,14 @@ public:
       arr_binEdge_[i] = vec_BinEdge[i];
 
     GenerateHists();
+
+    // cout << "[TnPHist::Constructor]" << endl;
+    // cout << "  tag =      " << tag << endl;
+    // cout << "  binType =  " << binType << endl;
+    // cout << "  minPtCut = " << minPtCut << endl;
+    // cout << "  nBin_ = "    << nBin_ << endl;
+    // cout << "  minM_ = "    << minM_ << endl;
+    // cout << "  maxM_ = "    << maxM_ << endl;
   }
 
   ~TnPHist()
@@ -179,6 +187,7 @@ public:
   void Fill( MuonHLT::TnPPairBase* pair, Double_t value, Double_t weight = 1.0 )
   {
     if( pair->ProbePt() < minPtCut_ ) return;
+
     Int_t i_hist = FindBinNumber(value);
     if( i_hist < 0 ) return; // -- out of bin range
 
