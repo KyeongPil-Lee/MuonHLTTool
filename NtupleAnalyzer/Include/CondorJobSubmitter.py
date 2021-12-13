@@ -106,6 +106,10 @@ class MultiCondorJobSubmitter:
 
         list_binnedSample = yamlParser["list_binnedSample"]
         for binnedSample in list_binnedSample:
+            if not BinnedSamples_Exist_In_JobList(binnedSample["list_sampleType"]):
+                print "%s will not be made as all binned samples are not run in this job" % binnedSample["name"]
+                continue;
+
             binMergedSampleName = binnedSample["name"]
 
             binMergedFileName = "ROOTFile_%s_%s.root" % (self.ROOTCodeName.split(".cxx")[0], binMergedSampleName)
@@ -137,6 +141,19 @@ class MultiCondorJobSubmitter:
 
             f_script.write(cmd_rm)
             f_script.write("\n\n\n")
+
+    def BinnedSamples_Exist_In_JobList(self, list_binnedSampleType):
+        doExist = True
+
+        for binnedSampleType in list_binnedSampleType:
+            if binnedSampleType not in self.dic_sample_nJob.keys():
+                doExist = False
+                break
+
+        return doExist
+
+
+
 
 
 
