@@ -132,7 +132,7 @@ void DrawLine( TF1*& f_line, Int_t color = kRed )
   f_line = new TF1("f_line", "1", -10000, 10000);
   f_line->SetLineColor(color);
   f_line->SetLineWidth(1);
-  f_line->Draw("PSAME");
+  f_line->Draw("LPSAME");
 }
 
 TH1D* DivideEachBin_ByBinWidth( TH1D* h, TString HistName = "" )
@@ -1148,6 +1148,10 @@ public:
       if( setRangeRatio_ ) g_ratio->GetYaxis()->SetRangeUser( minRatio_, maxRatio_ );
     }
 
+    bottomPad_->cd();
+    TF1 *f_line;
+    PlotTool::DrawLine(f_line);
+
     // -- remove points after drawing all of them
     if( doRemoveZeroPoint_ )
     {
@@ -1163,8 +1167,8 @@ public:
       }
     }
 
-    TF1 *f_line;
-    PlotTool::DrawLine(f_line);
+    // TF1 *f_line;
+    // PlotTool::DrawLine(f_line);
 
     c_->SaveAs(".pdf");
   }
