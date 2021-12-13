@@ -106,7 +106,7 @@ class MultiCondorJobSubmitter:
 
         list_binnedSample = yamlParser["list_binnedSample"]
         for binnedSample in list_binnedSample:
-            if not BinnedSamples_Exist_In_JobList(binnedSample["list_sampleType"]):
+            if not self.BinnedSamples_Exist_In_JobList(binnedSample["list_sampleType"]):
                 print "%s will not be made as all binned samples are not run in this job" % binnedSample["name"]
                 continue;
 
