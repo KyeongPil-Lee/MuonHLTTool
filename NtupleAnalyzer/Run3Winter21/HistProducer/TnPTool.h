@@ -18,6 +18,7 @@ public:
 
   Double_t mass_;
   Int_t nVtx_;
+  Int_t truePU_;
 
   TnPPairBase( MuonHLT::Muon tagCand, MuonHLT::Muon probeCand, NtupleHandle* ntuple ):
   tag_(tagCand),
@@ -61,6 +62,7 @@ public:
         isValid_ = kTRUE;
         mass_ = (tag_.vecP + probe_.vecP).M();
         nVtx_ = ntuple_->nVertex;
+        truePU_ = ntuple_->truePU;
 
         if( IsPassingProbe() ) isPassingProbe_ = kTRUE;
       }
@@ -84,6 +86,7 @@ public:
   Double_t ProbeEta() { return probe_.eta; }
   Double_t ProbePhi() { return probe_.phi; }
   Int_t nVtx() { return nVtx_; }
+  Int_t TruePU() { return truePU_; }
 
   Bool_t Get_isPassingProbe() { return isPassingProbe_; }
 
@@ -283,6 +286,7 @@ public:
     delete TnPHistEta_;
     delete TnPHistPhi_;
     delete TnPHistVtx_;
+    delete TnPHistTruePU_;
   }
 
   void Fill( MuonHLT::TnPPairBase* pair, Double_t weight = 1.0 )
@@ -292,6 +296,7 @@ public:
     TnPHistEta_->Fill( pair, pair->ProbeEta(), weight );
     TnPHistPhi_->Fill( pair, pair->ProbePhi(), weight );
     TnPHistVtx_->Fill( pair, pair->nVtx(), weight );
+    TnPHistTruePU_->Fill( pair, pair->TruePU(), weight );
   }
 
   void Save()
@@ -301,6 +306,7 @@ public:
     TnPHistEta_->Save();
     TnPHistPhi_->Save();
     TnPHistVtx_->Save();
+    TnPHistTruePU_->Save();
   }
 
 private:
@@ -311,6 +317,7 @@ private:
   TnPHist* TnPHistEta_;
   TnPHist* TnPHistPhi_;
   TnPHist* TnPHistVtx_;
+  TnPHist* TnPHistTruePU_;
 
   void Init()
   {
@@ -332,11 +339,19 @@ private:
       42.5, 44.5, 46.5, 48.5, 50.5, 52.5, 54.5, 56.5, 58.5, 60.5
     };
 
+    // -- 0, 2, 4, 6, ... 100
+    vector<Double_t> vec_TruePUBinEdge = {};
+    for(Int_t i=0; i<101; i++) {
+      if( i % 2 == 1 ) continue;
+      vec_TruePUBinEdge.push_back( i );
+    }
+
     TnPHistPt_     = new TnPHist(tag_, "Pt",     0,      vec_PtBinEdge);
     TnPHistHighPt_ = new TnPHist(tag_, "HighPt", 0,      vec_HighPtBinEdge);
     TnPHistEta_    = new TnPHist(tag_, "Eta",    ptCut_, vec_EtaBinEdge);
     TnPHistPhi_    = new TnPHist(tag_, "Phi",    ptCut_, vec_PhiBinEdge);
     TnPHistVtx_    = new TnPHist(tag_, "Vtx",    ptCut_, vec_VtxBinEdge);
+    TnPHistTruePU_ = new TnPHist(tag_, "TruePU", ptCut_, vec_TruePUBinEdge);
   }
 
   void Set_ptCut( Double_t ptCut ) { ptCut_ = ptCut; }
