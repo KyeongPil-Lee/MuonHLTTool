@@ -70,6 +70,15 @@ public:
     if( vec_MYHLTObj_IsoMu24.size() > 0 ) h_IsoMu24_->Fill( 1.5, weight );
     else                                  h_IsoMu24_->Fill( 0.5, weight );
 
+    // -- check isolation cut one by one;
+    vector<MuonHLT::MYHLTObject> vec_MYHLTObj_IsoMu24_oldWP = MuonHLT::GetAllMYHLTObj_Mu24_PassIso_OldWP(ntuple);
+    if( vec_MYHLTObj_IsoMu24_oldWP.size() > 0 ) h_IsoMu24_oldWP_->Fill( 1.5, weight );
+    else                                        h_IsoMu24_oldWP_->Fill( 0.5, weight );
+
+    vector<MuonHLT::MYHLTObject> vec_MYHLTObj_IsoMu24_newWP = MuonHLT::GetAllMYHLTObj_Mu24_PassIso_NewWP(ntuple);
+    if( vec_MYHLTObj_IsoMu24_newWP.size() > 0 ) h_IsoMu24_newWP_->Fill( 1.5, weight );
+    else                                        h_IsoMu24_newWP_->Fill( 0.5, weight );
+
     if( produceTnPHist_ && isDY_ ) {
       Fill_TnPHist<TnPTool::TnPPair_FullIsoOverMu24_OldWP>(ntuple, weight, tnpHist_IsoOverL3_oldWP_);
       Fill_TnPHist<TnPTool::TnPPair_FullIsoOverMu24_NewWP>(ntuple, weight, tnpHist_IsoOverL3_newWP_);
@@ -246,6 +255,8 @@ private:
 
   // -- is IsoMu24 fired
   TH1D* h_IsoMu24_;
+  TH1D* h_IsoMu24_oldWP_;
+  TH1D* h_IsoMu24_newWP_;
 
   //////////////////////////
   // -- muon by muon   -- //
@@ -337,6 +348,8 @@ private:
     h_rho_HCAL_ = new TH1D("h_rho_HCAL", "", 10000, 0, 1000); vec_hist_.push_back( h_rho_HCAL_ );
 
     h_IsoMu24_ = new TH1D("h_IsoMu24", "", 2, 0, 2); vec_hist_.push_back( h_IsoMu24_ );
+    h_IsoMu24_oldWP_ = new TH1D("h_IsoMu24_oldWP", "", 2, 0, 2); vec_hist_.push_back( h_IsoMu24_oldWP_ );
+    h_IsoMu24_newWP_ = new TH1D("h_IsoMu24_newWP", "", 2, 0, 2); vec_hist_.push_back( h_IsoMu24_newWP_ );
 
     h_Mu24Obj_ECALIso_ = new TH1D("h_Mu24Obj_ECALIso", "", 20000, -10000, 10000); vec_hist_.push_back( h_Mu24Obj_ECALIso_ );
     h_Mu24Obj_ECALIso_EB_ = new TH1D("h_Mu24Obj_ECALIso_EB", "", 20000, -10000, 10000); vec_hist_.push_back( h_Mu24Obj_ECALIso_EB_ );
