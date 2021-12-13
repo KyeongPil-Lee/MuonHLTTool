@@ -54,8 +54,8 @@ public:
   void Set_SampleType( TString type ) { 
     sampleType_ = type;
 
-    if( sampleType_.Contains("ZMuMu") || sampleType_.Contains("DYLL") ) isDY_ = kTRUE;
-    if( sampleType_.Contains("QCD") )                                   isQCD_ = kTRUE;
+    if( sampleType_.Contains("ZMuMu_M50to120") || sampleType_.Contains("DYLL_M50") ) isDY_M50_ = kTRUE;
+    if( sampleType_.Contains("QCD") )                                                isQCD_    = kTRUE;
   }
 
   void Set_GenMatchingForDYSample( Bool_t flag = kTRUE) { doGenMatchingForDY_ = flag; }
@@ -79,6 +79,9 @@ public:
       return;
     }
 
+    // -- sum(weight)
+    h_sumWeight_->Fill( 0.5, eventWeight );
+
     Double_t weight = eventWeight*normFactor;
 
     h_rho_ECAL_->Fill( ntuple->rho_ECAL, weight );
@@ -99,7 +102,7 @@ public:
     else                                        h_IsoMu24_newWP_->Fill( 0.5, weight );
 
     // -- use eventWeight instead of eventWeight*normFactor
-    if( produceTnPHist_ && isDY_ ) {
+    if( produceTnPHist_ && isDY_M50_ ) {
       Fill_TnPHist<TnPTool::TnPPair_FullIsoOverMu24_OldWP>(ntuple, eventWeight, tnpHist_IsoOverL3_oldWP_);
       Fill_TnPHist<TnPTool::TnPPair_FullIsoOverMu24_NewWP>(ntuple, eventWeight, tnpHist_IsoOverL3_newWP_);
     }
@@ -112,7 +115,7 @@ public:
       return;
     }
 
-    if( isDY_ && doGenMatchingForDY_ ) { // -- DY sample: check gen matching; only the object matched to a gen lepton will be filled
+    if( isDY_M50_ && doGenMatchingForDY_ ) { // -- DY sample: check gen matching; only the object matched to a gen lepton will be filled
       if( !GenMatching(Mu24Obj.vecP, ntuple) ) return;
     }
 
@@ -242,7 +245,7 @@ public:
     for(auto& h : vec_hist_ )
       h->Write();
 
-    if( produceTnPHist_ && isDY_ ) {
+    if( produceTnPHist_ && isDY_M50_ ) {
       for(auto& tnpHist : vec_tnpHist_ )
         tnpHist->Save();
     }
@@ -260,7 +263,7 @@ private:
   Double_t WP_new_HCAL_EE_ = 0;
 
   TString sampleType_ = "";
-  Bool_t isDY_ = kFALSE;
+  Bool_t isDY_M50_ = kFALSE;
   Bool_t isQCD_ = kFALSE;
 
   Bool_t doGenMatchingForDY_ = kFALSE;
@@ -276,6 +279,8 @@ private:
   //////////////////////////
   // -- event by event -- //
   //////////////////////////
+  TH1D* h_sumWeight_;
+
   // -- rho information
   TH1D* h_rho_ECAL_;
   TH1D* h_rho_HCAL_;
@@ -371,6 +376,8 @@ private:
 
   void Init_Hist()
   {
+    h_sumWeight_ = new TH1D("h_sumWeight", "", 1, 0, 1); vec_hist_.push_back( h_sumWeight_ );
+
     h_rho_ECAL_ = new TH1D("h_rho_ECAL", "", 10000, 0, 1000); vec_hist_.push_back( h_rho_ECAL_ );
     h_rho_HCAL_ = new TH1D("h_rho_HCAL", "", 10000, 0, 1000); vec_hist_.push_back( h_rho_HCAL_ );
 
@@ -475,10 +482,10 @@ private:
     }
 
     // cout << "[HistContainer::Init_Hist] produceTnPHist_ = " << produceTnPHist_ << endl;
-    // cout << "[HistContainer::Init_Hist] isDY_ =           " << isDY_ << endl;
+    // cout << "[HistContainer::Init_Hist] isDY_M50_ =           " << isDY_M50_ << endl;
 
     // -- TnPHist: only needed for DY sample
-    if( produceTnPHist_ && isDY_ ) {
+    if( produceTnPHist_ && isDY_M50_ ) {
       if( tag_ == "" ) {
         tnpHist_IsoOverL3_oldWP_ = new MuonHLT::TnPHistProducer("oldWP", minPt_);
         tnpHist_IsoOverL3_newWP_ = new MuonHLT::TnPHistProducer("newWP", minPt_);

@@ -21,7 +21,7 @@ Bool_t Pass_HLTIsoFilter_HCAL_NewWP(MuonHLT::MYHLTObject HLTObj) {
 }
 
 Bool_t Pass_HLTIsoFilter_Tracker_NewWP(MuonHLT::MYHLTObject HLTObj) {
-  return MuonHLT::Pass_HLTIsoFilter_HCAL( HLTObj, WP_new_Tracker);
+  return MuonHLT::Pass_HLTIsoFilter_Tracker( HLTObj, WP_new_Tracker);
 }
 
 vector<MuonHLT::MYHLTObject> GetAllMYHLTObj_Mu24_PassIso_OldWP(MuonHLT::NtupleHandle* ntuple) {
