@@ -14,12 +14,35 @@ public:
     Init_Hist();
   }
 
+  void Set_NewWP_ReadFromUtil( Bool_t flag = kTRUE ) { 
+    newWP_readFromUtil_ = flag;
+    if( newWP_readFromUtil_ ) {
+      cout << "[HistContainer] New WP values (only used for iso. histograms, not TnP) are read from Utility_NewWP.h..." << endl;
+      // -- value: defined in Utility_NewWP.h
+      WP_new_ECAL_EB_ = MuonHLT::WP_new_ECAL_EB;
+      WP_new_ECAL_EE_ = MuonHLT::WP_new_ECAL_EE;
+
+      WP_new_HCAL_EB_ = MuonHLT::WP_new_HCAL_EB;
+      WP_new_HCAL_EE_ = MuonHLT::WP_new_HCAL_EE;
+    }
+    else {
+      cout << "[HistContainer] New WP values (only used for iso. histograms, not TnP) are should be provided by hand" << endl;
+    }
+
+  }
+
   void Set_NewWP_ECAL( Double_t WP_EB, Double_t WP_EE ) {
+    if( newWP_readFromUtil_ )
+      cout << "[HistContainer::Set_NewWP_ECAL] new WP values were already read from Utility_NewWP.h... they will be overwritten" << endl;
+
     WP_new_ECAL_EB_ = WP_EB;
     WP_new_ECAL_EE_ = WP_EE;
   }
 
   void Set_NewWP_HCAL( Double_t WP_EB, Double_t WP_EE ) {
+    if( newWP_readFromUtil_ )
+      cout << "[HistContainer::Set_NewWP_HCAL] new WP values were already read from Utility_NewWP.h... they will be overwritten" << endl;
+
     WP_new_HCAL_EB_ = WP_EB;
     WP_new_HCAL_EE_ = WP_EE;
   }
@@ -193,6 +216,8 @@ public:
 
 private:
   TString tag_ = "";
+
+  Bool_t newWP_readFromUtil_ = kFALSE;
 
   Double_t WP_new_ECAL_EB_ = 0;
   Double_t WP_new_ECAL_EE_ = 0;
