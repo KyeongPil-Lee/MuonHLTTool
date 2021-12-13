@@ -71,12 +71,15 @@ public:
     isInit_ = kTRUE;
   }
 
-  void Fill_Event(MuonHLT::NtupleHandle* ntuple, Double_t weight)
+  // -- split eventWeight and normFactor: TnP hist doesn't need normalization
+  void Fill_Event(MuonHLT::NtupleHandle* ntuple, Double_t eventWeight, Double_t normFactor)
   {
     if( !isInit_ ) {
       cout << "HistContainer::Initialize is not called before filling the histograms! return" << endl;
       return;
     }
+
+    Double_t weight = eventWeight*normFactor;
 
     h_rho_ECAL_->Fill( ntuple->rho_ECAL, weight );
     h_rho_HCAL_->Fill( ntuple->rho_HCAL, weight );
@@ -95,9 +98,10 @@ public:
     if( vec_MYHLTObj_IsoMu24_newWP.size() > 0 ) h_IsoMu24_newWP_->Fill( 1.5, weight );
     else                                        h_IsoMu24_newWP_->Fill( 0.5, weight );
 
+    // -- use eventWeight instead of eventWeight*normFactor
     if( produceTnPHist_ && isDY_ ) {
-      Fill_TnPHist<TnPTool::TnPPair_FullIsoOverMu24_OldWP>(ntuple, weight, tnpHist_IsoOverL3_oldWP_);
-      Fill_TnPHist<TnPTool::TnPPair_FullIsoOverMu24_NewWP>(ntuple, weight, tnpHist_IsoOverL3_newWP_);
+      Fill_TnPHist<TnPTool::TnPPair_FullIsoOverMu24_OldWP>(ntuple, eventWeight, tnpHist_IsoOverL3_oldWP_);
+      Fill_TnPHist<TnPTool::TnPPair_FullIsoOverMu24_NewWP>(ntuple, eventWeight, tnpHist_IsoOverL3_newWP_);
     }
   }
 

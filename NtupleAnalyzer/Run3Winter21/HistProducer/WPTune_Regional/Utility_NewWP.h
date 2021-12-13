@@ -29,11 +29,16 @@ vector<MuonHLT::MYHLTObject> GetAllMYHLTObj_Mu24_PassIso_OldWP(MuonHLT::NtupleHa
 
   vector<MuonHLT::MYHLTObject> vec_Mu24Obj = MuonHLT::GetAllMYHLTObject(ntuple, "hltL3fL1sSingleMu22L1f0L2f10QL3Filtered24Q::MYHLT");
   for( auto& Mu24Obj : vec_Mu24Obj ) {
+    Mu24Obj.FillIsolationVariable(ntuple);
+    // cout << "MuonHLT::Pass_HLTIsoFilter_ECAL( Mu24Obj ) =    " << MuonHLT::Pass_HLTIsoFilter_ECAL( Mu24Obj ) << endl;
+    // cout << "MuonHLT::Pass_HLTIsoFilter_HCAL( Mu24Obj ) =    " << MuonHLT::Pass_HLTIsoFilter_HCAL( Mu24Obj ) << endl;
+    // cout << "MuonHLT::Pass_HLTIsoFilter_Tracker( Mu24Obj ) = " << MuonHLT::Pass_HLTIsoFilter_Tracker( Mu24Obj ) << endl;
     if( MuonHLT::Pass_HLTIsoFilter_ECAL( Mu24Obj ) &&
         MuonHLT::Pass_HLTIsoFilter_HCAL( Mu24Obj ) &&
         MuonHLT::Pass_HLTIsoFilter_Tracker( Mu24Obj ) )
       vec_selectedObj.push_back( Mu24Obj );
   }
+  // cout << "vec_selectedObj.size() = " << vec_selectedObj.size() << endl;
 
   return vec_selectedObj;
 }
@@ -43,6 +48,8 @@ vector<MuonHLT::MYHLTObject> GetAllMYHLTObj_Mu24_PassIso_NewWP(MuonHLT::NtupleHa
 
   vector<MuonHLT::MYHLTObject> vec_Mu24Obj = MuonHLT::GetAllMYHLTObject(ntuple, "hltL3fL1sSingleMu22L1f0L2f10QL3Filtered24Q::MYHLT");
   for( auto& Mu24Obj : vec_Mu24Obj ) {
+    Mu24Obj.FillIsolationVariable(ntuple);
+    
     if( MuonHLT::Pass_HLTIsoFilter_ECAL_NewWP( Mu24Obj ) &&
         MuonHLT::Pass_HLTIsoFilter_HCAL_NewWP( Mu24Obj ) &&
         MuonHLT::Pass_HLTIsoFilter_Tracker_NewWP( Mu24Obj ) )

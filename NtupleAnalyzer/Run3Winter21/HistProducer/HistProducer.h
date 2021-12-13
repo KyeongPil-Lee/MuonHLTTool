@@ -114,9 +114,9 @@ public:
 
       if( debug_ ) cout << "  before Fill_Event histContainer..." << endl;
 
-      histContainer->Fill_Event(ntuple, totWeight );
-      if( minPU_lowPU_ < truePU  && truePU < maxPU_lowPU_ )  histContainer_lowPU->Fill_Event(ntuple, totWeight );
-      if( minPU_highPU_ < truePU && truePU < maxPU_highPU_ ) histContainer_highPU->Fill_Event(ntuple, totWeight );
+      histContainer->Fill_Event(ntuple, genWeight, normFactor);
+      if( minPU_lowPU_ < truePU  && truePU < maxPU_lowPU_ )  histContainer_lowPU->Fill_Event(ntuple, genWeight, normFactor);
+      if( minPU_highPU_ < truePU && truePU < maxPU_highPU_ ) histContainer_highPU->Fill_Event(ntuple, genWeight, normFactor);
 
       if( debug_ ) cout << "  after Fill_Event histContainer..." << endl;
 
