@@ -55,16 +55,34 @@ public:
 
   Bool_t IsValid()
   {
+    // cout << "[TnPPairBase::IsValid]" << endl;
     if( IsTag() && IsProbe() )
     {
+      // cout << "  Pass IsTag() && IsProbe()" << endl;
+      // cout << TString::Format("  --> tag:   (pt, eta, isTight, relPFIso_dBeta) = (%.1lf, %.3lf, %d, %.3lf)", tag_.pt, tag_.eta, tag_.isTight, tag_.relPFIso_dBeta) << endl;
+      // Bool_t matched_Mu24    = MuonHLT::dRMatching_HLTObj(probe_.vecP, ntuple_, "hltL3fL1sSingleMu22L1f0L2f10QL3Filtered24Q", 0.1);
+      // Bool_t matched_IsoMu24 = MuonHLT::dRMatching_HLTObj(probe_.vecP, ntuple_, "hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07", 0.1);
+      // cout << TString::Format("  --> probe: (pt, eta, phi, isTight, relPFIso_dBeta, matched to Mu24?, IsoMu24?) = (%.1lf, %.3lf, %.3lf, %d, %.3lf, %d, %d)", probe_.pt, probe_.eta, probe_.phi, probe_.isTight, probe_.relPFIso_dBeta, matched_Mu24, matched_IsoMu24) << endl;
+      // if( !matched_IsoMu24 ) {
+      //   cout << "  IsoMu24 objects: " << endl;
+      //   vector<MuonHLT::HLTObject> vec_IsoMu24Obj = MuonHLT::GetAllHLTObject(ntuple_, "hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07");
+      //   for(auto& obj : vec_IsoMu24Obj ) {
+      //     cout << TString::Format("  (pt, eta, phi) = (%.1lf, %.3lf, %.3lf)", obj.pt, obj.eta, obj.phi) << endl;
+      //   }
+      // }
+
       if( IsGoodPair() )
       {
+        // cout << "  Pass IsGoodPair()" << endl;
+
         isValid_ = kTRUE;
         mass_ = (tag_.vecP + probe_.vecP).M();
         nVtx_ = ntuple_->nVertex;
         truePU_ = ntuple_->truePU;
 
         if( IsPassingProbe() ) isPassingProbe_ = kTRUE;
+
+        // cout << "  --> pair mass = " << mass_ << ", isPassingProbe_ = " << isPassingProbe_ << endl;
       }
     }
 
@@ -133,8 +151,8 @@ public:
 
   // -- internal use
   Bool_t IsTag()          { return IsTag(tag_, ntuple_); }
-  Bool_t IsProbe()        { return IsProbe(tag_, ntuple_); }
-  Bool_t IsPassingProbe() { return IsPassingProbe(tag_, ntuple_); }
+  Bool_t IsProbe()        { return IsProbe(probe_, ntuple_); }
+  Bool_t IsPassingProbe() { return IsPassingProbe(probe_, ntuple_); }
   Bool_t IsGoodPair()     { return IsGoodPair(tag_, probe_, ntuple_); }
 };
 
