@@ -21,7 +21,7 @@ void ProduceHist(TString textFile_ntupleList)
 
   histProducer->ProduceTnPHist(); // -- produce TnP hists for DY samples also
 
-  // histProducer->Set_ProduceSubPURangeHist(); // -- produce lowPU & highPU histograms
+  histProducer->Set_ProduceSubPURangeHist(); // -- produce lowPU & highPU histograms
 
   histProducer->Produce();
 }

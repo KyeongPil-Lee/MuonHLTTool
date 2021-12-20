@@ -105,6 +105,7 @@ public:
     if( produceTnPHist_ && isDY_M50_ ) {
       Fill_TnPHist<TnPTool::TnPPair_FullIsoOverMu24_OldWP>(ntuple, eventWeight, tnpHist_IsoOverL3_oldWP_);
       Fill_TnPHist<TnPTool::TnPPair_FullIsoOverMu24_NewWP>(ntuple, eventWeight, tnpHist_IsoOverL3_newWP_);
+      Fill_TnPHist<TnPTool::TnPPair_IsoMu24OverL3>(ntuple, eventWeight, tnpHist_IsoOverL3_default_);
     }
   }
 
@@ -372,6 +373,7 @@ private:
   vector<MuonHLT::TnPHistProducer*> vec_tnpHist_;
   MuonHLT::TnPHistProducer* tnpHist_IsoOverL3_oldWP_;
   MuonHLT::TnPHistProducer* tnpHist_IsoOverL3_newWP_;  
+  MuonHLT::TnPHistProducer* tnpHist_IsoOverL3_default_;
 
 
   void Init_Hist()
@@ -489,14 +491,17 @@ private:
       if( tag_ == "" ) {
         tnpHist_IsoOverL3_oldWP_ = new MuonHLT::TnPHistProducer("oldWP", minPt_);
         tnpHist_IsoOverL3_newWP_ = new MuonHLT::TnPHistProducer("newWP", minPt_);
+        tnpHist_IsoOverL3_default_ = new MuonHLT::TnPHistProducer("default", minPt_);
       }
       else {
         tnpHist_IsoOverL3_oldWP_ = new MuonHLT::TnPHistProducer("oldWP_"+tag_, minPt_);
         tnpHist_IsoOverL3_newWP_ = new MuonHLT::TnPHistProducer("newWP_"+tag_, minPt_);
+        tnpHist_IsoOverL3_default_ = new MuonHLT::TnPHistProducer("default_"+tag_, minPt_);
       }
 
       vec_tnpHist_.push_back( tnpHist_IsoOverL3_oldWP_ );
       vec_tnpHist_.push_back( tnpHist_IsoOverL3_newWP_ );
+      vec_tnpHist_.push_back( tnpHist_IsoOverL3_default_ );
     }
   }
 
