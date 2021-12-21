@@ -44,5 +44,6 @@ def customizerFuncForMuonHLTNtupler(process, newProcessName = "MYHLT"):
       )
 
     process.mypath = cms.EndPath(process.ntupler)
+    process.schedule.extend([process.mypath])
 
     return process
