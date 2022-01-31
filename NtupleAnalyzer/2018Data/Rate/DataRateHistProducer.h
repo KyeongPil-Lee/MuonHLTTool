@@ -1,5 +1,7 @@
 #include <2018Data/Rate/DataRateTool.h>
 #include <TStopwatch.h>
+#include <TH1.h>
+#include <TH2.h>
 
 class DataRateHistProducer {
 public:
@@ -12,6 +14,9 @@ public:
   void Set_Weight( Double_t weight ) { weight_ = weight; }
 
   void Produce() {
+    TH1::SetDefaultSumw2();
+    TH2::SetDefaultSumw2();
+
     StartTimer();
 
     TString sampleType = MuonHLT::GetInfo_String("sampleType", fileName_ntupleList_);
