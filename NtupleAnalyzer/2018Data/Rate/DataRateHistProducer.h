@@ -1,4 +1,5 @@
 #include <2018Data/Rate/DataRateTool.h>
+#include <TStopwatch.h>
 
 class DataRateHistProducer {
 public:
@@ -8,7 +9,7 @@ public:
   void Set_TriggerList_MYHLT(vector<TString> vec_trigger) { vec_trigger_MYHLT_ = vec_trigger; }
 
   // -- weight = HLT_Physics prescale * # HLTPhysics dataset
-  void Set_weight( Double_t weight ) { weight_ = weight; }
+  void Set_Weight( Double_t weight ) { weight_ = weight; }
 
   void Produce() {
     StartTimer();
