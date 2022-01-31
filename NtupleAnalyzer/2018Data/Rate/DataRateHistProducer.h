@@ -40,6 +40,8 @@ public:
       ntuple->GetEvent(i_ev);
 
       histContainer->Fill( ntuple );
+
+      cout << TString::Format("(nLS, instLumi) = (%d, %.3lf)", ntuple->lumiBlockNum, ntuple->instLumi) << endl;
     }
 
     TString outputFileName = TString::Format("ROOTFile_DataRateHistProducer_%s.root", sampleType.Data());
