@@ -2,7 +2,7 @@
 # -- cross section information: https://twiki.cern.ch/twiki/bin/view/CMS/HighLevelTriggerPhase2#Rate_calculations
 # -- MuonHLTTree_v08: update to CMSSW_12_1_0 including patatrack (regional tracking for isolation)
 # -- 2021.12.13: update sum(weight)
-
+# -- 2022.01.07: udpate HLTPhysics datasets (Tree_v10)
 list_sampleInfo:
   - sampleType: ZMuMu_M50to120
     list_ntupleDirPath: 
@@ -63,6 +63,19 @@ list_sampleInfo:
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v08/QCD_Pt-120To170_MuEnrichedPt5_TuneCP5_14TeV-pythia8
     xSec: 2.470e+04
     sumWeight: 47849.0
+
+  - sampleType: EphemeralHLTPhysics1_Run2018D_Run323775
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics1/crab_EphemeralHLTPhysics1_Run2018D_Run323775
+    xSec: -1.0
+    sumWeight: -1.0
+
+  # -- without patatrack
+  - sampleType: EphemeralHLTPhysics1_Run2018D_Run323775_withoutPT
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics1/crab_EphemeralHLTPhysics1_Run2018D_Run323775_withoutPT
+    xSec: -1.0
+    sumWeight: -1.0
 
 list_binnedSample:
   - name: ZMuMu_M50to400
