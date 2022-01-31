@@ -81,27 +81,27 @@ list_sampleInfo:
   - sampleType: EphemeralHLTPhysicsAll_Run2018D_Run323775
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics1/crab_EphemeralHLTPhysics1_Run2018D_Run323775
-      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics1/crab_EphemeralHLTPhysics2_Run2018D_Run323775
-      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics1/crab_EphemeralHLTPhysics3_Run2018D_Run323775
-      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics1/crab_EphemeralHLTPhysics4_Run2018D_Run323775
-      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics1/crab_EphemeralHLTPhysics5_Run2018D_Run323775
-      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics1/crab_EphemeralHLTPhysics6_Run2018D_Run323775
-      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics1/crab_EphemeralHLTPhysics7_Run2018D_Run323775
-      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics1/crab_EphemeralHLTPhysics8_Run2018D_Run323775
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics2/crab_EphemeralHLTPhysics2_Run2018D_Run323775
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics3/crab_EphemeralHLTPhysics3_Run2018D_Run323775
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics4/crab_EphemeralHLTPhysics4_Run2018D_Run323775
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics5/crab_EphemeralHLTPhysics5_Run2018D_Run323775
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics6/crab_EphemeralHLTPhysics6_Run2018D_Run323775
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics7/crab_EphemeralHLTPhysics7_Run2018D_Run323775
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics8/crab_EphemeralHLTPhysics8_Run2018D_Run323775
     xSec: -1.0
     sumWeight: -1.0
 
   # -- full, without patatrack
-  - sampleType: EphemeralHLTPhysicsAll_Run2018D_Run323775
+  - sampleType: EphemeralHLTPhysicsAll_Run2018D_Run323775_withoutPT
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics1/crab_EphemeralHLTPhysics1_Run2018D_Run323775_withoutPT
-      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics1/crab_EphemeralHLTPhysics2_Run2018D_Run323775_withoutPT
-      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics1/crab_EphemeralHLTPhysics3_Run2018D_Run323775_withoutPT
-      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics1/crab_EphemeralHLTPhysics4_Run2018D_Run323775_withoutPT
-      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics1/crab_EphemeralHLTPhysics5_Run2018D_Run323775_withoutPT
-      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics1/crab_EphemeralHLTPhysics6_Run2018D_Run323775_withoutPT
-      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics1/crab_EphemeralHLTPhysics7_Run2018D_Run323775_withoutPT
-      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics1/crab_EphemeralHLTPhysics8_Run2018D_Run323775_withoutPT
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics2/crab_EphemeralHLTPhysics2_Run2018D_Run323775_withoutPT
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics3/crab_EphemeralHLTPhysics3_Run2018D_Run323775_withoutPT
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics4/crab_EphemeralHLTPhysics4_Run2018D_Run323775_withoutPT
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics5/crab_EphemeralHLTPhysics5_Run2018D_Run323775_withoutPT
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics6/crab_EphemeralHLTPhysics6_Run2018D_Run323775_withoutPT
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics7/crab_EphemeralHLTPhysics7_Run2018D_Run323775_withoutPT
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v10/EphemeralHLTPhysics8/crab_EphemeralHLTPhysics8_Run2018D_Run323775_withoutPT
     xSec: -1.0
     sumWeight: -1.0
 
