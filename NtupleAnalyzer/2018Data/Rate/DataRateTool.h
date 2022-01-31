@@ -26,17 +26,21 @@ public:
     }
 
     // -- fill inst. lumi information
-    Int_t i_LSBin = ntuple->lumiBlockNum;
-    if( h_LSInstLumi_->GetBinContent(i_LSBin) == -1.0 ) { // -- if it is not filled yet
-      h_LSInstLumi_->SetBinContent(i_LSBin, ntuple->instLumi);
-    }
+    Int_t nLS = ntuple->lumiBlockNum;
+    Int_t index = nLS-1; // -- to start from 0 (0th element = 1st LS)
+    arr_LS_nCount_[index]      = arr_LS_nCount_[index] + 1; 
+    arr_LS_sumInstLumi_[index] = arr_LS_sumInstLumi_[index] + ntuple->instLumi;
 
     Fill_nLSEvent(ntuple->vec_firedTrigger,   ntuple->lumiBlockNum, vec_trigger_HLT_,   vec_hist_nLSEvent_HLT_);
     Fill_nLSEvent(ntuple->vec_myFiredTrigger, ntuple->lumiBlockNum, vec_trigger_MYHLT_, vec_hist_nLSEvent_MYHLT_);
   }
 
   void Save() {
-    h_LSInstLumi_->Write();
+    FillHist_fromArray( h_LS_nCount_,      arr_LS_nCount_ );
+    FillHist_fromArray( h_LS_sumInstLumi_, arr_LS_sumInstLumi_ );
+
+    h_LS_nCount_->Write();
+    h_LS_sumInstLumi_->Write();
 
     for(auto h : vec_hist_nLSEvent_HLT_ )
       h->Write();
@@ -56,8 +60,25 @@ private:
   vector<TH1D*> vec_hist_nLSEvent_HLT_   = {};
   vector<TH1D*> vec_hist_nLSEvent_MYHLT_ = {};
 
-  // -- inst. lumi per lumi section: needed to scale to an arbitrary lumi. (linear extrapolation in the case of the muon trigger)
-  TH1D* h_LSInstLumi_ = nullptr;
+  // -- needed to scale to an arbitrary lumi. (linear extrapolation in the case of the muon trigger) 
+  Double_t* arr_LS_nCount_ = nullptr; // -- # conuts per LS
+  Double_t* arr_LS_sumInstLumi_ = nullptr; // -- sum of inst. lumi per LS (will be averaged with h_LS_nCount_ later) 
+
+  TH1D* h_LS_nCount_ = nullptr;
+  TH1D* h_LS_sumInstLumi_ = nullptr;
+
+  void FillHist_fromArray( TH1D* h, Double_t* arr ) {
+    Int_t nBin = h->GetNbinsX();
+    for(Int_t i=0; i<nBin; i++) {
+      Int_t i_bin = i+1;
+
+      Double_t value = arr[i];
+
+      h->SetBinContent(i_bin, value);
+      h->SetBinError(i_bin, 0); // -- just set as 0; it is not important for rate calculation now
+    }
+
+  }
 
   void Fill_nLSEvent(vector<string>* vec_firedTrigger, Int_t LSNum, vector<TString> vec_triggerToCheck, vector<TH1D*> vec_hist) {
     Int_t nTrig = (Int_t)vec_triggerToCheck.size();
@@ -92,13 +113,11 @@ private:
       vec_hist_nLSEvent_MYHLT_.push_back( h_temp );
     }
 
+    arr_LS_nCount_      = new Double_t[nMaxLS];
+    arr_LS_sumInstLumi_ = new Double_t[nMaxLS];
 
-    h_LSInstLumi_ = new TH1D("h_LSInstLumi", "", nMaxLS, 0, nMaxLS);
-    // -- init. all bin contents with -1.0
-    for(Int_t i=0; i<h_LSInstLumi_->GetNbinsX(); i++) {
-      Int_t i_bin = i+1;
-      h_LSInstLumi_->SetBinContent(i_bin, -1.0);
-    }
+    h_LS_nCount_      = new TH1D("h_LS_nCount",      "", nMaxLS, 0, nMaxLS);
+    h_LS_sumInstLumi_ = new TH1D("h_LS_sumInstLumi", "", nMaxLS, 0, nMaxLS);
   }
 
 };
