@@ -136,6 +136,8 @@ public:
 
   void Set_InputFile( TString fileName ) { inputFile_ = fileName; }
 
+  void Set_nDataset( Int_t nDataset) { nDataset_ = nDataset; }
+
   TH1D* Get_h_LS_avgInstLumi() {
     if( h_LS_avgInstLumi_ == nullptr )
       MakeHist_AveragedLumi_PerLS();
@@ -146,6 +148,8 @@ public:
   // -- HLTType = "HLT", "MYHLT"
   // -- return rate vs. LS histogram and totalRate
   TH1D* Calc_Rate( TString HLTType, TString trigger, Bool_t doScaleTo2e34, Double_t& totalRate) {
+    Count_nActiveLumi();
+
     TString histName = TString::Format("h_nLSEvent_%s_%s", HLTType.Data(), trigger.Data());
     TH1D* h_nLSEvent = PlotTool::Get_Hist(inputFile_, histName);
 
@@ -154,6 +158,9 @@ public:
       cout << "There is overflow = " << overFlow << endl;
       cout << "---> it means there are more # lumi sections in a run: the x-range of the histogram should increase!" << endl;
     }
+
+    // -- normalize with # datasets
+    h_nLSEvent->Scale( 1.0 / (Double_t)nDataset_ );
 
     if( doScaleTo2e34 ) ScaleToArbitaryInstLumi(h_nLSEvent, 20000);
 
@@ -176,6 +183,8 @@ public:
 
 private:
   TString inputFile_ = "";
+
+  Int_t nDataset_ = 0;
 
   TH1D* h_LS_avgInstLumi_ = nullptr;
 
@@ -207,6 +216,22 @@ private:
     }
   }
 
+  // -- count # LS with non-zero inst. luminosity
+  void Count_nActiveLumi() {
+    nActiveLS_ = 0;
+
+    TH1D* h_LS_sumInstLumi = PlotTool::Get_Hist(inputFile_, "h_LS_sumInstLumi");
+    Int_t nBin = h_LS_sumInstLumi->GetNbinsX();
+    for(Int_t i=0; i<nBin; i++) {
+      Int_t i_bin = i+1;
+
+      Double_t sumInstLumi = h_LS_sumInstLumi->GetBinContent(i_bin);
+      if( sumInstLumi > 0 ) nActiveLS_++;
+    }
+    cout << "nActiveLS_ = " << nActiveLS_ << endl;
+  }
+
+
   void MakeHist_AveragedLumi_PerLS() {
     TH1D* h_LS_nCount      = PlotTool::Get_Hist(inputFile_, "h_LS_nCount");
     TH1D* h_LS_sumInstLumi = PlotTool::Get_Hist(inputFile_, "h_LS_sumInstLumi");
@@ -227,11 +252,7 @@ private:
       h_LS_avgInstLumi_->SetBinContent(i_bin, avgInstLumi);
 
       // cout << TString::Format("[%03dth bin] (nCount, sumInstLumi, avgInstLumi) = (%.1lf, %.1lf, %.1lf)", i_bin, nCount, sumInstLumi, avgInstLumi) << endl;
-
-      if( avgInstLumi > 0 ) nActiveLS_++; // -- for total rate calculation
     }
-
-    cout << "nActiveLS_ = " << nActiveLS_ << endl;
   }
 
 };
