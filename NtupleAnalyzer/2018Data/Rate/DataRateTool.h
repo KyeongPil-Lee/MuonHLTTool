@@ -116,6 +116,12 @@ private:
     arr_LS_nCount_      = new Double_t[nMaxLS];
     arr_LS_sumInstLumi_ = new Double_t[nMaxLS];
 
+    // -- initialize: essential!
+    for(Int_t i=0; i<nMaxLS; i++) {
+      arr_LS_nCount_[i] = 0;
+      arr_LS_sumInstLumi_[i] = 0;
+    }
+
     h_LS_nCount_      = new TH1D("h_LS_nCount",      "", nMaxLS, 0, nMaxLS);
     h_LS_sumInstLumi_ = new TH1D("h_LS_sumInstLumi", "", nMaxLS, 0, nMaxLS);
   }
@@ -162,20 +168,47 @@ public:
 private:
   TString inputFile_ = "";
 
+  TH1D* h_LS_avgInstLumi_ = nullptr;
+
   void ScaleToArbitaryInstLumi(TH1D* h_nLSEvent, Double_t givenInstLumi) {
-    TH1D* h_LSInstLumi = PlotTool::Get_Hist(inputFile_, "h_LSInstLumi");
-    Int_t nBin = h_LSInstLumi->GetNbinsX();
+    if( h_LS_avgInstLumi_ == nullptr )
+      MakeHist_AveragedLumi_PerLS();
+
+    Int_t nBin = h_LS_avgInstLumi_->GetNbinsX();
     for(Int_t i=0; i<nBin; i++) {
       Int_t i_bin = i+1;
 
       Double_t nEvent = h_nLSEvent->GetBinContent(i_bin);
 
-      Double_t instLumi = h_LSInstLumi->GetBinContent(i_bin);
+      Double_t instLumi = h_LS_avgInstLumi_->GetBinContent(i_bin); // -- averaged lumi.
       Double_t scale = givenInstLumi / instLumi;
 
       Double_t nEvent_scaled = nEvent * scale;
 
       h_nLSEvent->SetBinContent(i_bin, nEvent_scaled);
+
+      cout << TString::Format("[%03dth bin] (instLumi, scale, nEvent, nEvent_scaled) = (%.1lf, %.3lf, %.1lf, %.1lf)", i_bin, instLumi, scale, nEvent, nEvent_scaled) << endl;
+    }
+  }
+
+  void MakeHist_AveragedLumi_PerLS() {
+    TH1D* h_LS_nCount      = PlotTool::Get_Hist(inputFile_, "h_LS_nCount");
+    TH1D* h_LS_sumInstLumi = PlotTool::Get_Hist(inputFile_, "h_LS_sumInstLumi");
+
+    h_LS_avgInstLumi_ = (TH1D*)h_LS_sumInstLumi->Clone();
+
+    Int_t nBin = h_LS_avgInstLumi_->GetNbinsX();
+    for(Int_t i=0; i<nBin; i++) {
+      Int_t i_bin = i+1;
+
+      Double_t nCount      = h_LS_nCount->GetBinContent(i_bin);
+      Double_t sumInstLumi = h_LS_sumInstLumi->GetBinContent(i_bin);
+
+      Double_t avgInstLumi = 0;
+      if( nCount != 0 )
+        avgInstLumi = sumInstLumi / nCount;
+
+      h_LS_avgInstLumi_->SetBinContent(i_bin, avgInstLumi);
     }
   }
 
