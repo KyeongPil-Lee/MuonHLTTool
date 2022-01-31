@@ -39,7 +39,35 @@ if __name__ == '__main__':
     
     from CRABAPI.RawCommand import crabCommand
 
-    config.General.requestName = 'EphemeralHLTPhysics1_Run2018D_Run323775'
-    config.Data.inputDataset = '/EphemeralHLTPhysics1/Run2018D-v1/RAW'
+    # config.General.requestName = 'EphemeralHLTPhysics1_Run2018D_Run323775'
+    # config.Data.inputDataset = '/EphemeralHLTPhysics1/Run2018D-v1/RAW'
+    # crabCommand('submit', config = config)
+
+    config.General.requestName = 'EphemeralHLTPhysics2_Run2018D_Run323775'
+    config.Data.inputDataset = '/EphemeralHLTPhysics2/Run2018D-v1/RAW'
+    crabCommand('submit', config = config)
+
+    config.General.requestName = 'EphemeralHLTPhysics3_Run2018D_Run323775'
+    config.Data.inputDataset = '/EphemeralHLTPhysics3/Run2018D-v1/RAW'
+    crabCommand('submit', config = config)
+
+    config.General.requestName = 'EphemeralHLTPhysics4_Run2018D_Run323775'
+    config.Data.inputDataset = '/EphemeralHLTPhysics4/Run2018D-v1/RAW'
+    crabCommand('submit', config = config)
+
+    config.General.requestName = 'EphemeralHLTPhysics5_Run2018D_Run323775'
+    config.Data.inputDataset = '/EphemeralHLTPhysics5/Run2018D-v1/RAW'
+    crabCommand('submit', config = config)
+
+    config.General.requestName = 'EphemeralHLTPhysics6_Run2018D_Run323775'
+    config.Data.inputDataset = '/EphemeralHLTPhysics6/Run2018D-v1/RAW'
+    crabCommand('submit', config = config)
+
+    config.General.requestName = 'EphemeralHLTPhysics7_Run2018D_Run323775'
+    config.Data.inputDataset = '/EphemeralHLTPhysics7/Run2018D-v1/RAW'
+    crabCommand('submit', config = config)
+
+    config.General.requestName = 'EphemeralHLTPhysics8_Run2018D_Run323775'
+    config.Data.inputDataset = '/EphemeralHLTPhysics8/Run2018D-v1/RAW'
     crabCommand('submit', config = config)
 
