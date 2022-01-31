@@ -169,6 +169,8 @@ public:
 
     totalRate = nTotEvent / (time_LS*nActiveLS_);
 
+    cout << TString::Format("(nTotEvent, time_LS*nActiveLS_) = (%.1lf*1100 = %.1lf, %.2lf*%d = %.2lf) --> totalRate = %.3lf", nTotEvent/1100.0, nTotEvent, time_LS, nActiveLS_, time_LS*nActiveLS_, totalRate) << endl;
+
     return h_nLSEvent;
   }
 
@@ -195,6 +197,10 @@ private:
         Double_t nEvent_scaled = nEvent * scale;
 
         h_nLSEvent->SetBinContent(i_bin, nEvent_scaled);
+
+        Double_t error = h_nLSEvent->GetBinError(i_bin);
+        Double_t error_scaled = error * scale;
+        h_nLSEvent->SetBinError(i_bin, error_scaled);
 
         // cout << TString::Format("[%03dth bin] (instLumi, scale, nEvent, nEvent_scaled) = (%.1lf, %.3lf, %.1lf, %.1lf)", i_bin, instLumi, scale, nEvent, nEvent_scaled) << endl;
       }
