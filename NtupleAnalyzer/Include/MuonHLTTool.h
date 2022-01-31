@@ -442,5 +442,12 @@ Bool_t Pass_HLTIsoFilter_Tracker(MuonHLT::MYHLTObject HLTObj, Double_t WP = 0.07
   return flag;
 }
 
+TString MakeOutputFileName(TString className, TString sampleType, TString fileName_ntupleList) {
+  TString tag = fileName_ntupleList.Data();
+  tag = gSystem->BaseName(tag);
+  tag.ReplaceAll(".txt", "");
+
+  return TString::Format("ROOTFile_%s_%s_%s.root", className.Data(), sampleType.Data(), tag.Data());
+}
 
 }; // -- end of namespace

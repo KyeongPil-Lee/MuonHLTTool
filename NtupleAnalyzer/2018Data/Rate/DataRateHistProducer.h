@@ -41,10 +41,10 @@ public:
 
       histContainer->Fill( ntuple );
 
-      // cout << TString::Format("(nLS, instLumi) = (%d, %.3lf)", ntuple->lumiBlockNum, ntuple->instLumi) << endl;
+      // cout << TString::Format("[%d event] (nLS, instLumi) = (%d, %.3lf)", i_ev, ntuple->lumiBlockNum, ntuple->instLumi) << endl;
     }
 
-    TString outputFileName = TString::Format("ROOTFile_DataRateHistProducer_%s.root", sampleType.Data());
+    TString outputFileName = MuonHLT::MakeOutputFileName("DataRateHistProducer", sampleType, fileName_ntupleList_);
     TFile *f_output = TFile::Open(outputFileName, "RECREATE");
     f_output->cd();
     histContainer->Save();

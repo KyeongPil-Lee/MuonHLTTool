@@ -136,6 +136,13 @@ public:
 
   void Set_InputFile( TString fileName ) { inputFile_ = fileName; }
 
+  TH1D* Get_h_LS_avgInstLumi() {
+    if( h_LS_avgInstLumi_ == nullptr )
+      MakeHist_AveragedLumi_PerLS();
+
+    return h_LS_avgInstLumi_;
+  }
+
   // -- HLTType = "HLT", "MYHLT"
   // -- return rate vs. LS histogram and totalRate
   TH1D* Calc_Rate( TString HLTType, TString trigger, Bool_t doScaleTo2e34, Double_t& totalRate) {
@@ -160,7 +167,7 @@ public:
     Double_t time_LS = 23.31;
     h_nLSEvent->Scale( 1.0 / time_LS );
 
-    totalRate = nTotEvent / time_LS;
+    totalRate = nTotEvent / (time_LS*nActiveLS_);
 
     return h_nLSEvent;
   }
@@ -170,6 +177,8 @@ private:
 
   TH1D* h_LS_avgInstLumi_ = nullptr;
 
+  Int_t nActiveLS_ = 0;
+
   void ScaleToArbitaryInstLumi(TH1D* h_nLSEvent, Double_t givenInstLumi) {
     if( h_LS_avgInstLumi_ == nullptr )
       MakeHist_AveragedLumi_PerLS();
@@ -178,16 +187,17 @@ private:
     for(Int_t i=0; i<nBin; i++) {
       Int_t i_bin = i+1;
 
-      Double_t nEvent = h_nLSEvent->GetBinContent(i_bin);
-
       Double_t instLumi = h_LS_avgInstLumi_->GetBinContent(i_bin); // -- averaged lumi.
-      Double_t scale = givenInstLumi / instLumi;
 
-      Double_t nEvent_scaled = nEvent * scale;
+      if( instLumi > 0 ) { // -- for only active LS
+        Double_t nEvent = h_nLSEvent->GetBinContent(i_bin);
+        Double_t scale = givenInstLumi / instLumi;
+        Double_t nEvent_scaled = nEvent * scale;
 
-      h_nLSEvent->SetBinContent(i_bin, nEvent_scaled);
+        h_nLSEvent->SetBinContent(i_bin, nEvent_scaled);
 
-      cout << TString::Format("[%03dth bin] (instLumi, scale, nEvent, nEvent_scaled) = (%.1lf, %.3lf, %.1lf, %.1lf)", i_bin, instLumi, scale, nEvent, nEvent_scaled) << endl;
+        // cout << TString::Format("[%03dth bin] (instLumi, scale, nEvent, nEvent_scaled) = (%.1lf, %.3lf, %.1lf, %.1lf)", i_bin, instLumi, scale, nEvent, nEvent_scaled) << endl;
+      }
     }
   }
 
@@ -209,7 +219,13 @@ private:
         avgInstLumi = sumInstLumi / nCount;
 
       h_LS_avgInstLumi_->SetBinContent(i_bin, avgInstLumi);
+
+      // cout << TString::Format("[%03dth bin] (nCount, sumInstLumi, avgInstLumi) = (%.1lf, %.1lf, %.1lf)", i_bin, nCount, sumInstLumi, avgInstLumi) << endl;
+
+      if( avgInstLumi > 0 ) nActiveLS_++; // -- for total rate calculation
     }
+
+    cout << "nActiveLS_ = " << nActiveLS_ << endl;
   }
 
 };
