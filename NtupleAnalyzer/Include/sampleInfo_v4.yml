@@ -1,0 +1,168 @@
+# -- sample infomation read by CondorJobSubmitter
+# -- cross section information: https://twiki.cern.ch/twiki/bin/view/CMS/HighLevelTriggerPhase2#Rate_calculations
+# -- MuonHLTTree_v11: CMSSW_12_3_0_pre5, the GRun with the all muon customizers integrated.
+# -- 2021.12.13: update sum(weight)
+# -- 2022.01.07: udpate HLTPhysics datasets (Tree_v10)
+list_sampleInfo:
+  - sampleType: ZMuMu_M50to120_nVtx_nRegion_1_10
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_nVtx_nRegion_1_10/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8
+    xSec: 2288.0 # -- from Minseok's value
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt20to30_nVtx_nRegion_1_10
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_nVtx_nRegion_1_10/QCD_Pt-20To30_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 2.786e+06
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt30to50_nVtx_nRegion_1_10
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_nVtx_nRegion_1_10/QCD_Pt-30To50_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 1.510e+06
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt50to80_nVtx_nRegion_1_10
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_nVtx_nRegion_1_10/QCD_Pt-50To80_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 4.232e+05
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt80to120_nVtx_nRegion_1_10
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_nVtx_nRegion_1_10/QCD_Pt-80To120_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 1.002e+05
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt120to170_nVtx_nRegion_1_10
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_nVtx_nRegion_1_10/QCD_Pt-120To170_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 2.470e+04
+    sumWeight: -1.0
+
+  # -- (nVtx, nRegion) = (2, 20)
+  - sampleType: ZMuMu_M50to120_nVtx_nRegion_2_20
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_nVtx_nRegion_2_20/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8
+    xSec: 2288.0 # -- from Minseok's value
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt20to30_nVtx_nRegion_2_20
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_nVtx_nRegion_2_20/QCD_Pt-20To30_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 2.786e+06
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt30to50_nVtx_nRegion_2_20
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_nVtx_nRegion_2_20/QCD_Pt-30To50_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 1.510e+06
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt50to80_nVtx_nRegion_2_20
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_nVtx_nRegion_2_20/QCD_Pt-50To80_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 4.232e+05
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt80to120_nVtx_nRegion_2_20
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_nVtx_nRegion_2_20/QCD_Pt-80To120_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 1.002e+05
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt120to170_nVtx_nRegion_2_20
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_nVtx_nRegion_2_20/QCD_Pt-120To170_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 2.470e+04
+    sumWeight: -1.0
+
+  # -- (nVtx, nRegion) = (3, 30)
+  - sampleType: ZMuMu_M50to120_nVtx_nRegion_3_30
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_nVtx_nRegion_3_30/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8
+    xSec: 2288.0 # -- from Minseok's value
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt20to30_nVtx_nRegion_3_30
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_nVtx_nRegion_3_30/QCD_Pt-20To30_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 2.786e+06
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt30to50_nVtx_nRegion_3_30
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_nVtx_nRegion_3_30/QCD_Pt-30To50_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 1.510e+06
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt50to80_nVtx_nRegion_3_30
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_nVtx_nRegion_3_30/QCD_Pt-50To80_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 4.232e+05
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt80to120_nVtx_nRegion_3_30
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_nVtx_nRegion_3_30/QCD_Pt-80To120_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 1.002e+05
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt120to170_nVtx_nRegion_3_30
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_nVtx_nRegion_3_30/QCD_Pt-120To170_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 2.470e+04
+    sumWeight: -1.0
+
+  # -- (nVtx, nRegion) = (4, 40)
+  - sampleType: ZMuMu_M50to120_nVtx_nRegion_4_40
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_nVtx_nRegion_4_40/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8
+    xSec: 2288.0 # -- from Minseok's value
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt20to30_nVtx_nRegion_4_40
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_nVtx_nRegion_4_40/QCD_Pt-20To30_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 2.786e+06
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt30to50_nVtx_nRegion_4_40
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_nVtx_nRegion_4_40/QCD_Pt-30To50_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 1.510e+06
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt50to80_nVtx_nRegion_4_40
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_nVtx_nRegion_4_40/QCD_Pt-50To80_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 4.232e+05
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt80to120_nVtx_nRegion_4_40
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_nVtx_nRegion_4_40/QCD_Pt-80To120_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 1.002e+05
+    sumWeight: -1.0
+
+  - sampleType: QCDMuEnriched_Pt120to170_nVtx_nRegion_4_40
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_nVtx_nRegion_4_40/QCD_Pt-120To170_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 2.470e+04
+    sumWeight: -1.0
+
+
+list_binnedSample:
+  # - name: ZMuMu_M50to400
+  #   list_sampleType:
+  #     - ZMuMu_M50to120
+  #     - ZMuMu_M120to200
+  #     - ZMuMu_M200to400
+
+  - name: QCDMuEnriched_Pt20to170
+    list_sampleType:
+      - QCDMuEnriched_Pt20to30
+      - QCDMuEnriched_Pt30to50
+      - QCDMuEnriched_Pt50to80
+      - QCDMuEnriched_Pt80to120
+      - QCDMuEnriched_Pt120to170
