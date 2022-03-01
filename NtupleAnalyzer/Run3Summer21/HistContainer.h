@@ -67,6 +67,9 @@ public:
   // -- should be called before filling the histograms
   // -- initialze histograms after all conditions are provided by "Set_" functions
   void Initialize() { 
+    TH1::SetDefaultSumw2();
+    TH2::SetDefaultSumw2();
+    
     Init_Hist();
     isInit_ = kTRUE;
   }
