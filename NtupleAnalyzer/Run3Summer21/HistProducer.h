@@ -87,6 +87,8 @@ public:
       if( debug_ ) cout << "[" << i_ev << "th event]" << endl;
 
       Double_t genWeight = ntuple->isRealData? 1.0 : ntuple->genEventWeight;
+      genWeight = genWeight > 0 ? 1.0 : -1.0; // -- just take sign only
+
       Double_t totWeight = normFactor * genWeight;
 
       Double_t truePU = ntuple->truePU;
