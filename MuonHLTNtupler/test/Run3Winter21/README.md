@@ -1,3 +1,91 @@
+# Setup @ CMSSW_12_3_0_pre5
+
+* To use the latest HLT menu with all muon customizer integrated
+* The main menu used for the optimization study of the tracker isolation with patatrack
+
+```shell
+cmsrel CMSSW_12_3_0_pre5
+cd CMSSW_12_3_0_pre5/src
+cmsenv
+git cms-init
+
+# -- from README in https://github.com/khaosmos93/MuonHLTForRun3
+git cms-merge-topic silviodonato:customizeHLTforRun3_v2
+# NOTE: some customizers are already integrated or not compatible any more
+
+# Add new training for inside-out seed cleaner
+git clone -b dev https://github.com/wonpoint4/RecoMuon-TrackerSeedGenerator.git data_tmp
+cp data_tmp/xgb_*.xml RecoMuon/TrackerSeedGenerator/data
+rm -rf data_tmp
+
+# Add muon customizers and compile
+# -- we will use the menu with all the muon customizsers already, but just keep it for a possible use
+git clone https://github.com/khaosmos93/MuonHLTForRun3.git HLTrigger/Configuration/python/MuonHLTForRun3
+
+# -- muon HLT tool
+git clone git@github.com:KyeongPil-Lee/MuonHLTTool.git -b Run3_IDIso
+
+scram b -j4 >&scram.log&
+mkdir MuonHLTTool/MuonHLTNtupler/test/Run3Winter21/RerunHLT_RAWMINIAOD/CMSSW_12_3_0_pre5
+cd MuonHLTTool/MuonHLTNtupler/test/Run3Winter21/RerunHLT_RAWMINIAOD/CMSSW_12_3_0_pre5/
+
+# -- HLT configuration for MC
+# -- /dev/CMSSW_12_3_0/GRun/V36: all muon customizers are already integrated
+hltGetConfiguration /dev/CMSSW_12_3_0/GRun/V36 \
+--process MYHLT \
+--eras Run3 \
+--mc --globaltag auto:phase1_2021_realistic \
+--unprescale \
+--paths \
+HLTriggerFirstPath,\
+HLT_IsoMu24_v*,\
+HLT_Mu50_v*,\
+HLT_OldMu100_v*,\
+HLT_TkMu100_v*,\
+HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v*,\
+HLT_Mu37_TkMu27_v*,\
+HLTriggerFinalPath,\
+HLTAnalyzerEndpath \
+--customise \
+HLTrigger/Configuration/customizeHLTforPatatrack.customizeHLTforPatatrackTriplets \
+--input /store/mc/Run3Winter21DRMiniAOD/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8/GEN-SIM-DIGI-RAW/FlatPU30to80FEVT_112X_mcRun3_2021_realistic_v16-v2/130002/87cbcfff-3766-457c-9c5b-c5150664699d.root \
+--max-events 100 \
+--full --offline --no-output >HLTConfig_MC.py
+```
+
+### Customizers to be added at the end of the config
+
+```python
+from MuonHLTTool.MuonHLTNtupler.customizerForMuonHLTIsolationStudy import *
+process = customizeForMuonHLTIsolation_ignoreIsoFilter_IsoMu24(process)
+
+# -- rechit-based rho
+from MuonHLTTool.MuonHLTNtupler.customizerForMuonHLTIsolation_rhoFromPFRechit import *
+process = customizeForMuonHLTIsolation_differentRhoForECALHCAL(process)
+
+# -- change: #vtx, #region variable in tracking region for muon tracker isolation
+process.hltPixelTracksTrackingRegionsForSeedsL3Muon.RegionPSet.maxNVertices = cms.int32( 1 ) # -- default
+process.hltPixelTracksTrackingRegionsForSeedsL3Muon.RegionPSet.maxNRegions  = cms.int32( 10 ) # -- default
+
+# -- RAW+MINIAOD test
+process.options.numberOfThreads=cms.untracked.uint32(1) # -- for CRAB job
+process.options.numberOfConcurrentLuminosityBlocks = 1 # -- to make it run on both RAW + MINIAOD
+process.source.fileNames = cms.untracked.vstring("/store/mc/Run3Winter21DRMiniAOD/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8/MINIAODSIM/FlatPU30to80FEVT_112X_mcRun3_2021_realistic_v16-v2/130000/e891d16a-78a3-4c5e-aabe-1b6f8c1f3b58.root")
+process.source.secondaryFileNames = cms.untracked.vstring("/store/mc/Run3Winter21DRMiniAOD/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8/GEN-SIM-DIGI-RAW/FlatPU30to80FEVT_112X_mcRun3_2021_realistic_v16-v2/130001/0cf6e16c-7a35-47f4-9935-0f5df2d9a23f.root")
+process.maxEvents.input = cms.untracked.int32( 100 )
+
+from MuonHLTTool.MuonHLTNtupler.customizerForMuonHLTNtupler import *
+process = customizerFuncForMuonHLTNtupler(process, "MYHLT")
+process.ntupler.isMiniAOD             = cms.bool(True)
+process.ntupler.offlineVertex         = cms.untracked.InputTag("offlineSlimmedPrimaryVertices")
+process.ntupler.offlineMuon           = cms.untracked.InputTag("slimmedMuons")
+process.ntupler.triggerObject_miniAOD = cms.untracked.InputTag("slimmedPatTrigger")
+process.ntupler.PUSummaryInfo         = cms.untracked.InputTag("slimmedAddPileupInfo")
+process.ntupler.genParticle           = cms.untracked.InputTag("prunedGenParticles")
+```
+
+
+
 # Setup @ CMSSW_12_2_0_pre2
 
 To use patatrack full tracking information for the tracker isolation
