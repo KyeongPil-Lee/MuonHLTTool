@@ -86,6 +86,51 @@ process.ntupler.genParticle           = cms.untracked.InputTag("prunedGenParticl
 
 
 
+## Another menu: remove patatrack in the tracker isolation part
+
+[1] duplicate HLTrigger/Configuration/MuonHLTForRun3/customizeMuonHLTForRun3.py (MuonHLTForRun3/customizeMuonHLTForRun3_noPTForTrkIso.py)
+
+* comment out the patatrack part for the tracker isolation
+  * In ```customizeMuonHLTForPatatrackWithIsoAndTriplets``` function, 
+    the lines below ```if hasattr(process, "HLTIterativeTrackingL3MuonIteration0")```
+
+[2] ```hltGetConfiguration``` with the menu before the muon customizers are integrated
+
+* HLT_PFMET120_PFMHT120_IDTight_v* is needed to put some PF-related sequences (which could make an error if it doesn't exists in the menu when the customizers are used)
+
+```shell
+hltGetConfiguration /dev/CMSSW_12_3_0/GRun/V29 \
+--process MYHLT \
+--eras Run3 \
+--mc --globaltag auto:phase1_2021_realistic \
+--unprescale \
+--paths \
+HLTriggerFirstPath,\
+HLT_IsoMu24_v*,\
+HLT_Mu50_v*,\
+HLT_OldMu100_v*,\
+HLT_TkMu100_v*,\
+HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v*,\
+HLT_Mu37_TkMu27_v*,\
+HLT_PFMET120_PFMHT120_IDTight_v*,\
+HLTriggerFinalPath,\
+HLTAnalyzerEndpath \
+--customise \
+HLTrigger/Configuration/customizeHLTforPatatrack.customizeHLTforPatatrackTriplets,\
+HLTrigger/Configuration/MuonHLTForRun3/customizeMuonHLTForRun3_noPTForTrkIso.customizeMuonHLTForPatatrackWithIsoAndTriplets,\
+HLTrigger/Configuration/MuonHLTForRun3/customizeMuonHLTForRun3_noPTForTrkIso.customizeMuonHLTForPatatrackTkMu,\
+HLTrigger/Configuration/MuonHLTForRun3/customizeMuonHLTForRun3_noPTForTrkIso.customizeMuonHLTForPatatrackNoVtx,\
+HLTrigger/Configuration/MuonHLTForRun3/customizeMuonHLTForRun3_noPTForTrkIso.customizeMuonHLTForPatatrackOpenMu,\
+HLTrigger/Configuration/MuonHLTForRun3/customizeMuonHLTForRun3_noPTForTrkIso.customizeIOSeedingPatatrack \
+--input /store/mc/Run3Winter21DRMiniAOD/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8/GEN-SIM-DIGI-RAW/FlatPU30to80FEVT_112X_mcRun3_2021_realistic_v16-v2/130002/87cbcfff-3766-457c-9c5b-c5150664699d.root \
+--max-events 100 \
+--full --offline --no-output >HLTConfig_woPatatrack.py
+```
+
+[3] Add the additional customizers (e.g. rho) above, same with the usual menu above
+
+
+
 # Setup @ CMSSW_12_2_0_pre2
 
 To use patatrack full tracking information for the tracker isolation
