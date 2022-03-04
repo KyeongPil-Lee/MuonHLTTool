@@ -484,6 +484,43 @@ list_sampleInfo:
     xSec: 2.470e+04
     sumWeight: 999
 
+  # -- ntuple without patatrack
+  - sampleType: ZMuMu_M50to120_woPatatrack
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_woPatatrack/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8
+    xSec: 2288.0 # -- from Minseok's value
+    sumWeight: 999
+
+  - sampleType: QCDMuEnriched_Pt20to30_woPatatrack
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_woPatatrack/QCD_Pt-20To30_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 2.786e+06
+    sumWeight: 999
+
+  - sampleType: QCDMuEnriched_Pt30to50_woPatatrack
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_woPatatrack/QCD_Pt-30To50_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 1.510e+06
+    sumWeight: 999
+
+  - sampleType: QCDMuEnriched_Pt50to80_woPatatrack
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_woPatatrack/QCD_Pt-50To80_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 4.232e+05
+    sumWeight: 999
+
+  - sampleType: QCDMuEnriched_Pt80to120_woPatatrack
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_woPatatrack/QCD_Pt-80To120_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 1.002e+05
+    sumWeight: 999
+
+  - sampleType: QCDMuEnriched_Pt120to170_woPatatrack
+    list_ntupleDirPath: 
+      - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v11_woPatatrack/QCD_Pt-120To170_MuEnrichedPt5_TuneCP5_14TeV-pythia8
+    xSec: 2.470e+04
+    sumWeight: 999
+
 
 list_binnedSample:
   # - name: ZMuMu_M50to400
@@ -595,3 +632,12 @@ list_binnedSample:
       - QCDMuEnriched_Pt50to80_newParam_nVtx_nRegion_5_50
       - QCDMuEnriched_Pt80to120_newParam_nVtx_nRegion_5_50
       - QCDMuEnriched_Pt120to170_newParam_nVtx_nRegion_5_50
+
+  - name: QCDMuEnriched_Pt20to170_woPatatrack
+    list_sampleType:
+      - QCDMuEnriched_Pt20to30_woPatatrack
+      - QCDMuEnriched_Pt30to50_woPatatrack
+      - QCDMuEnriched_Pt50to80_woPatatrack
+      - QCDMuEnriched_Pt80to120_woPatatrack
+      - QCDMuEnriched_Pt120to170_woPatatrack
+      
