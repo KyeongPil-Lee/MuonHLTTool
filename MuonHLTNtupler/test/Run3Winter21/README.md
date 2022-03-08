@@ -56,16 +56,21 @@ HLTrigger/Configuration/customizeHLTforPatatrack.customizeHLTforPatatrackTriplet
 ### Customizers to be added at the end of the config
 
 ```python
+# -- synchronize the module parameters with TRK POG values & adjust maxNVertices, maxNRegions
+nRegionFactor = 1
+from HLTrigger.Configuration.MuonHLTForRun3.customizeMuonHLTForRun3 import customizeTrkIso
+process = customizeTrkIso(process, nRegionFactor)
+
+# -- if you want to change maxNVertices, maxNRegions without synchronizing the module parameters with TRK POG: use below lines
+#process.hltPixelTracksTrackingRegionsForSeedsL3Muon.RegionPSet.maxNVertices = cms.int32( 1 ) # -- default
+#process.hltPixelTracksTrackingRegionsForSeedsL3Muon.RegionPSet.maxNRegions  = cms.int32( 10 ) # -- default
+
 from MuonHLTTool.MuonHLTNtupler.customizerForMuonHLTIsolationStudy import *
 process = customizeForMuonHLTIsolation_ignoreIsoFilter_IsoMu24(process)
 
 # -- rechit-based rho
 from MuonHLTTool.MuonHLTNtupler.customizerForMuonHLTIsolation_rhoFromPFRechit import *
 process = customizeForMuonHLTIsolation_differentRhoForECALHCAL(process)
-
-# -- change: #vtx, #region variable in tracking region for muon tracker isolation
-process.hltPixelTracksTrackingRegionsForSeedsL3Muon.RegionPSet.maxNVertices = cms.int32( 1 ) # -- default
-process.hltPixelTracksTrackingRegionsForSeedsL3Muon.RegionPSet.maxNRegions  = cms.int32( 10 ) # -- default
 
 # -- RAW+MINIAOD test
 process.options.numberOfThreads=cms.untracked.uint32(1) # -- for CRAB job
