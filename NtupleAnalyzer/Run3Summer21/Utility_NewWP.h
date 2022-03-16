@@ -18,7 +18,8 @@ Double_t WP_new_ECAL_EE = 0.10;
 Double_t WP_new_HCAL_EB = 0.16;
 Double_t WP_new_HCAL_EE = 0.20;
 
-Double_t WP_new_Tracker = 0.09;
+// Double_t WP_new_Tracker = 0.09;
+Double_t WP_new_Tracker = 0.08;
 
 Bool_t Pass_HLTIsoFilter_ECAL_NewWP(MuonHLT::MYHLTObject HLTObj) {
   return MuonHLT::Pass_HLTIsoFilter_ECAL( HLTObj, WP_new_ECAL_EB, WP_new_ECAL_EE);
