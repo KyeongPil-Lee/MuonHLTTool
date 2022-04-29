@@ -55,12 +55,24 @@ ntuplerBase = cms.EDAnalyzer("MuonHLTNtupler",
 	# triggerObject_miniAOD = cms.untracked.InputTag("slimmedPatTrigger")
 
 	# -- for the extrapolation of offlie muon to 2nd muon station
-	preselection = cms.string("gmtMuonCand.quality > 1"), # FIXME: maybe exclude CSC-only region?
-	useTrack  = cms.string("tracker"),
-	useState  = cms.string("atVertex"),
-	maxDeltaR   = cms.double(1.5),             ## FIXME: to be tuned
-	maxDeltaEta = cms.double(0.3),             ## FIXME: to be tuned
-	l1PhiOffset = cms.double(1.25 * 3.14159265359/180.),
+	# preselection = cms.string("gmtMuonCand.quality > 1"), # FIXME: maybe exclude CSC-only region?
+	# useTrack  = cms.string("tracker"),
+	# useState  = cms.string("atVertex"),
+	# maxDeltaR   = cms.double(1.5),             ## FIXME: to be tuned
+	# maxDeltaEta = cms.double(0.3),             ## FIXME: to be tuned
+	# l1PhiOffset = cms.double(1.25 * 3.14159265359/180.),
+	# useSimpleGeometry = cms.bool(True),
+	# fallbackToME1     = cms.bool(True),
+
+	# -- from https://github.com/cms-sw/cmssw/blob/master/L1Trigger/L1TNtuples/python/l1MuonRecoTree_cfi.py
+	useTrack = cms.string("tracker"),  # 'none' to use Candidate P4; or 'tracker', 'muon', 'global'
+	useState = cms.string("atVertex"), # 'innermost' and 'outermost' require the TrackExtra
 	useSimpleGeometry = cms.bool(True),
-	fallbackToME1     = cms.bool(True),
+	useStation2 = cms.bool(True),
+	fallbackToME1 = cms.bool(False),
+	cosmicPropagationHypothesis = cms.bool(False),
+	useMB2InOverlap = cms.bool(False),
+	propagatorAlong = cms.ESInputTag("", "SteppingHelixPropagatorAlong"),
+	propagatorAny = cms.ESInputTag("", "SteppingHelixPropagatorAny"),
+	propagatorOpposite = cms.ESInputTag("", "SteppingHelixPropagatorOpposite")
 )

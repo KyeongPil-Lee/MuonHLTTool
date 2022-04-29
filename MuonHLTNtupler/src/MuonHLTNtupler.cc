@@ -90,7 +90,7 @@ t_genParticle_       ( consumes< reco::GenParticleCollection >            (iConf
 isMiniAOD_               ( iConfig.existsAs<bool>("isMiniAOD")         ? iConfig.getParameter<bool>("isMiniAOD")         : false),
 doSaveRerunObject_       ( iConfig.existsAs<bool>("doSaveRerunObject") ? iConfig.getParameter<bool>("doSaveRerunObject") : false),
 t_triggerObject_miniAOD_ ( mayConsume< std::vector<pat::TriggerObjectStandAlone> > (iConfig.getUntrackedParameter<edm::InputTag>("triggerObject_miniAOD")) ), // -- not used in AOD case
-propagatorToMuon(iConfig, consumesCollector())
+propSetup_(iConfig, consumesCollector())
 {
   cout << "isMiniAOD_ = " << isMiniAOD_ << endl;
 }
@@ -99,7 +99,7 @@ void MuonHLTNtupler::analyze(const edm::Event &iEvent, const edm::EventSetup &iS
 {
   Init();
 
-  propagatorToMuon.init(iSetup);
+  propagatorToMuon_ = propSetup_.init(iSetup);
 
   // -- basic info.
   isRealData_ = iEvent.isRealData();
@@ -759,7 +759,7 @@ void MuonHLTNtupler::Fill_Muon(const edm::Event &iEvent)
       muon_stationMask_[_nMuon] = mu->stationMask();
 
       // -- propagation to the 2nd station and get eta and phi value (for the matching with L1 muons)
-      TrajectoryStateOnSurface prop = propagatorToMuon.extrapolate( *(mu->muonBestTrack()) );
+      TrajectoryStateOnSurface prop = propagatorToMuon_.extrapolate( *(mu->muonBestTrack()) );
       if( prop.isValid() )
       {
         muon_propEta_[_nMuon] = prop.globalPosition().eta();
