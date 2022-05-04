@@ -7,7 +7,7 @@ list_sampleInfo:
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v12_HCALStudy_nominal/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8
     xSec: 2288.0 # -- from Minseok's value
-    sumWeight: -1.0
+    sumWeight: 2918004.0
 
   # - sampleType: ZMuMu_M120to200
   #   list_ntupleDirPath: 
@@ -37,31 +37,31 @@ list_sampleInfo:
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v12_HCALStudy_nominal/QCD_Pt-20To30_MuEnrichedPt5_TuneCP5_14TeV-pythia8
     xSec: 2.786e+06
-    sumWeight: -1.0
+    sumWeight: 505458.0
 
   - sampleType: QCDMuEnriched_Pt30to50
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v12_HCALStudy_nominal/QCD_Pt-30To50_MuEnrichedPt5_TuneCP5_14TeV-pythia8
     xSec: 1.510e+06
-    sumWeight: -1.0
+    sumWeight: 366672.0
 
   - sampleType: QCDMuEnriched_Pt50to80
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v12_HCALStudy_nominal/QCD_Pt-50To80_MuEnrichedPt5_TuneCP5_14TeV-pythia8
     xSec: 4.232e+05
-    sumWeight: -1.0
+    sumWeight: 72418.0
 
   - sampleType: QCDMuEnriched_Pt80to120
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v12_HCALStudy_nominal/QCD_Pt-80To120_MuEnrichedPt5_TuneCP5_14TeV-pythia8
     xSec: 1.002e+05
-    sumWeight: -1.0
+    sumWeight: 83362.0
 
   - sampleType: QCDMuEnriched_Pt120to170
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v12_HCALStudy_nominal/QCD_Pt-120To170_MuEnrichedPt5_TuneCP5_14TeV-pythia8
     xSec: 2.470e+04
-    sumWeight: -1.0
+    sumWeight: 84489.0
 
 
     # -- new HCAL condition
@@ -69,7 +69,7 @@ list_sampleInfo:
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v12_HCALStudy_newHCAL/ZToMuMu_M-50To120_TuneCP5_14TeV-powheg-pythia8
     xSec: 2288.0 # -- from Minseok's value
-    sumWeight: -1.0
+    sumWeight: 2918004.0
 
   # - sampleType: ZMuMu_M120to200_newHCAL
   #   list_ntupleDirPath: 
@@ -99,31 +99,31 @@ list_sampleInfo:
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v12_HCALStudy_newHCAL/QCD_Pt-20To30_MuEnrichedPt5_TuneCP5_14TeV-pythia8
     xSec: 2.786e+06
-    sumWeight: -1.0
+    sumWeight: 505458.0
 
   - sampleType: QCDMuEnriched_Pt30to50_newHCAL
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v12_HCALStudy_newHCAL/QCD_Pt-30To50_MuEnrichedPt5_TuneCP5_14TeV-pythia8
     xSec: 1.510e+06
-    sumWeight: -1.0
+    sumWeight: 366672.0
 
   - sampleType: QCDMuEnriched_Pt50to80_newHCAL
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v12_HCALStudy_newHCAL/QCD_Pt-50To80_MuEnrichedPt5_TuneCP5_14TeV-pythia8
     xSec: 4.232e+05
-    sumWeight: -1.0
+    sumWeight: 72418.0
 
   - sampleType: QCDMuEnriched_Pt80to120_newHCAL
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v12_HCALStudy_newHCAL/QCD_Pt-80To120_MuEnrichedPt5_TuneCP5_14TeV-pythia8
     xSec: 1.002e+05
-    sumWeight: -1.0
+    sumWeight: 81050.0
 
   - sampleType: QCDMuEnriched_Pt120to170_newHCAL
     list_ntupleDirPath: 
       - /pnfs/iihe/cms/store/user/kplee/MuonHLTTree_v12_HCALStudy_newHCAL/QCD_Pt-120To170_MuEnrichedPt5_TuneCP5_14TeV-pythia8
     xSec: 2.470e+04
-    sumWeight: -1.0
+    sumWeight: 84489.0
 
 
 list_binnedSample:
