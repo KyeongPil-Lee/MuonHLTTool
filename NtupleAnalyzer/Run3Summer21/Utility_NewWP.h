@@ -17,8 +17,14 @@ Double_t WP_new_ECAL_EE = 0.10;
 
 // Double_t WP_new_HCAL_EB = 0.16;
 // Double_t WP_new_HCAL_EE = 0.20;
-Double_t WP_new_HCAL_EB = 0.177;
-Double_t WP_new_HCAL_EE = 0.240;
+
+// -- 98.5%
+// Double_t WP_new_HCAL_EB = 0.177;
+// Double_t WP_new_HCAL_EE = 0.240;
+
+// -- 99%
+Double_t WP_new_HCAL_EB = 0.203;
+Double_t WP_new_HCAL_EE = 0.270;
 
 // Double_t WP_new_Tracker = 0.09;
 Double_t WP_new_Tracker = 0.08;
