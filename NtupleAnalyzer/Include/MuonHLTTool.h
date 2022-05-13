@@ -431,7 +431,7 @@ Bool_t Pass_HLTIsoFilter_HCAL(MuonHLT::MYHLTObject HLTObj, Double_t WP_EB = 0.16
   return flag;
 }
 
-Bool_t Pass_HLTIsoFilter_Tracker(MuonHLT::MYHLTObject HLTObj, Double_t WP = 0.07)
+Bool_t Pass_HLTIsoFilter_Tracker(MuonHLT::MYHLTObject HLTObj, Double_t WP = 0.08)
 {
   Bool_t flag = kFALSE;
 
