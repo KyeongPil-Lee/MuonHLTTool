@@ -15,8 +15,10 @@ namespace MuonHLT {
 Double_t WP_new_ECAL_EB = 0.14;
 Double_t WP_new_ECAL_EE = 0.10;
 
-Double_t WP_new_HCAL_EB = 0.16;
-Double_t WP_new_HCAL_EE = 0.20;
+// Double_t WP_new_HCAL_EB = 0.16;
+// Double_t WP_new_HCAL_EE = 0.20;
+Double_t WP_new_HCAL_EB = 0.177;
+Double_t WP_new_HCAL_EE = 0.240;
 
 // Double_t WP_new_Tracker = 0.09;
 Double_t WP_new_Tracker = 0.08;
