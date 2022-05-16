@@ -1,4 +1,4 @@
-import FWCore.ParameterSet.Config as cms
+from HLTrigger.Configuration.common import *
 
 def customizerForMuonHLT_NewHCALIsoWP(process, wp = "0.985"):
     # -- singal efficiency: 98.5%
@@ -15,9 +15,11 @@ def customizerForMuonHLT_NewHCALIsoWP(process, wp = "0.985"):
         return
 
     for module in filters_by_type(process, "HLTMuonGenericFilter"):
-        if module.varTag.value() == "hltMuonHcalRegPFClusterIsoForMuons" # -- HCAL isolation
-        module.thrOverEEB = cms.vdouble( newWP_barrel ) # -- new WP
-        module.thrOverEEE = cms.vdouble( newWP_endcap ) # -- new WP
+        if module.varTag.value() == "hltMuonHcalRegPFClusterIsoForMuons": # -- HCAL isolation
+            module.thrOverEEB = cms.vdouble( newWP_barrel ) # -- new WP
+            module.thrOverEEE = cms.vdouble( newWP_endcap ) # -- new WP
+
+    return process
 
 
 
