@@ -1,13 +1,13 @@
 from HLTrigger.Configuration.common import *
 
 def customizerForMuonHLT_NewHCALIsoWP(process, wp = "0.985"):
-    # -- singal efficiency: 98.5%
+    
     newWP_barrel = 0;
     newWP_endcap = 0;
-    if wp == "0.985":
+    if wp == "0.985": # -- signal efficiency (HCAL iso.): 98.5%
         newWP_barrel = 0.177
         newWP_endcap = 0.240
-    elif wp == "0.99":
+    elif wp == "0.99": # -- signal efficiency (HCAL iso.): 99%
         newWP_barrel = 0.203
         newWP_endcap = 0.270
     else:
