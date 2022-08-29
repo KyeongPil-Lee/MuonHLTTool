@@ -45,7 +45,8 @@
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 
 // -- for the extrapolation of the offline muon to 2nd muon station
-#include "MuonAnalysis/MuonAssociators/interface/PropagateToMuon.h"
+// #include "MuonAnalysis/MuonAssociators/interface/PropagateToMuon.h"
+#include "MuonAnalysis/MuonAssociators/interface/PropagateToMuonSetup.h"
 
 #include "TTree.h"
 
@@ -93,6 +94,11 @@ private:
   edm::EDGetTokenT< trigger::TriggerEvent >                  t_myTriggerEvent_;
 
   edm::EDGetTokenT< reco::RecoChargedCandidateCollection >   t_L3Muon_;
+  edm::EDGetTokenT< double >                                 t_rho_ECAL_;
+  edm::EDGetTokenT< double >                                 t_rho_HCAL_;
+  edm::EDGetTokenT< reco::RecoChargedCandidateIsolationMap > t_ECALIsoMap_;
+  edm::EDGetTokenT< reco::RecoChargedCandidateIsolationMap > t_HCALIsoMap_;
+  edm::EDGetTokenT< reco::IsoDepositMap >                    t_trkIsoMap_;
   edm::EDGetTokenT< reco::RecoChargedCandidateCollection >   t_L2Muon_;
   edm::EDGetTokenT< l1t::MuonBxCollection >                  t_L1Muon_;
   edm::EDGetTokenT< reco::RecoChargedCandidateCollection >   t_TkMuon_;
@@ -113,7 +119,8 @@ private:
   bool doSaveRerunObject_;
   edm::EDGetTokenT< std::vector<pat::TriggerObjectStandAlone> > t_triggerObject_miniAOD_;
 
-  PropagateToMuon propagatorToMuon;
+  PropagateToMuon propagatorToMuon_;
+  PropagateToMuonSetup propSetup_;
 
 
 
@@ -139,6 +146,9 @@ private:
   double offlineBunchLumi_;
   int truePU_;
   double genEventWeight_;
+
+  double rho_ECAL_;
+  double rho_HCAL_;
 
   // -- generator level particles (only MC)
   int nGenParticle_;
@@ -258,6 +268,10 @@ private:
   double L3Muon_phi_[arrSize_];
   double L3Muon_charge_[arrSize_];
   double L3Muon_trkPt_[arrSize_];
+
+  double L3Muon_ECALIso_[arrSize_];
+  double L3Muon_HCALIso_[arrSize_];
+  double L3Muon_trkIso_[arrSize_];
 
   // -- L2 muon
   int nL2Muon_;

@@ -20,6 +20,13 @@ ntuplerBase = cms.EDAnalyzer("MuonHLTNtupler",
 	L3Muon = cms.untracked.InputTag("hltIterL3MuonCandidates", "",     "MYHLT"),
 	TkMuon = cms.untracked.InputTag("hltHighPtTkMuonCands",    "",     "MYHLT"),
 
+	ECALIsoMap = cms.untracked.InputTag("hltMuonEcalMFPFClusterIsoForMuons", "",               "MYHLT"),
+	HCALIsoMap = cms.untracked.InputTag("hltMuonHcalRegPFClusterIsoForMuons", "" ,              "MYHLT"),
+	trkIsoMap  = cms.untracked.InputTag("hltMuonTkRelIsolationCut0p07Map",               "trkIsoDeposits", "MYHLT"),
+
+	rho_ECAL = cms.untracked.InputTag("hltFixedGridRhoFastjetECALMFForMuons", "", "MYHLT"),
+	rho_HCAL = cms.untracked.InputTag("hltFixedGridRhoFastjetHCAL",           "", "MYHLT"),
+
 	iterL3OI        = cms.untracked.InputTag("hltL3MuonsIterL3OI",                   "", "MYHLT"),
 	iterL3IOFromL2  = cms.untracked.InputTag("hltL3MuonsIterL3IO",                   "", "MYHLT"),
 	iterL3FromL2    = cms.untracked.InputTag("hltIterL3MuonsFromL2LinksCombination", "", "MYHLT"),
@@ -42,17 +49,30 @@ ntuplerBase = cms.EDAnalyzer("MuonHLTNtupler",
 	l1tAlgBlkInputTag     = cms.InputTag("gtStage2Digis"), # -- for L1TGlobalUtil
 	l1tExtBlkInputTag     = cms.InputTag("gtStage2Digis"), # -- for L1TGlobalUtil
 	ReadPrescalesFromFile = cms.bool( False ),             # -- for L1TGlobalUtil
+	stageL1Trigger        = cms.uint32( 2 ),               # -- newly added in higher CMSSW version
 
 	# isMiniAOD             = cms.untracked.bool(True),
 	# triggerObject_miniAOD = cms.untracked.InputTag("slimmedPatTrigger")
 
 	# -- for the extrapolation of offlie muon to 2nd muon station
-	preselection = cms.string("gmtMuonCand.quality > 1"), # FIXME: maybe exclude CSC-only region?
-	useTrack  = cms.string("tracker"),
-	useState  = cms.string("atVertex"),
-	maxDeltaR   = cms.double(1.5),             ## FIXME: to be tuned
-	maxDeltaEta = cms.double(0.3),             ## FIXME: to be tuned
-	l1PhiOffset = cms.double(1.25 * 3.14159265359/180.),
+	# preselection = cms.string("gmtMuonCand.quality > 1"), # FIXME: maybe exclude CSC-only region?
+	# useTrack  = cms.string("tracker"),
+	# useState  = cms.string("atVertex"),
+	# maxDeltaR   = cms.double(1.5),             ## FIXME: to be tuned
+	# maxDeltaEta = cms.double(0.3),             ## FIXME: to be tuned
+	# l1PhiOffset = cms.double(1.25 * 3.14159265359/180.),
+	# useSimpleGeometry = cms.bool(True),
+	# fallbackToME1     = cms.bool(True),
+
+	# -- from https://github.com/cms-sw/cmssw/blob/master/L1Trigger/L1TNtuples/python/l1MuonRecoTree_cfi.py
+	useTrack = cms.string("tracker"),  # 'none' to use Candidate P4; or 'tracker', 'muon', 'global'
+	useState = cms.string("atVertex"), # 'innermost' and 'outermost' require the TrackExtra
 	useSimpleGeometry = cms.bool(True),
-	fallbackToME1     = cms.bool(True),
+	useStation2 = cms.bool(True),
+	fallbackToME1 = cms.bool(False),
+	cosmicPropagationHypothesis = cms.bool(False),
+	useMB2InOverlap = cms.bool(False),
+	propagatorAlong = cms.ESInputTag("", "SteppingHelixPropagatorAlong"),
+	propagatorAny = cms.ESInputTag("", "SteppingHelixPropagatorAny"),
+	propagatorOpposite = cms.ESInputTag("", "SteppingHelixPropagatorOpposite")
 )
