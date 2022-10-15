@@ -50,6 +50,7 @@
 #include <string>
 #include <iomanip>
 #include "TTree.h"
+#include <Math/VectorUtil.h>
 
 using namespace std;
 using namespace reco;
@@ -63,9 +64,9 @@ t_offlineMuon_       ( consumes< edm::View<reco::Muon> >                  (iConf
 t_offlinePATMuon_    ( consumes< std::vector<pat::Muon> >                 (iConfig.getUntrackedParameter<edm::InputTag>("offlineMuon"       )) ), // -- use same inputTag with t_offlineMuon
 t_offlineVertex_     ( consumes< reco::VertexCollection >                 (iConfig.getUntrackedParameter<edm::InputTag>("offlineVertex"     )) ),
 t_generalTrack_      ( consumes< reco::TrackCollection >                  (iConfig.getUntrackedParameter<edm::InputTag>("generalTrack"      )) ),
-t_trackTime_           ( consumes< edm::valueMap<float> >                 (iConfig.getUntrackedParameter<edm::InputTag>("trackTime"         )) ),
-t_trackTimeError_      ( consumes< edm::valueMap<float> >                 (iConfig.getUntrackedParameter<edm::InputTag>("trackTimeError"         )) ),
-t_trackTimeQualityMVA_ ( consumes< edm::valueMap<float> >                 (iConfig.getUntrackedParameter<edm::InputTag>("trackTimeQualityMVA"         )) ),
+t_trackTime_           ( consumes< edm::ValueMap<float> >                 (iConfig.getUntrackedParameter<edm::InputTag>("trackTime"         )) ),
+t_trackTimeError_      ( consumes< edm::ValueMap<float> >                 (iConfig.getUntrackedParameter<edm::InputTag>("trackTimeError"         )) ),
+t_trackTimeQualityMVA_ ( consumes< edm::ValueMap<float> >                 (iConfig.getUntrackedParameter<edm::InputTag>("trackTimeQualityMVA"         )) ),
 t_triggerResults_    ( consumes< edm::TriggerResults >                    (iConfig.getUntrackedParameter<edm::InputTag>("triggerResults"    )) ),
 t_triggerEvent_      ( mayConsume< trigger::TriggerEvent >                (iConfig.getUntrackedParameter<edm::InputTag>("triggerEvent"      )) ), // -- not used in miniAOD case
 t_myTriggerResults_  ( consumes< edm::TriggerResults >                    (iConfig.getUntrackedParameter<edm::InputTag>("myTriggerResults"  )) ),
@@ -120,14 +121,20 @@ void MuonHLTNtupler::analyze(const edm::Event &iEvent, const edm::EventSetup &iS
   edm::Handle<reco::VertexCollection> h_offlineVertex;
   if( iEvent.getByToken(t_offlineVertex_, h_offlineVertex) )
   {
-    const reco::Vertex& pv = h_offlineVertex->at(0);
-    pv_time_      = pv->t();
-    pv_timeError_ = pv->tError();
-
     // -- count # vertex
+    bool isPVFound = false;
     int nGoodVtx = 0;
-    for(reco::VertexCollection::const_iterator it = h_offlineVertex->begin(); it != h_offlineVertex->end(); ++it)
-      if( it->isValid() ) nGoodVtx++;
+    for(reco::VertexCollection::const_iterator it = h_offlineVertex->begin(); it != h_offlineVertex->end(); ++it) {
+      if( it->isValid() ) {
+        nGoodVtx++;
+
+        if( !isPVFound ) { // -- the first "valid" vertex
+          isPVFound = true;
+          pv_time_      = it->t();
+          pv_timeError_ = it->tError();
+        }
+      }
+    }
 
     nVertex_ = nGoodVtx;
   }
@@ -819,7 +826,7 @@ void MuonHLTNtupler::Fill_Muon(const edm::Event &iEvent)
         muon_inner_pt_[_nMuon]    = innerTrk->pt();
         muon_inner_eta_[_nMuon]   = innerTrk->eta();
         muon_inner_phi_[_nMuon]   = innerTrk->phi();
-        Fill_Muon_TrackMTDTime(innerTrk, _nMuon);
+        Fill_Muon_TrackMTDTime(iEvent, innerTrk, _nMuon);
 
         muon_normChi2_inner_[_nMuon] = innerTrk->normalizedChi2();
 
@@ -1411,9 +1418,9 @@ bool MuonHLTNtupler::isNewHighPtMuon(const reco::Muon& muon, const reco::Vertex&
 void MuonHLTNtupler::Fill_GeneralTrack(const edm::Event &iEvent) {
 
 
-  edm::Handle< edm::valueMap<float> > h_trackTime;
-  edm::Handle< edm::valueMap<float> > h_trackTimeError;
-  edm::Handle< edm::valueMap<float> > h_trackTimeQualityMVA;
+  edm::Handle< edm::ValueMap<float> > h_trackTime;
+  edm::Handle< edm::ValueMap<float> > h_trackTimeError;
+  edm::Handle< edm::ValueMap<float> > h_trackTimeQualityMVA;
 
   bool timeInfo = iEvent.getByToken(t_trackTime_,           h_trackTime) &&
                   iEvent.getByToken(t_trackTimeError_,      h_trackTimeError) &&
@@ -1425,25 +1432,28 @@ void MuonHLTNtupler::Fill_GeneralTrack(const edm::Event &iEvent) {
   int _nTrack = 0;
   if( iEvent.getByToken(t_generalTrack_, h_generalTrack) ) {
 
-    for( size_t i=0; i< h_generalTrack->size(); ++i) {
-      const auto generalTrack = (*h_generalTrack)[i];
+    // cout << "h_generalTrack->size() = " << h_generalTrack->size() << endl;
+    for( size_t i=0; i<h_generalTrack->size(); ++i) {
 
-      generalTrack_pt[_nTrack]  = generalTrack.pt();
-      generalTrack_eta[_nTrack] = generalTrack.eta();
-      generalTrack_phi[_nTrack] = generalTrack.phi();
-      generalTrack_dxy[_nTrack] = generalTrack.dxy(); // -- UPDATE: w.r.t. beamspot?
-      generalTrack_dz[_nTrack]  = generalTrack.dz();
+      reco::TrackRef generalTrack = reco::TrackRef(h_generalTrack, i);
+
+      generalTrack_pt_[_nTrack]  = generalTrack->pt();
+      generalTrack_eta_[_nTrack] = generalTrack->eta();
+      generalTrack_phi_[_nTrack] = generalTrack->phi();
+      generalTrack_dxy_[_nTrack] = generalTrack->dxy(); // -- UPDATE: w.r.t. beamspot?
+      generalTrack_dz_[_nTrack]  = generalTrack->dz();
 
       if( timeInfo ) {
-        generalTrack_time[_nTrack]        = (*h_trackTime)[generalTrack];
-        generalTrack_timeError[_nTrack]   = (*h_trackTimeError)[generalTrack];
-        generalTrack_timeQualMVA[_nTrack] = (*h_trackTimeQualityMVA)[generalTrack];
+        generalTrack_time_[_nTrack]        = (*h_trackTime)[generalTrack];
+        generalTrack_timeError_[_nTrack]   = (*h_trackTimeError)[generalTrack];
+        generalTrack_timeQualMVA_[_nTrack] = (*h_trackTimeQualityMVA)[generalTrack];
 
       } // -- end of if( timeInfo )
 
       _nTrack++;
-    }
 
+      if( _nTrack >= arrSize_ ) break; // -- do not save more than maximum array size (seg. fault)
+    }
 
   } // -- end of if( track available? )
 
@@ -1452,8 +1462,8 @@ void MuonHLTNtupler::Fill_GeneralTrack(const edm::Event &iEvent) {
 }
 
 
-void MuonHLTNtupler::Fill_Muon_TrackMTDTime(const reco::TrackRef& theTrack, const int& _nMuon) {
-  math::XYZVector theMomentum = theTrack.momentum();
+void MuonHLTNtupler::Fill_Muon_TrackMTDTime(const edm::Event& iEvent, const reco::TrackRef& theTrack, const int& _nMuon) {
+  math::XYZVector theMomentum = theTrack->momentum();
 
   edm::Handle< reco::TrackCollection > h_generalTrack;
   iEvent.getByToken(t_generalTrack_, h_generalTrack);
@@ -1474,33 +1484,33 @@ void MuonHLTNtupler::Fill_Muon_TrackMTDTime(const reco::TrackRef& theTrack, cons
 
     auto matchedTrack = reco::TrackRef(h_generalTrack, i_matchedTrack);
 
-    cout << "muon - genreral track is matched" << endl;
-    cout << "[muon]          (pt, eta, phi) = (" << theTrack.pt()     << ", " << theTrack.eta()     << ", " << theTrack.phi()     << ")" << endl;
-    cout << "[general track] (pt, eta, phi) = (" << matchedTrack.pt() << ", " << matchedTrack.eta() << ", " << matchedTrack.phi() << ")" << endl;
-    cout << "---> dR = " << dR_smallest << endl;
+    // cout << "muon - genreral track is matched" << endl;
+    // cout << "[muon]          (pt, eta, phi) = (" << theTrack->pt()     << ", " << theTrack->eta()     << ", " << theTrack->phi()     << ")" << endl;
+    // cout << "[general track] (pt, eta, phi) = (" << matchedTrack->pt() << ", " << matchedTrack->eta() << ", " << matchedTrack->phi() << ")" << endl;
+    // cout << "---> dR = " << dR_smallest << endl;
     
-    edm::Handle< edm::valueMap<float> > h_trackTime;
-    edm::Handle< edm::valueMap<float> > h_trackTimeError;
-    edm::Handle< edm::valueMap<float> > h_trackTimeQualityMVA;
+    edm::Handle< edm::ValueMap<float> > h_trackTime;
+    edm::Handle< edm::ValueMap<float> > h_trackTimeError;
+    edm::Handle< edm::ValueMap<float> > h_trackTimeQualityMVA;
 
     iEvent.getByToken(t_trackTime_,           h_trackTime);
     iEvent.getByToken(t_trackTimeError_,      h_trackTimeError);
     iEvent.getByToken(t_trackTimeQualityMVA_, h_trackTimeQualityMVA);
 
-    muon_inner_time[_nMuon]        = (*h_trackTime)[matchedTrack];
-    muon_inner_timeError[_nMuon]   = (*h_trackTimeError)[matchedTrack];
-    muon_inner_timeQualMVA[_nMuon] = (*h_trackTimeQualityMVA)[matchedTrack];
+    muon_inner_time_[_nMuon]        = (*h_trackTime)[matchedTrack];
+    muon_inner_timeError_[_nMuon]   = (*h_trackTimeError)[matchedTrack];
+    muon_inner_timeQualMVA_[_nMuon] = (*h_trackTimeQualityMVA)[matchedTrack];
   }
   else {
-    cout << "matched general track is not found!" << endl;
-    cout << "[muon] (pt, eta, phi) = (" << theTrack.pt() << ", " << theTrack.eta() << ", " << theTrack.phi() << ")" << endl;
-    cout << "[general tracks]" << endl;
+    // cout << "matched general track is not found!" << endl;
+    // cout << "[muon] (pt, eta, phi) = (" << theTrack->pt() << ", " << theTrack->eta() << ", " << theTrack->phi() << ")" << endl;
+    // cout << "[general tracks]" << endl;
 
-    for( size_t i=0; i< h_generalTrack->size(); ++i) {
-      const auto generalTrack = (*h_generalTrack)[i];
-      double dR = ROOT::Math::VectorUtil::DeltaR(generalTrack.momentum(), theMomentum);
-      cout << "  " << i << "th: (pt, eta, phi) = (" << generalTrack.pt() << ", " << generalTrack.eta() << ", " << generalTrack.phi() << ") --> dR = " << dR << endl;
-    }
+    // for( size_t i=0; i< h_generalTrack->size(); ++i) {
+    //   const auto generalTrack = (*h_generalTrack)[i];
+    //   double dR = ROOT::Math::VectorUtil::DeltaR(generalTrack.momentum(), theMomentum);
+    //   cout << "  " << i << "th: (pt, eta, phi) = (" << generalTrack.pt() << ", " << generalTrack.eta() << ", " << generalTrack.phi() << ") --> dR = " << dR << endl;
+    // }
   }
 }
 
