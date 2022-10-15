@@ -71,6 +71,7 @@ private:
   void Make_Branch();
   void Fill_HLT(const edm::Event &iEvent, const edm::EventSetup &iSetup, bool isMYHLT);
   void Fill_Muon(const edm::Event &iEvent);
+  void Fill_GeneralTrack(const edm::Event &iEvent);
   void Fill_HLTMuon(const edm::Event &iEvent);
   void Fill_L1Muon(const edm::Event &iEvent);
   void Fill_GenParticle(const edm::Event &iEvent);
@@ -83,11 +84,18 @@ private:
 
   bool isNewHighPtMuon(const reco::Muon& muon, const reco::Vertex& vtx);
 
+  void Fill_Muon_TrackMTDTime(const reco::TrackRef& theTrack, const int& _nMuon)
+
   HLTPrescaleProvider hltPreConfig_;
   HLTPrescaleProvider myHLTPreConfig_;
 
   edm::EDGetTokenT< edm::View<reco::Muon> >                  t_offlineMuon_;
+  edm::EDGetTokenT< std::vector<pat::Muon> >                 t_offlinePATMuon_; // -- to check whether given offline muon collection is PAT (e.g. miniAOD)
   edm::EDGetTokenT< reco::VertexCollection >                 t_offlineVertex_;
+  edm::EDGetTokenT< reco::TrackCollection >                  t_generalTrack_;
+  edm::EDGetTokenT< edm::valueMap<float> >                   t_trackTime_;
+  edm::EDGetTokenT< edm::valueMap<float> >                   t_trackTimeError_;
+  edm::EDGetTokenT< edm::valueMap<float> >                   t_trackTimeQualityMVA_;
   edm::EDGetTokenT< edm::TriggerResults >                    t_triggerResults_;
   edm::EDGetTokenT< trigger::TriggerEvent >                  t_triggerEvent_;
   edm::EDGetTokenT< edm::TriggerResults >                    t_myTriggerResults_;
@@ -115,8 +123,9 @@ private:
   edm::EDGetTokenT< GenEventInfoProduct >                    t_genEventInfo_;
   edm::EDGetTokenT< reco::GenParticleCollection >            t_genParticle_;
 
-  bool isMiniAOD_;
-  bool doSaveRerunObject_;
+  bool isMiniAOD_ = false;
+  bool rerunHLT_ = false;
+  bool doSaveRerunObject_ = false;
   edm::EDGetTokenT< std::vector<pat::TriggerObjectStandAlone> > t_triggerObject_miniAOD_;
 
   PropagateToMuon propagatorToMuon_;
@@ -134,6 +143,8 @@ private:
   unsigned long long eventNum_;
 
   int nVertex_;
+  double pv_time_;
+  double pv_timeError_;
 
   double bunchID_;
   double instLumi_;
@@ -243,6 +254,10 @@ private:
   int muon_nPixelHit_global_[arrSize_];
   int muon_nMuonHit_global_[arrSize_];
 
+  double muon_inner_pt_[arrSize_];
+  double muon_inner_eta_[arrSize_];
+  double muon_inner_phi_[arrSize_];
+  double muon_inner_time_[arrSize_];
   double muon_normChi2_inner_[arrSize_];
   int muon_nTrackerHit_inner_[arrSize_];
   int muon_nTrackerLayer_inner_[arrSize_];
@@ -260,6 +275,31 @@ private:
 
   double muon_propEta_[arrSize_];
   double muon_propPhi_[arrSize_];
+
+  // -- sim-hit
+  int muon_simType_[arrSize_];
+  int muon_simExtType_[arrSize_];
+  int muon_simPdgId_[arrSize_];
+  int muon_simFlavour_[arrSize_];
+  double muon_simPt_[arrSize_];
+  double muon_simEta_[arrSize_];
+  double muon_simPhi_[arrSize_];
+  int muon_simBX_[arrSize_];
+  double muon_simProdZ_[arrSize_];
+  double muon_simProdRho_[arrSize_];
+  int muon_simMotherPdgId_[arrSize_];
+  int muon_simHeaviestMotherFlavour_[arrSize_];
+
+  // -- general track
+  int nGeneralTrack_;
+  double generalTrack_pt_[arrSize_];
+  double generalTrack_eta_[arrSize_];
+  double generalTrack_phi_[arrSize_];
+  double generalTrack_dxy_[arrSize_];
+  double generalTrack_dz_[arrSize_];
+  double generalTrack_time_[arrSize_];
+  double generalTrack_timeError_[arrSize_];
+  double generalTrack_timeQualMVA_[arrSize_];
 
   // -- L3 muon
   int nL3Muon_;

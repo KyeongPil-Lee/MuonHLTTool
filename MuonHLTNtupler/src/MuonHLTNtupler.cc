@@ -60,7 +60,12 @@ MuonHLTNtupler::MuonHLTNtupler(const edm::ParameterSet& iConfig):
 hltPreConfig_(iConfig, consumesCollector(), *this),
 myHLTPreConfig_(iConfig, consumesCollector(), *this),
 t_offlineMuon_       ( consumes< edm::View<reco::Muon> >                  (iConfig.getUntrackedParameter<edm::InputTag>("offlineMuon"       )) ),
+t_offlinePATMuon_    ( consumes< std::vector<pat::Muon> >                 (iConfig.getUntrackedParameter<edm::InputTag>("offlineMuon"       )) ), // -- use same inputTag with t_offlineMuon
 t_offlineVertex_     ( consumes< reco::VertexCollection >                 (iConfig.getUntrackedParameter<edm::InputTag>("offlineVertex"     )) ),
+t_generalTrack_      ( consumes< reco::TrackCollection >                  (iConfig.getUntrackedParameter<edm::InputTag>("generalTrack"      )) ),
+t_trackTime_           ( consumes< edm::valueMap<float> >                 (iConfig.getUntrackedParameter<edm::InputTag>("trackTime"         )) ),
+t_trackTimeError_      ( consumes< edm::valueMap<float> >                 (iConfig.getUntrackedParameter<edm::InputTag>("trackTimeError"         )) ),
+t_trackTimeQualityMVA_ ( consumes< edm::valueMap<float> >                 (iConfig.getUntrackedParameter<edm::InputTag>("trackTimeQualityMVA"         )) ),
 t_triggerResults_    ( consumes< edm::TriggerResults >                    (iConfig.getUntrackedParameter<edm::InputTag>("triggerResults"    )) ),
 t_triggerEvent_      ( mayConsume< trigger::TriggerEvent >                (iConfig.getUntrackedParameter<edm::InputTag>("triggerEvent"      )) ), // -- not used in miniAOD case
 t_myTriggerResults_  ( consumes< edm::TriggerResults >                    (iConfig.getUntrackedParameter<edm::InputTag>("myTriggerResults"  )) ),
@@ -88,11 +93,14 @@ t_genEventInfo_      ( consumes< GenEventInfoProduct >                    (iConf
 t_genParticle_       ( consumes< reco::GenParticleCollection >            (iConfig.getUntrackedParameter<edm::InputTag>("genParticle"       )) ),
 
 isMiniAOD_               ( iConfig.existsAs<bool>("isMiniAOD")         ? iConfig.getParameter<bool>("isMiniAOD")         : false),
+rerunHLT_                ( iConfig.existsAs<bool>("rerunHLT")          ? iConfig.getParameter<bool>("rerunHLT")          : false),
 doSaveRerunObject_       ( iConfig.existsAs<bool>("doSaveRerunObject") ? iConfig.getParameter<bool>("doSaveRerunObject") : false),
 t_triggerObject_miniAOD_ ( mayConsume< std::vector<pat::TriggerObjectStandAlone> > (iConfig.getUntrackedParameter<edm::InputTag>("triggerObject_miniAOD")) ), // -- not used in AOD case
 propSetup_(iConfig, consumesCollector())
 {
-  cout << "isMiniAOD_ = " << isMiniAOD_ << endl;
+  cout << "isMiniAOD_ = "         << isMiniAOD_         << endl;
+  cout << "rerunHLT_ = "          << rerunHLT_          << endl;
+  cout << "doSaveRerunObject_ = " << doSaveRerunObject_ << endl;
 }
 
 void MuonHLTNtupler::analyze(const edm::Event &iEvent, const edm::EventSetup &iSetup)
@@ -112,22 +120,17 @@ void MuonHLTNtupler::analyze(const edm::Event &iEvent, const edm::EventSetup &iS
   edm::Handle<reco::VertexCollection> h_offlineVertex;
   if( iEvent.getByToken(t_offlineVertex_, h_offlineVertex) )
   {
+    const reco::Vertex& pv = h_offlineVertex->at(0);
+    pv_time_      = pv->t();
+    pv_timeError_ = pv->tError();
+
+    // -- count # vertex
     int nGoodVtx = 0;
     for(reco::VertexCollection::const_iterator it = h_offlineVertex->begin(); it != h_offlineVertex->end(); ++it)
       if( it->isValid() ) nGoodVtx++;
 
     nVertex_ = nGoodVtx;
   }
-
-  // -- rho
-  edm::Handle<double> h_rho_ECAL;
-  if( iEvent.getByToken(t_rho_ECAL_, h_rho_ECAL) ) 
-    rho_ECAL_ = *(h_rho_ECAL.product());
-
-  edm::Handle<double> h_rho_HCAL;
-  if( iEvent.getByToken(t_rho_HCAL_, h_rho_HCAL) ) 
-    rho_HCAL_ = *(h_rho_HCAL.product());
-
 
   if( isRealData_ )
   {
@@ -173,8 +176,19 @@ void MuonHLTNtupler::analyze(const edm::Event &iEvent, const edm::EventSetup &iS
     } // -- end of if ( token exists )
   } // -- end of isMC -- //
 
+  // -- rerun objects
+  if( rerunHLT_ && doSaveRerunObject_ ) {
+    // -- rho @ HLT
+    edm::Handle<double> h_rho_ECAL;
+    rho_ECAL_ = *(h_rho_ECAL.product());
+
+    edm::Handle<double> h_rho_HCAL;
+    rho_HCAL_ = *(h_rho_HCAL.product());
+  }
+
   // -- fill each object
   Fill_Muon(iEvent);
+  Fill_GeneralTrack(iEvent);
   Fill_HLT(iEvent, iSetup, 0); // -- original HLT objects saved in data taking
   if( doSaveRerunObject_ ) Fill_HLT(iEvent, iSetup, 1); // -- rerun objects
   Fill_HLTMuon(iEvent);
@@ -204,6 +218,8 @@ void MuonHLTNtupler::Init()
   bunchID_ = -999;
 
   nVertex_ = -999;
+  pv_time_ = -999;
+  pv_timeError_ = -999;
 
   instLumi_  = -999;
   dataPU_    = -999;
@@ -319,6 +335,12 @@ void MuonHLTNtupler::Init()
     muon_nPixelHit_global_[i] = -999;
     muon_nMuonHit_global_[i] = -999;
 
+    muon_inner_pt_[i] = -999;
+    muon_inner_eta_[i] = -999;
+    muon_inner_phi_[i] = -999;
+    muon_inner_time_[i] = -999;
+    muon_inner_timeError_[i] = -999;
+    muon_inner_timeQualMVA_[i] = -999;
     muon_normChi2_inner_[i] = -999;
     muon_nTrackerHit_inner_[i] = -999;
     muon_nTrackerLayer_inner_[i] = -999;
@@ -336,6 +358,31 @@ void MuonHLTNtupler::Init()
 
     muon_propEta_[i] = -999;
     muon_propPhi_[i] = -999;
+
+    muon_simType_[i] = -999;
+    muon_simExtType_[i] = -999;
+    muon_simPdgId_[i] = -999;
+    muon_simFlavour_[i] = -999;
+    muon_simPt_[i] = -999;
+    muon_simEta_[i] = -999;
+    muon_simPhi_[i] = -999;
+    muon_simBX_[i] = -999;
+    muon_simProdZ_[i] = -999;
+    muon_simProdRho_[i] = -999;
+    muon_simMotherPdgId_[i] = -999;
+    muon_simHeaviestMotherFlavour_[i] = -999;
+  }
+
+  nGeneralTrack_ = 0;
+  for( int i=0; i<arrSize_; i++) {
+    generalTrack_pt_[i] = -999;
+    generalTrack_eta_[i] = -999;
+    generalTrack_phi_[i] = -999;
+    generalTrack_dxy_[i] = -999;
+    generalTrack_dz_[i] = -999;
+    generalTrack_time_[i] = -999;
+    generalTrack_timeError_[i] = -999;
+    generalTrack_timeQualMVA_[i] = -999;
   }
 
   nL3Muon_ = 0;
@@ -463,6 +510,8 @@ void MuonHLTNtupler::Make_Branch()
   ntuple_->Branch("lumiBlockNum",&lumiBlockNum_,"lumiBlockNum/I");
   ntuple_->Branch("eventNum",&eventNum_,"eventNum/l"); // -- unsigned long long -- //
   ntuple_->Branch("nVertex", &nVertex_, "nVertex/I");
+  ntuple_->Branch("pv_time",      &pv_time_,      "pv_time/D");
+  ntuple_->Branch("pv_timeError", &pv_timeError_, "pv_timeError/D");
   ntuple_->Branch("bunchID", &bunchID_, "bunchID/D");
   ntuple_->Branch("instLumi", &instLumi_, "instLumi/D");
   ntuple_->Branch("dataPU", &dataPU_, "dataPU/D");
@@ -561,6 +610,12 @@ void MuonHLTNtupler::Make_Branch()
   ntuple_->Branch("muon_nTrackerLayer_global", &muon_nTrackerLayer_global_, "muon_nTrackerLayer_global[nMuon]/I");
   ntuple_->Branch("muon_nPixelHit_global", &muon_nPixelHit_global_, "muon_nPixelHit_global[nMuon]/I");
   ntuple_->Branch("muon_nMuonHit_global", &muon_nMuonHit_global_, "muon_nMuonHit_global[nMuon]/I");
+  ntuple_->Branch("muon_inner_pt",  &muon_inner_pt_, "muon_inner_pt[nMuon]/D");
+  ntuple_->Branch("muon_inner_eta", &muon_inner_eta_, "muon_inner_eta[nMuon]/D");
+  ntuple_->Branch("muon_inner_phi", &muon_inner_phi_, "muon_inner_phi[nMuon]/D");
+  ntuple_->Branch("muon_inner_time",        &muon_inner_time_,        "muon_inner_time[nMuon]/D");
+  ntuple_->Branch("muon_inner_timeError",   &muon_inner_timeError_,   "muon_inner_timeError[nMuon]/D");
+  ntuple_->Branch("muon_inner_timeQualMVA", &muon_inner_timeQualMVA_, "muon_inner_timeQualMVA[nMuon]/D");
   ntuple_->Branch("muon_normChi2_inner", &muon_normChi2_inner_, "muon_normChi2_inner[nMuon]/D");
   ntuple_->Branch("muon_nTrackerHit_inner", &muon_nTrackerHit_inner_, "muon_nTrackerHit_inner[nMuon]/I");
   ntuple_->Branch("muon_nTrackerLayer_inner", &muon_nTrackerLayer_inner_, "muon_nTrackerLayer_inner[nMuon]/I");
@@ -575,6 +630,30 @@ void MuonHLTNtupler::Make_Branch()
 
   ntuple_->Branch("muon_propEta", &muon_propEta_, "muon_propEta[nMuon]/D");
   ntuple_->Branch("muon_propPhi", &muon_propPhi_, "muon_propPhi[nMuon]/D");
+
+  ntuple_->Branch("muon_simType",    &muon_simType_,    "muon_simType[nMuon]/I");
+  ntuple_->Branch("muon_simExtType", &muon_simExtType_, "muon_simExtType[nMuon]/I");
+  ntuple_->Branch("muon_simPdgId",   &muon_simPdgId_,   "muon_simPdgId[nMuon]/I");
+  ntuple_->Branch("muon_simFlavour", &muon_simFlavour_, "muon_simFlavour[nMuon]/I");
+  ntuple_->Branch("muon_simPt",  &muon_simPt_,  "muon_simPt[nMuon]/D");
+  ntuple_->Branch("muon_simEta", &muon_simEta_, "muon_simEta[nMuon]/D");
+  ntuple_->Branch("muon_simPhi", &muon_simPhi_, "muon_simPhi[nMuon]/D");
+  ntuple_->Branch("muon_simBX",  &muon_simBX_,  "muon_simBX[nMuon]/I");
+  ntuple_->Branch("muon_simProdZ",       &muon_simProdZ_,       "muon_simProdZ[nMuon]/D");
+  ntuple_->Branch("muon_simProdRho",     &muon_simProdRho_,     "muon_simProdRho[nMuon]/D");  
+  ntuple_->Branch("muon_simMotherPdgId", &muon_simMotherPdgId_, "muon_simMotherPdgId[nMuon]/I");
+  ntuple_->Branch("muon_simHeaviestMotherFlavour", &muon_simHeaviestMotherFlavour_, "muon_simHeaviestMotherFlavour[nMuon]/I");
+
+
+  ntuple_->Branch("nGeneralTrack",    &nGeneralTrack_, "nGeneralTrack/I");
+  ntuple_->Branch("generalTrack_pt",  &generalTrack_pt_, "generalTrack_pt[nGeneralTrack]/D");
+  ntuple_->Branch("generalTrack_eta", &generalTrack_eta_, "generalTrack_eta[nGeneralTrack]/D");
+  ntuple_->Branch("generalTrack_phi", &generalTrack_phi_, "generalTrack_phi[nGeneralTrack]/D");
+  ntuple_->Branch("generalTrack_dxy", &generalTrack_dxy_, "generalTrack_dxy[nGeneralTrack]/D");
+  ntuple_->Branch("generalTrack_dz",  &generalTrack_dz_, "generalTrack_dz[nGeneralTrack]/D");
+  ntuple_->Branch("generalTrack_time",  &generalTrack_time_, "generalTrack_time[nGeneralTrack]/D");
+  ntuple_->Branch("generalTrack_timeError",  &generalTrack_timeError_, "generalTrack_timeError[nGeneralTrack]/D");
+  ntuple_->Branch("generalTrack_timeQualMVA",  &generalTrack_timeQualMVA_, "generalTrack_timeQualMVA[nGeneralTrack]/D");
 
   ntuple_->Branch("nL3Muon", &nL3Muon_, "nL3Muon/I");
   ntuple_->Branch("L3Muon_pt", &L3Muon_pt_, "L3Muon_pt[nL3Muon]/D");
@@ -667,9 +746,12 @@ void MuonHLTNtupler::Make_Branch()
 
 void MuonHLTNtupler::Fill_Muon(const edm::Event &iEvent)
 {
-  edm::Handle< edm::View<reco::Muon> > h_offlineMuon;
+  // -- check whether the muon collection is pat::muon, which has more information than reco::muon
+  edm::Handle<std::vector<pat::Muon>> h_offlinePATMuon;
+  Bool_t isPATMuon = iEvent.getByToken(t_offlinePATMuon_, h_offlinePATMuon);
 
-  // edm::Handle< edm::View<reco::Muon> > h_offlineMuon;
+  // -- universal handle (reco::muon, pat::muon, etc)
+  edm::Handle< edm::View<reco::Muon> > h_offlineMuon;
   if( iEvent.getByToken(t_offlineMuon_, h_offlineMuon) ) // -- only when the dataset has offline muon collection (e.g. AOD) -- //
   {
     edm::Handle<reco::VertexCollection> h_offlineVertex;
@@ -686,12 +768,11 @@ void MuonHLTNtupler::Fill_Muon(const edm::Event &iEvent)
       muon_py_[_nMuon]  = mu->py();
       muon_pz_[_nMuon]  = mu->pz();
       muon_charge_[_nMuon] = mu->charge();
-      // if( isMiniAOD_ ) muon_dB_[_nMuon] = mu->dB(); // -- dB is only availabe in pat::Muon -- //
 
-      if( mu->isGlobalMuon() ) muon_isGLB_[_nMuon] = 1;
+      if( mu->isGlobalMuon() )     muon_isGLB_[_nMuon] = 1;
       if( mu->isStandAloneMuon() ) muon_isSTA_[_nMuon] = 1;
-      if( mu->isTrackerMuon() ) muon_isTRK_[_nMuon] = 1;
-      if( mu->isPFMuon() ) muon_isPF_[_nMuon] = 1;
+      if( mu->isTrackerMuon() )    muon_isTRK_[_nMuon] = 1;
+      if( mu->isPFMuon() )         muon_isPF_[_nMuon] = 1;
 
       // -- defintion of ID functions: http://cmsdoxygen.web.cern.ch/cmsdoxygen/CMSSW_9_4_0/doc/html/da/d18/namespacemuon.html#ac122b2516e5711ce206256d7945473d2 -- //
       if( muon::isTightMuon( (*mu), pv ) )  muon_isTight_[_nMuon] = 1;
@@ -719,8 +800,6 @@ void MuonHLTNtupler::Fill_Muon(const edm::Event &iEvent)
       muon_PFIso04_photon_[_nMuon]  = mu->pfIsolationR04().sumPhotonEt;
       muon_PFIso04_sumPU_[_nMuon]   = mu->pfIsolationR04().sumPUPt;
 
-      // reco::MuonRef muRef = reco::MuonRef(h_offlineMuon, _nMuon);
-
       reco::TrackRef globalTrk = mu->globalTrack();
       if( globalTrk.isNonnull() )
       {
@@ -736,12 +815,18 @@ void MuonHLTNtupler::Fill_Muon(const edm::Event &iEvent)
       reco::TrackRef innerTrk = mu->innerTrack();
       if( innerTrk.isNonnull() )
       {
+        // -- to find muon track in general track collection by matching
+        muon_inner_pt_[_nMuon]    = innerTrk->pt();
+        muon_inner_eta_[_nMuon]   = innerTrk->eta();
+        muon_inner_phi_[_nMuon]   = innerTrk->phi();
+        Fill_Muon_TrackMTDTime(innerTrk, _nMuon);
+
         muon_normChi2_inner_[_nMuon] = innerTrk->normalizedChi2();
 
         const reco::HitPattern & innerTrkHit = innerTrk->hitPattern();
-        muon_nTrackerHit_inner_[_nMuon]   = innerTrkHit.numberOfValidTrackerHits();
-        muon_nTrackerLayer_inner_[_nMuon] = innerTrkHit.trackerLayersWithMeasurement();
-        muon_nPixelHit_inner_[_nMuon]     = innerTrkHit.numberOfValidPixelHits();
+        muon_nTrackerHit_inner_[_nMuon]      = innerTrkHit.numberOfValidTrackerHits();
+        muon_nTrackerLayer_inner_[_nMuon]    = innerTrkHit.trackerLayersWithMeasurement();
+        muon_nPixelHit_inner_[_nMuon]        = innerTrkHit.numberOfValidPixelHits();
       }
 
       reco::TrackRef tunePTrk = mu->tunePMuonBestTrack();
@@ -772,6 +857,33 @@ void MuonHLTNtupler::Fill_Muon(const edm::Event &iEvent)
       {
         // printf("[Propagation: failed (isGLB, isTRK, isSTA, isPF) = (%d, %d, %d, %d)]\n", muon_isGLB_[_nMuon], muon_isTRK_[_nMuon], muon_isSTA_[_nMuon], muon_isPF_[_nMuon]);
       }
+
+      // -- additional info available only in pat::muon
+      if( isPATMuon ) {
+        auto PATMu = dynamic_cast<const pat::Muon*>(&*mu);
+        muon_dB_[_nMuon] = PATMu->dB();
+
+        // -- sim-hit matching information
+        if( !isRealData_ ) {
+          muon_simType_[_nMuon]    = PATMu->simType();
+          muon_simExtType_[_nMuon] = PATMu->simExtType();
+
+          muon_simPdgId_[_nMuon]   = PATMu->simPdgId();
+          muon_simFlavour_[_nMuon] = PATMu->simFlavour();
+
+          muon_simPt_[_nMuon]  = PATMu->simPt();
+          muon_simEta_[_nMuon] = PATMu->simEta();
+          muon_simPhi_[_nMuon] = PATMu->simPhi();
+
+          muon_simBX_[_nMuon]      = PATMu->simBX();
+          muon_simProdZ_[_nMuon]   = PATMu->simProdZ();
+          muon_simProdRho_[_nMuon] = PATMu->simProdRho();
+
+          muon_simMotherPdgId_[_nMuon]           = PATMu->simMotherPdgId();
+          muon_simHeaviestMotherFlavour_[_nMuon] = PATMu->simHeaviestMotherFlavour();
+        }
+
+      } // -- end of isPATMuon
 
       _nMuon++;
     }
@@ -1296,8 +1408,102 @@ bool MuonHLTNtupler::isNewHighPtMuon(const reco::Muon& muon, const reco::Vertex&
 
 }
 
+void MuonHLTNtupler::Fill_GeneralTrack(const edm::Event &iEvent) {
 
-void MuonHLTNtupler::endJob() {}
+
+  edm::Handle< edm::valueMap<float> > h_trackTime;
+  edm::Handle< edm::valueMap<float> > h_trackTimeError;
+  edm::Handle< edm::valueMap<float> > h_trackTimeQualityMVA;
+
+  bool timeInfo = iEvent.getByToken(t_trackTime_,           h_trackTime) &&
+                  iEvent.getByToken(t_trackTimeError_,      h_trackTimeError) &&
+                  iEvent.getByToken(t_trackTimeQualityMVA_, h_trackTimeQualityMVA);
+
+
+  edm::Handle< reco::TrackCollection > h_generalTrack;
+
+  int _nTrack = 0;
+  if( iEvent.getByToken(t_generalTrack_, h_generalTrack) ) {
+
+    for( size_t i=0; i< h_generalTrack->size(); ++i) {
+      const auto generalTrack = (*h_generalTrack)[i];
+
+      generalTrack_pt[_nTrack]  = generalTrack.pt();
+      generalTrack_eta[_nTrack] = generalTrack.eta();
+      generalTrack_phi[_nTrack] = generalTrack.phi();
+      generalTrack_dxy[_nTrack] = generalTrack.dxy(); // -- UPDATE: w.r.t. beamspot?
+      generalTrack_dz[_nTrack]  = generalTrack.dz();
+
+      if( timeInfo ) {
+        generalTrack_time[_nTrack]        = (*h_trackTime)[generalTrack];
+        generalTrack_timeError[_nTrack]   = (*h_trackTimeError)[generalTrack];
+        generalTrack_timeQualMVA[_nTrack] = (*h_trackTimeQualityMVA)[generalTrack];
+
+      } // -- end of if( timeInfo )
+
+      _nTrack++;
+    }
+
+
+  } // -- end of if( track available? )
+
+  nGeneralTrack_ = _nTrack;
+
+}
+
+
+void MuonHLTNtupler::Fill_Muon_TrackMTDTime(const reco::TrackRef& theTrack, const int& _nMuon) {
+  math::XYZVector theMomentum = theTrack.momentum();
+
+  edm::Handle< reco::TrackCollection > h_generalTrack;
+  iEvent.getByToken(t_generalTrack_, h_generalTrack);
+
+  double dR_smallest = 1e10;
+  int i_matchedTrack = -1;
+
+  for( size_t i=0; i< h_generalTrack->size(); ++i) {
+    const auto generalTrack = (*h_generalTrack)[i];
+    double dR = ROOT::Math::VectorUtil::DeltaR(generalTrack.momentum(), theMomentum);
+    if( dR < 0.3 && dR < dR_smallest ) {
+      dR_smallest = dR;
+      i_matchedTrack = i;
+    }
+  }
+
+  if( i_matchedTrack >= 0 ) {
+
+    auto matchedTrack = reco::TrackRef(h_generalTrack, i_matchedTrack);
+
+    cout << "muon - genreral track is matched" << endl;
+    cout << "[muon]          (pt, eta, phi) = (" << theTrack.pt()     << ", " << theTrack.eta()     << ", " << theTrack.phi()     << ")" << endl;
+    cout << "[general track] (pt, eta, phi) = (" << matchedTrack.pt() << ", " << matchedTrack.eta() << ", " << matchedTrack.phi() << ")" << endl;
+    cout << "---> dR = " << dR_smallest << endl;
+    
+    edm::Handle< edm::valueMap<float> > h_trackTime;
+    edm::Handle< edm::valueMap<float> > h_trackTimeError;
+    edm::Handle< edm::valueMap<float> > h_trackTimeQualityMVA;
+
+    iEvent.getByToken(t_trackTime_,           h_trackTime);
+    iEvent.getByToken(t_trackTimeError_,      h_trackTimeError);
+    iEvent.getByToken(t_trackTimeQualityMVA_, h_trackTimeQualityMVA);
+
+    muon_inner_time[_nMuon]        = (*h_trackTime)[matchedTrack];
+    muon_inner_timeError[_nMuon]   = (*h_trackTimeError)[matchedTrack];
+    muon_inner_timeQualMVA[_nMuon] = (*h_trackTimeQualityMVA)[matchedTrack];
+  }
+  else {
+    cout << "matched general track is not found!" << endl;
+    cout << "[muon] (pt, eta, phi) = (" << theTrack.pt() << ", " << theTrack.eta() << ", " << theTrack.phi() << ")" << endl;
+    cout << "[general tracks]" << endl;
+
+    for( size_t i=0; i< h_generalTrack->size(); ++i) {
+      const auto generalTrack = (*h_generalTrack)[i];
+      double dR = ROOT::Math::VectorUtil::DeltaR(generalTrack.momentum(), theMomentum);
+      cout << "  " << i << "th: (pt, eta, phi) = (" << generalTrack.pt() << ", " << generalTrack.eta() << ", " << generalTrack.phi() << ") --> dR = " << dR << endl;
+    }
+  }
+}
+
 void MuonHLTNtupler::beginRun(const edm::Run &iRun, const edm::EventSetup &iSetup)
 {
   bool changedConfig;
@@ -1316,6 +1522,8 @@ void MuonHLTNtupler::beginRun(const edm::Run &iRun, const edm::EventSetup &iSetu
     }
   }
 }
+
+void MuonHLTNtupler::endJob() {}
 void MuonHLTNtupler::endRun(const edm::Run &iRun, const edm::EventSetup &iSetup) {}
 
 DEFINE_FWK_MODULE(MuonHLTNtupler);

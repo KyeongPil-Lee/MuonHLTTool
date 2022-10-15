@@ -1,14 +1,22 @@
-# -- custoimzer for ntupler that can be added to the HLT configuration for re-running HLT
-# -- add two lines in the HLT config.:
-# from MuonHLTTool.MuonHLTNtupler.customizerForMuonHLTNtupler import *
-# process = customizerFuncForMuonHLTNtupler(process, "MYHLT")
-
 import FWCore.ParameterSet.Config as cms
 
-def customizerFuncForMuonHLTNtupler(process, newProcessName = "MYHLT"):
+# -- update inputTag if given sample is miniAOD
+def customizeModule_miniAOD(ntupler):
+    ntupler.isMiniAOD             = cms.bool(True)
+    ntupler.offlineVertex         = cms.untracked.InputTag("offlineSlimmedPrimaryVertices")
+    ntupler.offlineMuon           = cms.untracked.InputTag("slimmedMuons")
+    ntupler.triggerObject_miniAOD = cms.untracked.InputTag("slimmedPatTrigger")
+    ntupler.PUSummaryInfo         = cms.untracked.InputTag("slimmedAddPileupInfo")
+    ntupler.genParticle           = cms.untracked.InputTag("prunedGenParticles")
+
+# -- add ntuple module (HLT-rerun mode) to given process: 
+# ---- it is usually used at the end of the HLT menu to produce ntuples
+# -- add two lines in the HLT menu config.:
+# from MuonHLTTool.MuonHLTNtupler.Customizer_MuonHLTNtuple import *
+# process = addNtupleModuleToProcess(process, "MYHLT", isMiniAOD=False)
+def addNtupleModuleToProcess(process, newProcessName = "MYHLT", isMiniAOD=False):
     if hasattr(process, "DQMOutput"):
         del process.DQMOutput
-
 
     # -- for the extrapolation of offlie muon to 2nd muon station
     process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAny_cfi")
@@ -16,7 +24,8 @@ def customizerFuncForMuonHLTNtupler(process, newProcessName = "MYHLT"):
     process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorOpposite_cfi")
     
     from MuonHLTTool.MuonHLTNtupler.ntupler_cfi import ntuplerBase
-    process.ntupler = ntuplerBase.clone()
+    # process.ntupler = ntuplerBase.clone()
+    process.ntupler = ntuplerBaseRerunHLT.clone()
 
     # -- set to the new process name
     process.ntupler.myTriggerResults = cms.untracked.InputTag("TriggerResults",          "",     newProcessName)
@@ -38,6 +47,10 @@ def customizerFuncForMuonHLTNtupler(process, newProcessName = "MYHLT"):
     process.ntupler.iterL3MuonNoID.iterL3IOFromL1  = cms.untracked.InputTag("hltIter3IterL3FromL1MuonMerged",       "", newProcessName)
     process.ntupler.iterL3MuonNoID                 = cms.untracked.InputTag("hltIterL3MuonsNoID",                   "", newProcessName)
 
+    if isMiniAOD:
+        customize_miniAOD(process.ntupler)
+
+
     process.TFileService = cms.Service("TFileService",
       fileName = cms.string("ntuple.root"),
       closeFileFast = cms.untracked.bool(False),
@@ -47,3 +60,4 @@ def customizerFuncForMuonHLTNtupler(process, newProcessName = "MYHLT"):
     process.schedule.extend([process.mypath])
 
     return process
+
