@@ -1,5 +1,6 @@
 universe    = vanilla
 executable  = condor_ROOTRun_wrapper.sh
+transfer_input_files = MakeHist_Isolation.cxx
 getenv      = True
 output      = condor/job.$(ClusterId).$(ProcId).out
 error       = condor/job.$(ClusterId).$(ProcId).err
