@@ -3,6 +3,8 @@
 
 #include <TTreeReader.h>
 #include <TH1D.h>
+#include <TChain.h>
+#include <TFile.h>
 #include <Math/VectorUtil.h>
 
 #include <iostream>

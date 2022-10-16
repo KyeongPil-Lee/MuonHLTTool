@@ -1,4 +1,6 @@
 #include <TTreeReader.h>
+#include <TTreeReaderValue.h>
+#include <TTreeReaderArray.h>
 #include <Math/Vector4D.h>
 
 namespace MuonHLT {
