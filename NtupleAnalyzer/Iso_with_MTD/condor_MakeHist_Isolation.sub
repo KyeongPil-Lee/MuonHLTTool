@@ -10,83 +10,44 @@ when_to_transfer_output = ON_EXIT
 # -- to avoid to transfer some (unnecessary) temp. files
 Transfer_Output_Files = ""
 
-arguments = MakeHist_Isolation.cxx DY 10
-queue
-arguments = MakeHist_Isolation.cxx DY 11
-queue
-arguments = MakeHist_Isolation.cxx DY 12
-queue
-arguments = MakeHist_Isolation.cxx DY 1-3
-queue
-arguments = MakeHist_Isolation.cxx DY 13
-queue
-arguments = MakeHist_Isolation.cxx DY 14
-queue
-arguments = MakeHist_Isolation.cxx DY 1-5
-queue
-arguments = MakeHist_Isolation.cxx DY 3
-queue
-arguments = MakeHist_Isolation.cxx DY 4
-queue
-arguments = MakeHist_Isolation.cxx DY 7
-queue
-arguments = MakeHist_Isolation.cxx DY 9
-queue
-
-arguments = MakeHist_Isolation.cxx TT 10
-queue
-arguments = MakeHist_Isolation.cxx TT 11
-queue
-arguments = MakeHist_Isolation.cxx TT 12
-queue
-arguments = MakeHist_Isolation.cxx TT 13
-queue
-arguments = MakeHist_Isolation.cxx TT 14
-queue
-arguments = MakeHist_Isolation.cxx TT 15
-queue
-arguments = MakeHist_Isolation.cxx TT 16
-queue
-arguments = MakeHist_Isolation.cxx TT 17
-queue
-arguments = MakeHist_Isolation.cxx TT 18
-queue
-arguments = MakeHist_Isolation.cxx TT 19
-queue
-arguments = MakeHist_Isolation.cxx TT 1
-queue
-arguments = MakeHist_Isolation.cxx TT 20
-queue
-arguments = MakeHist_Isolation.cxx TT 21
-queue
-arguments = MakeHist_Isolation.cxx TT 22
-queue
-arguments = MakeHist_Isolation.cxx TT 23
-queue
-arguments = MakeHist_Isolation.cxx TT 24
-queue
-arguments = MakeHist_Isolation.cxx TT 25
-queue
-arguments = MakeHist_Isolation.cxx TT 26
-queue
-arguments = MakeHist_Isolation.cxx TT 27
-queue
-arguments = MakeHist_Isolation.cxx TT 28
-queue
-arguments = MakeHist_Isolation.cxx TT 2
-queue
-arguments = MakeHist_Isolation.cxx TT 3
-queue
-arguments = MakeHist_Isolation.cxx TT 4
-queue
-arguments = MakeHist_Isolation.cxx TT 5
-queue
-arguments = MakeHist_Isolation.cxx TT 6
-queue
-arguments = MakeHist_Isolation.cxx TT 7
-queue
-arguments = MakeHist_Isolation.cxx TT 8
-queue
-arguments = MakeHist_Isolation.cxx TT 9
-queue
-
+Queue Arguments From (
+  MakeHist_Isolation.cxx DY 10
+  MakeHist_Isolation.cxx DY 11
+  MakeHist_Isolation.cxx DY 12
+  MakeHist_Isolation.cxx DY 1-3
+  MakeHist_Isolation.cxx DY 13
+  MakeHist_Isolation.cxx DY 14
+  MakeHist_Isolation.cxx DY 1-5
+  MakeHist_Isolation.cxx DY 3
+  MakeHist_Isolation.cxx DY 4
+  MakeHist_Isolation.cxx DY 7
+  MakeHist_Isolation.cxx DY 9
+  MakeHist_Isolation.cxx TT 10
+  MakeHist_Isolation.cxx TT 11
+  MakeHist_Isolation.cxx TT 12
+  MakeHist_Isolation.cxx TT 13
+  MakeHist_Isolation.cxx TT 14
+  MakeHist_Isolation.cxx TT 15
+  MakeHist_Isolation.cxx TT 16
+  MakeHist_Isolation.cxx TT 17
+  MakeHist_Isolation.cxx TT 18
+  MakeHist_Isolation.cxx TT 19
+  MakeHist_Isolation.cxx TT 1
+  MakeHist_Isolation.cxx TT 20
+  MakeHist_Isolation.cxx TT 21
+  MakeHist_Isolation.cxx TT 22
+  MakeHist_Isolation.cxx TT 23
+  MakeHist_Isolation.cxx TT 24
+  MakeHist_Isolation.cxx TT 25
+  MakeHist_Isolation.cxx TT 26
+  MakeHist_Isolation.cxx TT 27
+  MakeHist_Isolation.cxx TT 28
+  MakeHist_Isolation.cxx TT 2
+  MakeHist_Isolation.cxx TT 3
+  MakeHist_Isolation.cxx TT 4
+  MakeHist_Isolation.cxx TT 5
+  MakeHist_Isolation.cxx TT 6
+  MakeHist_Isolation.cxx TT 7
+  MakeHist_Isolation.cxx TT 8
+  MakeHist_Isolation.cxx TT 9
+)
