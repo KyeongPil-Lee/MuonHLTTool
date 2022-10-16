@@ -6,9 +6,6 @@ error       = condor/job.$(ClusterId).$(ProcId).err
 log         = condor/job.$(ClusterId).$(ProcId).log
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
-# -- output files will directly be copied in the shell script
-# -- to avoid to transfer some (unnecessary) temp. files
-Transfer_Output_Files = ""
 
 Queue Arguments From (
   MakeHist_Isolation.cxx DY 10
