@@ -101,7 +101,15 @@ public:
     dzCut_ = dzCut;
   }
 
+  void Set_TimeMVACheck(Bool_t flag=kTRUE) { timeMVACheck_ = flag; }
+
   void Fill(Muon& mu, vector<GeneralTrack>& vec_GT) {
+
+    if( timeMVACheck_ ) {
+      Int_t i_matchedTrack = Find_MatchedGeneralTrackIndex(mu, vec_GT);
+      if( vec_GT[i_matchedTrack].timeQualMVA < timeMVACut_ ) // -- if the muon fails to pass MVA: do not include
+        return;
+    }
 
     // calc. relTrkIso for each scan
     vector<Double_t> vec_relTrkIso = Calc_Iso(mu, vec_GT);
@@ -131,6 +139,9 @@ private:
   Double_t dRCut_outer_ = 0.3;
   Bool_t applyDzCut_ = kFALSE;
   Double_t dzCut_ = -1;
+
+  Bool_t timeMVACheck_ = kFALSE;
+  Double_t timeMVACut_ = 0.5;
 
   void Init() {
     // -- e.g. nBin=10, varMin=0, varMax=10 ---> step = 1 (as expected)
@@ -176,6 +187,9 @@ private:
 
       Double_t pt_track = track.pt;
       Double_t theScanVar = ScanVariable(vec_GT[i_matchedTrack], track);
+
+      if( timeMVACheck_ && track.timeQualMVA > timeMVACut_ ) // -- if it fails to pass MVA cut:
+        theScanVar = 0; // -- set it to the smallest value: it will always be added in the isolation
 
       // -- loop over each scan point & calc. pt sum for each case
       for(Int_t i=0; i<nBin_; i++) {
@@ -238,8 +252,18 @@ void MakeHist_Isolation_scan(TString sampleType, TString splitNum) {
   producer_dt->Set_DZCut(0.2);
 
   // -- run two producers independently is not time-efficient, but let's do for now as the total run time is not so long
-  IsoHistProducer_1DScan* producer_dtSig = new IsoHistProducer_1DScan("dz0p2", "dtSig", 100, 0, 1);
+  IsoHistProducer_1DScan* producer_dtSig = new IsoHistProducer_1DScan("dz0p2", "dtSig", 100, 0, 5);
   producer_dtSig->Set_DZCut(0.2);
+
+  // -- MVA check
+  IsoHistProducer_1DScan* producer_dt_MVACheck = new IsoHistProducer_1DScan("dz0p2_MVACheck", "dt", 100, 0, 10);
+  producer_dt_MVACheck->Set_DZCut(0.2);
+  producer_dt_MVACheck->Set_TimeMVACheck();
+
+  IsoHistProducer_1DScan* producer_dtSig_MVACheck = new IsoHistProducer_1DScan("dz0p2_MVACheck", "dtSig", 100, 0, 5);
+  producer_dtSig_MVACheck->Set_DZCut(0.2);
+  producer_dtSig_MVACheck->Set_TimeMVACheck();
+
 
   TChain* chain = new TChain("ntupler/ntuple");
   if( sampleType == "test" )   chain->Add("Example/ntuple_example.root");
@@ -268,6 +292,9 @@ void MakeHist_Isolation_scan(TString sampleType, TString splitNum) {
       producer_dt->Fill( mu, vec_GT );
       producer_dtSig->Fill( mu, vec_GT );
 
+      producer_dt_MVACheck->Fill( mu, vec_GT );
+      producer_dtSig_MVACheck->Fill( mu, vec_GT );
+
     } // -- end of the loop over the muons
 
   } // -- end of event iteration
@@ -277,5 +304,7 @@ void MakeHist_Isolation_scan(TString sampleType, TString splitNum) {
   f_output->cd();
   producer_dt->Save();
   producer_dtSig->Save();
+  producer_dt_MVACheck->Save();
+  producer_dtSig_MVACheck->Save();
   f_output->Close();
 }
