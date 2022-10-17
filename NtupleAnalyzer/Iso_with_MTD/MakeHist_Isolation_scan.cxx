@@ -91,6 +91,11 @@ public:
     Init();
   }
 
+  void Set_dRCut(Double_t min, Double_t max) {
+    dRCut_inner_ = min;
+    dRCut_outer_ = max;
+  }
+
   void Set_DZCut(Double_t dzCut) {
     applyDzCut_ = kTRUE;
     dzCut_ = dzCut;
@@ -98,16 +103,13 @@ public:
 
   void Fill(Muon& mu, vector<GeneralTrack>& vec_GT) {
 
-    // calc. relTrkIso for each scan (fill vec_relTrkIso_)
-    Calc_Iso(mu, vec_GT);
+    // calc. relTrkIso for each scan
+    vector<Double_t> vec_relTrkIso = Calc_Iso(mu, vec_GT);
 
     Bool_t isPrompt = (mu.simType == 4);
 
     for(Int_t i=0; i<nBin_; i++)
-      vec_isoHist_[i].Fill( vec_relTrkIso_[i], isPrompt);
-
-    // -- make it empty after using it
-    vec_relTrkIso_.clear();
+      vec_isoHist_[i].Fill( vec_relTrkIso[i], isPrompt);
   }
 
   void Save() {
@@ -124,14 +126,13 @@ private:
   Double_t varMax_;
   vector<Double_t> vec_varCut_; // -- cut value for scan
   vector<IsoHist> vec_isoHist_; // -- hist. for each scan
-  vector<Double_t> vec_relTrkIso_; // -- iso. value for each scan
 
+  Double_t dRCut_inner_ = 0.01;
+  Double_t dRCut_outer_ = 0.3;
   Bool_t applyDzCut_ = kFALSE;
   Double_t dzCut_ = -1;
 
   void Init() {
-    vec_relTrkIso_.clear();
-
     // -- e.g. nBin=10, varMin=0, varMax=10 ---> step = 1 (as expected)
     Double_t step = (varMax_ - varMin_ ) / (Double_t)nBin_;
 
@@ -141,18 +142,23 @@ private:
       vec_varCut_.push_back( theVarCut );
       vec_isoHist_.push_back( IsoHist(type_, scanVarName_, theVarCut) );
     }
+
+    TString dRCutInfo = TString::Format("[IsoHistProducer_1DScan::Init] dR condition: %.3lf < dR < %.3lf", dRCut_inner_, dRCut_outer_);
+    cout << dRCutInfo << endl;
   }
 
-  void Calc_Iso(Muon& mu, vector<GeneralTrack>& vec_GT) {
-    Int_t i_matchedTrack = Find_MatchedGeneralTrackIndex(mu, vec_GT);
-    if( i_matchedTrack < 0 ) {
-      cout << "[Calc_Iso] No matched track for given muon is found!" << endl;
-      return;
-    }
+  vector<Double_t> Calc_Iso(Muon& mu, vector<GeneralTrack>& vec_GT) {
+    vector<Double_t> vec_relTrkIso;
 
     // -- put 0 in vec_relTrkIso_ first
     for(Int_t i=0; i<nBin_; i++)
-      vec_relTrkIso_.push_back(0.0);
+      vec_relTrkIso.push_back(0.0);
+
+    Int_t i_matchedTrack = Find_MatchedGeneralTrackIndex(mu, vec_GT);
+    if( i_matchedTrack < 0 ) {
+      cout << "[Calc_Iso] No matched track for given muon is found!" << endl;
+      return vec_relTrkIso;
+    }
 
     // -- loop over general tracks
     for(auto& track : vec_GT ) {
@@ -164,6 +170,10 @@ private:
           continue;
       }
 
+      Double_t dR = ROOT::Math::VectorUtil::DeltaR(vec_GT[i_matchedTrack].vecP, track.vecP);
+      if( !(dRCut_inner_ < dR && dR < dRCut_outer_) )
+        continue;
+
       Double_t pt_track = track.pt;
       Double_t theScanVar = ScanVariable(vec_GT[i_matchedTrack], track);
 
@@ -171,13 +181,19 @@ private:
       for(Int_t i=0; i<nBin_; i++) {
         Double_t theVarCut = vec_varCut_[i];
         if( theScanVar < theVarCut )
-          vec_relTrkIso_[i] = vec_relTrkIso_[i] + pt_track;
+          vec_relTrkIso[i] = vec_relTrkIso[i] + pt_track;
       } // -- end of loop over scan points
     } // -- end of loop over tracks
 
     // -- change to relative values
-    for(Int_t i=0; i<nBin_; i++)
-      vec_relTrkIso_[i] = vec_relTrkIso_[i] / mu.pt;
+    // cout << "mu.pt = " << mu.pt << endl;
+    for(Int_t i=0; i<nBin_; i++) {
+      vec_relTrkIso[i] = vec_relTrkIso[i] / mu.pt;
+      // cout << "vec_relTrkIso[i] = " << vec_relTrkIso[i] << endl;
+    }
+    // cout << endl;
+
+    return vec_relTrkIso;
   }
 
   Double_t ScanVariable(GeneralTrack& muTrack, GeneralTrack& theTrack) {
@@ -237,6 +253,7 @@ void MakeHist_Isolation_scan(TString sampleType, TString splitNum) {
   Int_t nEvent_tot = reader->GetEntries(kTRUE);
   cout << "nEvent_tot = " << nEvent_tot << endl;
 
+  // nEvent_tot = 10;
   for(Int_t i_ev=0; i_ev<nEvent_tot; i_ev++) {
     reader->SetEntry(i_ev);
 
