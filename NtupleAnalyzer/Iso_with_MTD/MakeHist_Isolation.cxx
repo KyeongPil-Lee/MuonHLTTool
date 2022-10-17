@@ -32,8 +32,8 @@ void MakeHist_Isolation(TString sampleType, TString splitNum) {
   Double_t dRCut_outer = 0.3;
 
   // -- histogram
-  TH1D* h_relTrkIso_prompt    = new TH1D("h_relTrkIso_prompt",    "", 1000, 10, 0);
-  TH1D* h_relTrkIso_nonprompt = new TH1D("h_relTrkIso_nonprompt", "", 1000, 10, 0);
+  TH1D* h_relTrkIso_prompt    = new TH1D("h_relTrkIso_prompt",    "", 1000, 0, 10);
+  TH1D* h_relTrkIso_nonprompt = new TH1D("h_relTrkIso_nonprompt", "", 1000, 0, 10);
 
   TH1D* h_dz_track_vs_muon_prompt    = new TH1D("h_dz_track_vs_muon_prompt",    "", 2000, -10, 10);
   TH1D* h_dz_track_vs_muon_nonprompt = new TH1D("h_dz_track_vs_muon_nonprompt", "", 2000, -10, 10);
