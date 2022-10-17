@@ -12,14 +12,15 @@ config.JobType.numCores = 1
 config.Data.inputDataset = ''
 # config.Data.useParent = True
 
-config.Data.inputDBS = 'global'
+# config.Data.inputDBS = 'global'
+config.Data.inputDBS = 'phys03' # -- USER data
 config.Data.publication = False
 
-config.Data.splitting = 'Automatic' # -- it is not preferred: test job is frequently failed due to memory
+# config.Data.splitting = 'Automatic' # -- it is not preferred: test job is frequently failed due to memory
 # config.Data.splitting = 'FileBased'
 # config.Data.unitsPerJob = 1
-# config.Data.splitting = 'EventAwareLumiBased'
-# config.Data.unitsPerJob = 3000 # -- ~3000 events per job --> 1000 jobs for ZMuMu_M50to120 (3M events)
+config.Data.splitting = 'EventAwareLumiBased'
+config.Data.unitsPerJob = 3000
 
 config.Site.storageSite = 'T2_BE_IIHE'
 
@@ -28,7 +29,7 @@ config.Site.storageSite = 'T2_BE_IIHE'
 # config.JobType.allowUndistributedCMSSW = True
 
 config.JobType.psetName = 'Run_ntupler_MTDStudy.py' # -- should be filled
-version = 'v1'
+version = 'v2'
 
 config.General.workArea = 'CRABDir_%s' % version
 config.Data.outLFNDirBase = '/store/user/kplee/MuonHLTTree_phase2MTD_%s' % version
@@ -39,10 +40,27 @@ if __name__ == '__main__':
     
     from CRABAPI.RawCommand import crabCommand
 
+    # # -- DY
+    # config.General.requestName = 'DYLL_M50_Pythia8'
+    # config.Data.inputDataset = '/DYToLL_M-50_TuneCP5_14TeV-pythia8/PhaseIISpring22DRMiniAOD-PU200_BSzpz35_123X_mcRun4_realistic_v11_ext1-v1/GEN-SIM-RECO'
+    # crabCommand('submit', config = config)
+
+    # # -- ttbar
+    # config.General.requestName = 'TTSemiLeptonic_Powheg'
+    # config.Data.inputDataset = '/TTToSemileptonic_TuneCP5_14TeV-powheg-pythia8/PhaseIISpring22DRMiniAOD-PU200_123X_mcRun4_realistic_v11-v1/GEN-SIM-RECO'
+    # crabCommand('submit', config = config)
+
+    # -- rereco-d
     # -- DY
     config.General.requestName = 'DYLL_M50_Pythia8'
-    config.Data.inputDataset = '/DYToLL_M-50_TuneCP5_14TeV-pythia8/PhaseIISpring22DRMiniAOD-PU200_BSzpz35_123X_mcRun4_realistic_v11_ext1-v1/GEN-SIM-RECO'
+    config.Data.inputDataset = '/DYToLL_M-50_TuneCP5_14TeV-pythia8/phys_egamma-reRECO_MiniAODmod-7964208c5865353948ffb7081c695345/USER'
     crabCommand('submit', config = config)
+
+    # -- ttbar
+    config.General.requestName = 'TTSemiLeptonic_Powheg'
+    config.Data.inputDataset = '/TTToSemileptonic_TuneCP5_14TeV-powheg-pythia8/phys_egamma-reRECO_MiniAODmod-7964208c5865353948ffb7081c695345/USER'
+    crabCommand('submit', config = config)
+
 
     # -- no general track information: cannot calculate tracker isolation at the ntuple level
     # # -- QCD, inclusive
