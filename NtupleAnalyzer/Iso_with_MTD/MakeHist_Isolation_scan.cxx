@@ -11,47 +11,37 @@
 
 using namespace MuonHLT;
 
+Int_t Find_MatchedGeneralTrackIndex(Muon mu, vector<MuonHLT::GeneralTrack>& vec_GT) {
+
+  // -- find the track with the smallest dR (at least less than 0.01)
+  Int_t theIndex = -1;
+  Double_t dR_smallest = 1e10;
+
+  Int_t nTrack = (Int_t)vec_GT.size();
+  for(Int_t i=0; i<nTrack; i++) {
+
+    ROOT::Math::PtEtaPhiMVector vecP_innerTrack(mu.inner_pt, mu.inner_eta, mu.inner_phi, MuonHLT::M_mu);
+
+    Double_t dR = ROOT::Math::VectorUtil::DeltaR(vecP_innerTrack, vec_GT[i].vecP);
+
+    if( dR < 0.01 && dR < dR_smallest ) {
+      dR_smallest = dR;
+      theIndex = i;
+    }
+  }
+
+  return theIndex;
+}
+
 
 class IsoHistProducer_1DScan {
 public:
-  IsoHistProducer_1DScan(TString type, TString scanVarName, Int_t nBin, Double_t varMin, Double_t varMax) {
-    type_ = type;
-    scanVarName_ = scanVarName;
-    nBin_ = nBin;
-    varMin_ = varMin;
-    varMax_ = varMax;
 
-    Init();
-  }
-
-  void Set_DZCut(Double_t dzCut) {
-    applyDzCut_ = kTRUE;
-    dzCut_ = dzCut;
-  }
-
-  void Fill(Muon& mu, vector<GeneralTrack>& vec_GT) {
-
-    // calc. relTrkIso for each scan (fill vec_relTrkIso_)
-    Calc_Iso(mu, vec_GT);
-
-    Bool_t isPrompt = (mu.simType == 4);
-
-    for(Int_t i=0; i<nBin_; i++)
-      vec_isoHist_[i].Fill( vec_relTrkIso_[i], isPrompt);
-
-    // -- make it empty after using it
-    vec_relTrkIso_.clear();
-  }
-
-  void Save() {
-    for(auto isoHist : vec_isoHist_ )
-      isoHist.Save();
-  }
-
-private:
+  ///////////////////////
+  // -- inner class -- //
   class IsoHist {
   public:
-    IsoHist() = delete;
+    IsoHist() {}
 
     IsoHist(TString type, TString scanVarName, Double_t varCut) { 
       type_ = type;
@@ -87,7 +77,45 @@ private:
       h_nonprompt_ = new TH1D(histName_base+"_nonprompt", "", 1000, 0, 1);
     }
 
-  }; // -- end of the class IsoHist
+  }; 
+  // -- end of the class IsoHist -- //
+  ////////////////////////////////////
+
+  IsoHistProducer_1DScan(TString type, TString scanVarName, Int_t nBin, Double_t varMin, Double_t varMax) {
+    type_ = type;
+    scanVarName_ = scanVarName;
+    nBin_ = nBin;
+    varMin_ = varMin;
+    varMax_ = varMax;
+
+    Init();
+  }
+
+  void Set_DZCut(Double_t dzCut) {
+    applyDzCut_ = kTRUE;
+    dzCut_ = dzCut;
+  }
+
+  void Fill(Muon& mu, vector<GeneralTrack>& vec_GT) {
+
+    // calc. relTrkIso for each scan (fill vec_relTrkIso_)
+    Calc_Iso(mu, vec_GT);
+
+    Bool_t isPrompt = (mu.simType == 4);
+
+    for(Int_t i=0; i<nBin_; i++)
+      vec_isoHist_[i].Fill( vec_relTrkIso_[i], isPrompt);
+
+    // -- make it empty after using it
+    vec_relTrkIso_.clear();
+  }
+
+  void Save() {
+    for(auto isoHist : vec_isoHist_ )
+      isoHist.Save();
+  }
+
+private:
 
   TString type_;
   TString scanVarName_;
@@ -168,28 +196,6 @@ private:
     return theScanVar;
   }
 
-  Int_t Find_MatchedGeneralTrackIndex(Muon mu, vector<MuonHLT::GeneralTrack>& vec_GT) {
-
-    // -- find the track with the smallest dR (at least less than 0.01)
-    Int_t theIndex = -1;
-    Double_t dR_smallest = 1e10;
-
-    Int_t nTrack = (Int_t)vec_GT.size();
-    for(Int_t i=0; i<nTrack; i++) {
-
-      ROOT::Math::PtEtaPhiMVector vecP_innerTrack(mu.inner_pt, mu.inner_eta, mu.inner_phi, MuonHLT::M_mu);
-
-      Double_t dR = ROOT::Math::VectorUtil::DeltaR(vecP_innerTrack, vec_GT[i].vecP);
-
-      if( dR < 0.01 && dR < dR_smallest ) {
-        dR_smallest = dR;
-        theIndex = i;
-      }
-    }
-
-    return theIndex;
-  }
-
 };
 
 
@@ -212,8 +218,12 @@ void MakeHist_Isolation_scan(TString sampleType, TString splitNum) {
   Double_t dRCut_outer = 0.3;
 
   // -- histogram setting
-  IsoHistProducer_1DScan* producer = new IsoHistProducer_1DScan("dz0p2", "dt", 100, 0, 10);
-  producer->Set_DZCut(0.2);
+  IsoHistProducer_1DScan* producer_dt = new IsoHistProducer_1DScan("dz0p2", "dt", 100, 0, 10);
+  producer_dt->Set_DZCut(0.2);
+
+  // -- run two producers independently is not time-efficient, but let's do for now as the total run time is not so long
+  IsoHistProducer_1DScan* producer_dtSig = new IsoHistProducer_1DScan("dz0p2", "dtSig", 100, 0, 1);
+  producer_dtSig->Set_DZCut(0.2);
 
   TChain* chain = new TChain("ntupler/ntuple");
   if( sampleType == "test" )   chain->Add("Example/ntuple_example.root");
@@ -238,7 +248,8 @@ void MakeHist_Isolation_scan(TString sampleType, TString splitNum) {
       // -- to ensure the muon has the inner track (and corresponding time information)
       if( !mu.isLoose ) continue;
 
-      producer->Fill( mu, vec_GT );
+      producer_dt->Fill( mu, vec_GT );
+      producer_dtSig->Fill( mu, vec_GT );
 
     } // -- end of the loop over the muons
 
@@ -247,6 +258,7 @@ void MakeHist_Isolation_scan(TString sampleType, TString splitNum) {
   TString outputFName = TString::Format("ROOTFile_IsoScan_%s_%s.root", sampleType.Data(), splitNum.Data());
   TFile *f_output = TFile::Open(outputFName, "RECREATE");
   f_output->cd();
-  producer->Save();
+  producer_dt->Save();
+  producer_dtSig->Save();
   f_output->Close();
 }
