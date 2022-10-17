@@ -84,7 +84,7 @@ private:
 
   bool isNewHighPtMuon(const reco::Muon& muon, const reco::Vertex& vtx);
 
-  void Fill_Muon_TrackMTDTime(const reco::TrackRef& theTrack, const int& _nMuon)
+  void Fill_Muon_TrackMTDTime(const edm::Event &iEvent, const reco::TrackRef& theTrack, const int& _nMuon);
 
   HLTPrescaleProvider hltPreConfig_;
   HLTPrescaleProvider myHLTPreConfig_;
@@ -93,9 +93,9 @@ private:
   edm::EDGetTokenT< std::vector<pat::Muon> >                 t_offlinePATMuon_; // -- to check whether given offline muon collection is PAT (e.g. miniAOD)
   edm::EDGetTokenT< reco::VertexCollection >                 t_offlineVertex_;
   edm::EDGetTokenT< reco::TrackCollection >                  t_generalTrack_;
-  edm::EDGetTokenT< edm::valueMap<float> >                   t_trackTime_;
-  edm::EDGetTokenT< edm::valueMap<float> >                   t_trackTimeError_;
-  edm::EDGetTokenT< edm::valueMap<float> >                   t_trackTimeQualityMVA_;
+  edm::EDGetTokenT< edm::ValueMap<float> >                   t_trackTime_;
+  edm::EDGetTokenT< edm::ValueMap<float> >                   t_trackTimeError_;
+  edm::EDGetTokenT< edm::ValueMap<float> >                   t_trackTimeQualityMVA_;
   edm::EDGetTokenT< edm::TriggerResults >                    t_triggerResults_;
   edm::EDGetTokenT< trigger::TriggerEvent >                  t_triggerEvent_;
   edm::EDGetTokenT< edm::TriggerResults >                    t_myTriggerResults_;
@@ -134,7 +134,7 @@ private:
 
 
   TTree *ntuple_;
-  static const int arrSize_ = 2000;
+  static const int arrSize_ = 20000;
 
   // -- general event information
   bool isRealData_;
@@ -258,6 +258,8 @@ private:
   double muon_inner_eta_[arrSize_];
   double muon_inner_phi_[arrSize_];
   double muon_inner_time_[arrSize_];
+  double muon_inner_timeError_[arrSize_];
+  double muon_inner_timeQualMVA_[arrSize_];
   double muon_normChi2_inner_[arrSize_];
   int muon_nTrackerHit_inner_[arrSize_];
   int muon_nTrackerLayer_inner_[arrSize_];

@@ -25,7 +25,7 @@ ntuplerBase = cms.EDAnalyzer("MuonHLTNtupler",
 	generalTrack        = cms.untracked.InputTag("generalTracks"),
 	trackTime           = cms.untracked.InputTag("tofPID", "t0safe"),
 	trackTimeError      = cms.untracked.InputTag("tofPID", "sigmat0safe"),
-	trackTimeQualityMVA = cms.untracked.Inputtag("mtdTrackQualityMVA", "mtdQualMVA"),
+	trackTimeQualityMVA = cms.untracked.InputTag("mtdTrackQualityMVA", "mtdQualMVA"),
 
 	# -- generator information
 	PUSummaryInfo = cms.untracked.InputTag("addPileupInfo"),
@@ -129,7 +129,7 @@ ntuplerBaseRerunHLT = cms.EDAnalyzer("MuonHLTNtupler",
 	generalTrack        = cms.untracked.InputTag("generalTracks"),
 	trackTime           = cms.untracked.InputTag("tofPID", "t0safe"),
 	trackTimeError      = cms.untracked.InputTag("tofPID", "sigmat0safe"),
-	trackTimeQualityMVA = cms.untracked.Inputtag("mtdTrackQualityMVA", "mtdQualMVA"),
+	trackTimeQualityMVA = cms.untracked.InputTag("mtdTrackQualityMVA", "mtdQualMVA"),
 	
 	# -- generator information
 	PUSummaryInfo = cms.untracked.InputTag("addPileupInfo"),
