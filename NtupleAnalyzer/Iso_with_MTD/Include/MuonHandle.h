@@ -1,3 +1,5 @@
+#pragma once
+
 #include <TTreeReader.h>
 #include <TTreeReaderValue.h>
 #include <TTreeReaderArray.h>

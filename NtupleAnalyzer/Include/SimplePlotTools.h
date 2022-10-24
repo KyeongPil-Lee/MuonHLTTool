@@ -328,6 +328,7 @@ public:
   TLatex latex_;
   Bool_t setLatexCMSPre_;
   Bool_t setLatexLumiEnergy_;
+  Bool_t setLatexCMSInternal_;
   Double_t lumi_;
   Int_t energy_;
   Bool_t setLatexCMSSim_;
@@ -416,6 +417,11 @@ public:
     setLatexCMSPre_ = kTRUE;
   }
 
+  void Latex_CMSInternal()
+  {
+    setLatexCMSInternal_ = kTRUE;
+  }
+
   void Latex_CMSPre(Double_t lumi, Int_t energy)
   {
     Latex_CMSPre();
@@ -469,6 +475,7 @@ public:
 
     setLatexCMSPre_ = kFALSE;
     setLatexLumiEnergy_ = kFALSE;
+    setLatexCMSInternal_ = kFALSE;
     lumi_ = -999;
     energy_ = -999;
     setLatexCMSSim_ = kFALSE;
@@ -492,6 +499,11 @@ public:
   void DrawLatex_CMSPre()
   {
     latex_.DrawLatexNDC(0.13, 0.96, "#font[62]{CMS}#font[42]{#it{#scale[0.8]{ Preliminary}}}");
+  }
+
+  void DrawLatex_CMSInternal()
+  {
+    latex_.DrawLatexNDC(0.13, 0.96, "#font[62]{CMS}#font[42]{#it{#scale[0.8]{ Internal}}}");
   }
 
   void DrawLatex_CMSPreLumiEnergy()
@@ -560,6 +572,8 @@ public:
       if( setLatexLumiEnergy_ ) DrawLatex_CMSPreLumiEnergy();
       else                      DrawLatex_CMSPre();
     }
+
+    if( setLatexCMSInternal_ ) DrawLatex_CMSInternal();
 
     if( setLatexCMSSim_ ) DrawLatex_CMSSim();
 
