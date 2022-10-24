@@ -36,13 +36,13 @@ void MakeHist_Isolation_scan_step1(TString sampleType, TString splitNum) {
   Double_t max_timeQualMVA = 0.5;
 
   // -- setting the scanning tool
-  Int_t scanRange_dt_nBin = 100; // -- bin size = 0.05
+  Int_t scanRange_dt_nBin = 100; // -- bin size = 0.1
   Double_t scanRange_dt_min = 0;
-  Double_t scanRange_dt_max = 5;
+  Double_t scanRange_dt_max = 10;
 
-  Int_t scanRange_dz_nBin = 50; // -- bin size = 0.01
+  Int_t scanRange_dz_nBin = 50; // -- bin size = 0.02
   Double_t scanRange_dz_min = 0;
-  Double_t scanRange_dz_max = 0.5;
+  Double_t scanRange_dz_max = 1.0;
 
   Double_t step_dz = (scanRange_dz_max - scanRange_dz_min) / scanRange_dz_nBin;
   vector<Double_t> vec_dzCut = {};

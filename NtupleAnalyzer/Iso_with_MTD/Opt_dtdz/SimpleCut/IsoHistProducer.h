@@ -108,6 +108,11 @@ public:
 
   void Set_IsoType(TString type) { isoType_ = type; }
 
+  void Set_DefaultCut_dt( Double_t value ) {
+    applyDefaultCut_dt = kTRUE;
+    defaultCut_dt = value;
+  }
+
   void Fill(Muon& mu, vector<GeneralTrack>& vec_GT) {
 
     // calc. relTrkIso for each scan
@@ -142,6 +147,9 @@ private:
   Double_t dzCut_noMuonTime_ = -1;
 
   Double_t timeMVACut_ = 0.5;
+
+  Bool_t applyDefaultCut_dt = kFALSE;
+  Double_t defaultCut_dt = -1.0;
 
   // -- Simplest: dz < max_dz & dt < max_dt / if dt is not availble: just put in the isolation cut
   // -- SimpleCut: dz < max_dz & dt < max_dt / if dt is not available: dz < max_dz_noDt ( apply the other dz cut )
@@ -199,6 +207,12 @@ private:
 
         Double_t dz = std::abs(vec_GT[i_matchedTrack].dz - track.dz);
         if( trackHasTimeInfo ) {
+          // -- baseline cut on dt (if necessary)
+          if( applyDefaultCut_dt ) {
+            Double_t dt = std::abs(vec_GT[i_matchedTrack].time - track.time);
+            if( dt > defaultCut_dt ) continue;
+          }
+
           if( dz > dzCut_ ) continue;
 
           Double_t pt_track = track.pt;
