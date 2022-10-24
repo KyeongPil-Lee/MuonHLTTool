@@ -24,7 +24,7 @@ TString GetFilePath(TString sampleType, TString splitNum) {
 }
 
 // -- step 1: assume dzCut = dzCut_noTrackTime and perform scan
-void MakeHist_Isolation_scan_step1(TString sampleType, TString splitNum) {
+void MakeHist_Isolation_scan_noMuonTime(TString sampleType, TString splitNum) {
   cout << "sampleType = " << sampleType << endl;
   cout << "splitNum =   " << splitNum << endl;
 
@@ -36,38 +36,11 @@ void MakeHist_Isolation_scan_step1(TString sampleType, TString splitNum) {
   Double_t max_timeQualMVA = 0.5;
 
   // -- setting the scanning tool
-  Int_t scanRange_dt_nBin = 50;
-  Double_t scanRange_dt_min = 0;
-  Double_t scanRange_dt_max = 2;
-
   Int_t scanRange_dz_nBin = 50;
   Double_t scanRange_dz_min = 0;
   Double_t scanRange_dz_max = 0.5;
 
   Double_t step_dz = (scanRange_dz_max - scanRange_dz_min) / scanRange_dz_nBin;
-  vector<Double_t> vec_dzCut = {};
-  for(Int_t i=0; i<scanRange_dz_nBin; i++)
-    vec_dzCut.push_back( scanRange_dz_min + (i+1)*step_dz );
-
-  // vector<Double_t> vec_dzCut_noDt = {};
-  // for(Int_t i=0; i<scanRange_dz_nBin; i++)
-  //   vec_dzCut_noDt.push_back( scanRange_dz_min + (i+1)*step_dz );
-
-  vector<IsoHistProducer_1DScan*> vec_producer_muTime;
-  for( auto dzCut :  vec_dzCut ) {
-    TString type = TString::Format("dz%.2lf_muTime", dzCut);
-    type.ReplaceAll(".", "p");
-
-    IsoHistProducer_1DScan* producer = new IsoHistProducer_1DScan(type, "dt", scanRange_dt_nBin, scanRange_dt_min, scanRange_dt_max);
-    producer->Set_DZCut(dzCut);
-    producer->Set_DZCut_noTrackTime(dzCut); // -- use the same dz cut for the muons/tracks without time info: for simplicity (for the initial scan)
-    producer->Set_DZCut_noMuonTime(dzCut); // -- not used anyway
-    producer->Set_TimeMVACut(max_timeQualMVA);
-    producer->Set_IsoType("SimpleCut");
-    vec_producer_muTime.push_back( producer );
-  }
-
-  // -- another scan: when muon has no (reliable) time info.
   vector<Double_t> vec_dzCut_no_muonTime = {};
   for(Int_t i=0; i<scanRange_dz_nBin; i++)
     vec_dzCut_no_muonTime.push_back( scanRange_dz_min + (i+1)*step_dz );
@@ -86,19 +59,12 @@ void MakeHist_Isolation_scan_step1(TString sampleType, TString splitNum) {
     vec_producer_no_muTime.push_back( producer );
   }
 
-  // -- default algorithm for comparison:
-  IsoHistProducer_1DScan* producer_default_muTime = new IsoHistProducer_1DScan("default", "dt", 1, 0, 1000); // -- 1 bin for dt: not used
-  producer_default_muTime->Set_DZCut(0.2);
-  producer_default_muTime->Set_IsoType("Default");
-
   IsoHistProducer_1DScan* producer_default_no_muTime = new IsoHistProducer_1DScan("default", "dt", 1, 0, 1000); // -- 1 bin for dt: not used
   producer_default_no_muTime->Set_DZCut(0.2);
   producer_default_no_muTime->Set_IsoType("Default");
 
-
-
   TChain* chain = new TChain("ntupler/ntuple");
-  if( sampleType == "test" )   chain->Add("../../Example/ntuple_example.root");
+  if( sampleType == "test" )   chain->Add("../../../Example/ntuple_example.root");
   else                         chain->Add( GetFilePath(sampleType, splitNum) );
 
   TTreeReader* reader = new TTreeReader(chain);
@@ -125,13 +91,7 @@ void MakeHist_Isolation_scan_step1(TString sampleType, TString splitNum) {
       Int_t i_matchedTrack = Find_MatchedGeneralTrackIndex(mu, vec_GT);
       Bool_t muonHasTimeInfo = (vec_GT[i_matchedTrack].timeQualMVA < max_timeQualMVA);
 
-      if( muonHasTimeInfo ) {
-        producer_default_muTime->Fill( mu, vec_GT );
-        for(auto producer : vec_producer_muTime)
-          producer->Fill( mu, vec_GT );
-
-      }
-      else {
+      if( !muonHasTimeInfo ) {
         producer_default_no_muTime->Fill( mu, vec_GT );
         for(auto producer : vec_producer_no_muTime)
           producer->Fill( mu, vec_GT );
@@ -141,13 +101,10 @@ void MakeHist_Isolation_scan_step1(TString sampleType, TString splitNum) {
 
   } // -- end of event iteration
 
-  TString outputFName = TString::Format("ROOTFile_IsoScan_Step1_%s_%s.root", sampleType.Data(), splitNum.Data());
+  TString outputFName = TString::Format("ROOTFile_IsoScan_NoMuonTime_%s_%s.root", sampleType.Data(), splitNum.Data());
   TFile *f_output = TFile::Open(outputFName, "RECREATE");
   f_output->cd();
-  producer_default_muTime->Save();
   producer_default_no_muTime->Save();
-  for(auto producer : vec_producer_muTime)
-    producer->Save();
   for(auto producer : vec_producer_no_muTime)
     producer->Save();
   f_output->Close();
