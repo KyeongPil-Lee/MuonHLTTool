@@ -58,7 +58,7 @@ void MakeHist_Isolation_scan_step1(TString sampleType, TString splitNum) {
     TString type = TString::Format("dz%.2lf_muTime", dzCut);
     type.ReplaceAll(".", "p");
 
-    IsoHistProducer_1DScan* producer = new IsoHistProducer_1DScan(type, "dt", 100, 0, 5);
+    IsoHistProducer_1DScan* producer = new IsoHistProducer_1DScan(type, "dt", scanRange_dt_nBin, scanRange_dt_min, scanRange_dt_max);
     producer->Set_DZCut(dzCut);
     producer->Set_DZCut_noTrackTime(dzCut); // -- use the same dz cut for the muons/tracks without time info: for simplicity (for the initial scan)
     producer->Set_DZCut_noMuonTime(dzCut); // -- not used anyway
