@@ -175,6 +175,7 @@ private:
     if( isoType_ == "Simplest" )       return Calc_Iso_Simplest(mu, vec_GT);
     else if( isoType_ == "SimpleCut" ) return Calc_Iso_SimpleCut(mu, vec_GT);
     else if( isoType_ == "Default" )   return Calc_Iso_Default(mu, vec_GT);
+    else if( isoType_ == "LinearCut" ) return Calc_Iso_LinearCut(mu, vec_GT);
     else
       cout << "[Calc_Iso] IsoType = " << isoType_ << " is not recognized... return empty vector" << endl;
 
@@ -223,6 +224,101 @@ private:
           for(Int_t i=0; i<nBin_; i++) {
             Double_t theVarCut = vec_varCut_[i];
             if( theScanVar < theVarCut )
+              vec_relTrkIso[i] = vec_relTrkIso[i] + pt_track;
+          } // -- end of loop over scan points
+
+        }
+        else { // -- track has no reliable time info: only rely on dz
+
+          if( dz > dzCut_noTrackTime_ ) continue;
+
+          Double_t pt_track = track.pt;
+
+          // -- no scan on the time variable: just put the same values for all scan points
+          for(Int_t i=0; i<nBin_; i++) {
+            vec_relTrkIso[i] = vec_relTrkIso[i] + pt_track;
+          } // -- end of loop over scan points
+
+        } // -- end of else( trackHasTimeInfo )
+
+      } // -- end of track iteration
+    }
+    else { // -- if muon has no reliable time info: only rely on dz cut
+
+      // -- loop over general tracks
+      for(auto& track : vec_GT ) {
+
+        Double_t dR = ROOT::Math::VectorUtil::DeltaR(vec_GT[i_matchedTrack].vecP, track.vecP);
+        if( !(dRCut_inner_ < dR && dR < dRCut_outer_) )
+          continue;
+
+        // -- apply DZ cut: skip if it has large dz(muon, track)
+        Double_t dz = std::abs(vec_GT[i_matchedTrack].dz - track.dz);
+        if( dz > dzCut_noMuonTime_ ) continue;
+
+        Double_t pt_track = track.pt;
+
+        // -- no scan on the time variable: just put the same values for all scan points
+        for(Int_t i=0; i<nBin_; i++) {
+          vec_relTrkIso[i] = vec_relTrkIso[i] + pt_track;
+        } // -- end of loop over scan points
+
+      }
+
+    } // -- end of else( muonHasTimeInfo )
+
+    // -- change to relative values
+    for(Int_t i=0; i<nBin_; i++) {
+      vec_relTrkIso[i] = vec_relTrkIso[i] / mu.pt;
+    }
+
+    return vec_relTrkIso;
+  }
+
+  // -- when dt is available: apply (dz/dz_cut + dt/dt_cut <= 2)
+  // -- when dt is not available: same with SimpleCut case
+  vector<Double_t> Calc_Iso_LinearCut(Muon& mu, vector<GeneralTrack>& vec_GT) {
+    vector<Double_t> vec_relTrkIso;
+
+    // -- put 0 in vec_relTrkIso_ first
+    for(Int_t i=0; i<nBin_; i++)
+      vec_relTrkIso.push_back(0.0);
+
+    Int_t i_matchedTrack = Find_MatchedGeneralTrackIndex(mu, vec_GT);
+    Double_t MVA_muTrack = vec_GT[i_matchedTrack].timeQualMVA;
+    Bool_t muonHasTimeInfo = MVA_muTrack < timeMVACut_;
+
+    if( muonHasTimeInfo ) {
+
+      // -- loop over general tracks
+      for(auto& track : vec_GT ) {
+
+        Double_t dR = ROOT::Math::VectorUtil::DeltaR(vec_GT[i_matchedTrack].vecP, track.vecP);
+        if( !(dRCut_inner_ < dR && dR < dRCut_outer_) )
+          continue;
+
+        Bool_t trackHasTimeInfo = track.timeQualMVA < timeMVACut_;
+
+        Double_t dz = std::abs(vec_GT[i_matchedTrack].dz - track.dz);
+        if( trackHasTimeInfo ) {
+          // -- baseline cut on dt (if necessary)
+          if( applyDefaultCut_dt ) {
+            Double_t dt = std::abs(vec_GT[i_matchedTrack].time - track.time);
+            if( dt > defaultCut_dt ) continue;
+          }
+
+          if( dz > dzCut_ ) continue;
+
+          Double_t pt_track = track.pt;
+          Double_t theScanVar = ScanVariable(vec_GT[i_matchedTrack], track); // -- e.g. dt or dtSig, etc
+
+          // -- loop over each scan point & calc. pt sum for each case
+          for(Int_t i=0; i<nBin_; i++) {
+            Double_t theVarCut = vec_varCut_[i];
+
+            Double_t combinedValue = dz/dzCut_ + theScanVar/theVarCut;
+
+            if( combinedValue < 2.0 )
               vec_relTrkIso[i] = vec_relTrkIso[i] + pt_track;
           } // -- end of loop over scan points
 
