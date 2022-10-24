@@ -1,6 +1,6 @@
 #include <Iso_with_MTD/Include/MuonHandle.h>
 #include <Iso_with_MTD/Include/GeneralTrackHandle.h>
-#include <Iso_with_MTD/Opt_dtdz/SimpleCut/IsoHistProducer.h>
+#include <Iso_with_MTD/Opt_dtdz/IsoHistProducer.h>
 
 #include <TTreeReader.h>
 #include <TH1D.h>
