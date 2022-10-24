@@ -1266,4 +1266,124 @@ public:
   }
 };
 
+class Hist2DCanvas : public CanvasBase
+{
+public:
+  TH2D* h2D_ = nullptr;
+
+  Bool_t isLogZ_ = kFALSE;
+
+  Bool_t setRangeZ_ = kFALSE;
+  Double_t minZ_ = 0.0;
+  Double_t maxZ_ = 1.0;
+
+  Bool_t setAutoRangeZ_ = kFALSE;
+
+  Hist2DCanvas() {};
+
+  Hist2DCanvas(TString canvasName, Bool_t isLogX = kFALSE, Bool_t isLogY = kFALSE, Bool_t isLogZ = kFALSE ): Hist2DCanvas()
+  {
+    canvasName_ = canvasName;
+    isLogX_ = isLogX;
+    isLogY_ = isLogY;
+    isLogZ_ = isLogZ;
+  }
+
+  void Register( TH2D* h2D )
+  {
+    h2D_ = h2D;
+  }
+
+  void SetRangeZ( Double_t minZ, Double_t maxZ )
+  {
+    setRangeZ_ = kTRUE;
+    minZ_ = minZ;
+    maxZ_ = maxZ;
+  }
+
+  void SetAutoRangeZ( Bool_t flag = kTRUE ) { setAutoRangeZ_ = flag; }
+
+
+  void Draw( TString drawOp = "COLZ" )
+  {
+    // -- draw canvas
+    SetCanvas_Square();
+    c_->SetLogz(isLogZ_);
+
+    // c_->SetTopMargin(0.05);
+    // c_->SetBottomMargin(0.13);
+
+    c_->SetLeftMargin(0.13);
+    c_->SetRightMargin(0.12);
+
+    c_->cd();
+    h2D_->Draw(drawOp);
+    h2D_->SetStats(kFALSE);
+    h2D_->SetTitle("");
+
+    PlotTool::SetAxis_SinglePad( h2D_->GetXaxis(), h2D_->GetYaxis(), titleX_, titleY_ );
+    if( setRangeX_ ) h2D_->GetXaxis()->SetRangeUser( minX_, maxX_ );
+    if( setRangeY_ ) h2D_->GetYaxis()->SetRangeUser( minY_, maxY_ );
+    if( setRangeZ_ ) h2D_->GetZaxis()->SetRangeUser( minZ_, maxZ_ );
+
+    if( setAutoRangeZ_ ) CalcAutoRangeZAndSet();
+
+    // -- adjustment
+    h2D_->GetXaxis()->SetLabelSize(0.035);
+    h2D_->GetYaxis()->SetLabelSize(0.035);
+    h2D_->GetYaxis()->SetTitleOffset(1.1);
+
+    DrawLatexAll();
+
+    c_->SaveAs(".pdf");
+  }
+
+private:
+  void CalcAutoRangeZAndSet()
+  {
+    Double_t minZ = 1e10;
+    Double_t maxZ = -1e10;
+
+    // -- find min and max
+    Int_t nBinX = h2D_->GetNbinsX();
+    Int_t nBinY = h2D_->GetNbinsY();
+    for(Int_t i_x=0; i_x<nBinX; i_x++)
+    {
+      Int_t i_binX = i_x+1;
+
+      for(Int_t i_y=0; i_y<nBinY; i_y++)
+      {
+        Int_t i_binY = i_y+1;
+        Double_t value = h2D_->GetBinContent(i_binX, i_binY);
+
+        if( value > maxZ ) maxZ = value;
+        if( value < minZ ) minZ = value;
+      }
+    }
+
+    if( isLogZ_ )
+    {
+      if( minZ < 0 )
+      {
+        cout << "[Hist2DCanvas::SetAutoRangeZ] minZ < 0 but isLogZ = True ... force the range to start at 0" << endl;
+        minZ = 0;
+      }
+
+      maxZ = maxZ * 5;
+    }
+    else // -- linear scale
+    {
+      if( minZ > 0 ) minZ = minZ * 0.9;
+      else           minZ = minZ * 1.1;
+
+      if( maxZ > 0 ) maxZ = maxZ * 1.1;
+      else           maxZ = maxZ * 0.9;
+    }
+
+    cout << "[Hist2DCanvas::SetAutoRangeZ] minZ = " << minZ << ", maxZ = " << maxZ << endl; 
+    h2D_->GetZaxis()->SetRangeUser( minZ, maxZ );
+  }
+
+};
+
 }; // -- namespace PlotTool
