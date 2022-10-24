@@ -40,9 +40,9 @@ void MakeHist_Isolation_scan_step1(TString sampleType, TString splitNum) {
   Double_t scanRange_dt_min = 0;
   Double_t scanRange_dt_max = 10;
 
-  Int_t scanRange_dz_nBin = 100;
+  Int_t scanRange_dz_nBin = 50;
   Double_t scanRange_dz_min = 0;
-  Double_t scanRange_dz_max = 10.0;
+  Double_t scanRange_dz_max = 1.0;
 
   Double_t step_dz = (scanRange_dz_max - scanRange_dz_min) / scanRange_dz_nBin;
   vector<Double_t> vec_dzCut = {};
@@ -86,6 +86,15 @@ void MakeHist_Isolation_scan_step1(TString sampleType, TString splitNum) {
     vec_producer_no_muTime.push_back( producer );
   }
 
+  // -- default algorithm for comparison:
+  IsoHistProducer_1DScan* producer_default_muTime = new IsoHistProducer_1DScan("default", "dt", 1, 0, 1000); // -- 1 bin for dt: not used
+  producer_default_muTime->Set_DZCut(0.2);
+  producer_default_muTime->Set_IsoType("Default");
+
+  IsoHistProducer_1DScan* producer_default_no_muTime = new IsoHistProducer_1DScan("default", "dt", 1, 0, 1000); // -- 1 bin for dt: not used
+  producer_default_no_muTime->Set_DZCut(0.2);
+  producer_default_no_muTime->Set_IsoType("Default");
+
 
 
   TChain* chain = new TChain("ntupler/ntuple");
@@ -117,10 +126,13 @@ void MakeHist_Isolation_scan_step1(TString sampleType, TString splitNum) {
       Bool_t muonHasTimeInfo = (vec_GT[i_matchedTrack].timeQualMVA < max_timeQualMVA);
 
       if( muonHasTimeInfo ) {
+        producer_default_muTime->Fill( mu, vec_GT );
         for(auto producer : vec_producer_muTime)
           producer->Fill( mu, vec_GT );
+
       }
       else {
+        producer_default_no_muTime->Fill( mu, vec_GT );
         for(auto producer : vec_producer_no_muTime)
           producer->Fill( mu, vec_GT );
       }
@@ -132,6 +144,8 @@ void MakeHist_Isolation_scan_step1(TString sampleType, TString splitNum) {
   TString outputFName = TString::Format("ROOTFile_IsoScan_Step1_%s_%s.root", sampleType.Data(), splitNum.Data());
   TFile *f_output = TFile::Open(outputFName, "RECREATE");
   f_output->cd();
+  producer_default_muTime->Save();
+  producer_default_no_muTime->Save();
   for(auto producer : vec_producer_muTime)
     producer->Save();
   for(auto producer : vec_producer_no_muTime)

@@ -174,6 +174,7 @@ private:
   vector<Double_t> Calc_Iso(Muon& mu, vector<GeneralTrack>& vec_GT) {
     if( isoType_ == "Simplest" )       return Calc_Iso_Simplest(mu, vec_GT);
     else if( isoType_ == "SimpleCut" ) return Calc_Iso_SimpleCut(mu, vec_GT);
+    else if( isoType_ == "Default" )   return Calc_Iso_Default(mu, vec_GT);
     else
       cout << "[Calc_Iso] IsoType = " << isoType_ << " is not recognized... return empty vector" << endl;
 
@@ -340,6 +341,45 @@ private:
     }
 
     return theScanVar;
+  }
+
+  // -- just return the isolation with the default algorithm: no scan at all
+  vector<Double_t> Calc_Iso_Default(Muon& mu, vector<GeneralTrack>& vec_GT) {
+    vector<Double_t> vec_relTrkIso;
+
+    // -- put 0 in vec_relTrkIso_ first
+    for(Int_t i=0; i<nBin_; i++)
+      vec_relTrkIso.push_back(0.0);
+
+    Int_t i_matchedTrack = Find_MatchedGeneralTrackIndex(mu, vec_GT);
+
+    // -- loop over general tracks
+    for(auto& track : vec_GT ) {
+
+      Double_t dR = ROOT::Math::VectorUtil::DeltaR(vec_GT[i_matchedTrack].vecP, track.vecP);
+      if( !(dRCut_inner_ < dR && dR < dRCut_outer_) )
+        continue;
+
+      // -- apply DZ cut: skip if it has large dz(muon, track)
+      Double_t dz = std::abs(vec_GT[i_matchedTrack].dz - track.dz);
+      if( dz > dzCut_ ) continue;
+
+      Double_t pt_track = track.pt;
+
+      // -- no scan on the time variable: just put the same values for all scan points
+      for(Int_t i=0; i<nBin_; i++) {
+        vec_relTrkIso[i] = vec_relTrkIso[i] + pt_track;
+      } // -- end of loop over scan points
+
+    } // -- end of track iteration
+
+    // -- change to relative values
+    for(Int_t i=0; i<nBin_; i++) {
+      vec_relTrkIso[i] = vec_relTrkIso[i] / mu.pt;
+    }
+
+    return vec_relTrkIso;
+
   }
 
 };
