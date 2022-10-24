@@ -108,6 +108,7 @@ void MakeHist_Isolation_scan_step1(TString sampleType, TString splitNum) {
     vector<MuonHLT::GeneralTrack> vec_GT = GetAll_GeneralTrack(GTHandle);
 
     for(auto mu : vec_muon ) {
+      if( mu.pt < 24.0 ) continue; // -- exclude too low muons (to have same pt phase space between prompt and nonprompt & realistic range in phase-2 muon HLT)
 
       // -- to ensure the muon has the inner track (and corresponding time information)
       if( !mu.isLoose ) continue;
