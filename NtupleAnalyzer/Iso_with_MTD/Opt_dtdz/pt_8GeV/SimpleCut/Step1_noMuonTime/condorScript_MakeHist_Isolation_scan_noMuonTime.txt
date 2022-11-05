@@ -1,5 +1,5 @@
 universe    = vanilla
-executable  = ../../../condor_ROOTRun_wrapper.sh
+executable  = ../../condor_ROOTRun_wrapper.sh
 transfer_input_files = MakeHist_Isolation_scan_noMuonTime.cxx
 getenv      = True
 output      = condor/job.$(ClusterId).$(ProcId).out
