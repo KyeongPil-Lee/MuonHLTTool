@@ -33,7 +33,7 @@ void MakeHist_Isolation_scan_noMuonTime(TString sampleType, TString splitNum) {
   Double_t dRCut_outer = 0.3;
 
   // -- TimeQualMVA cut
-  Double_t max_timeQualMVA = 0.5;
+  Double_t min_timeQualMVA = 0.5;
 
   // -- setting the scanning tool
   Int_t scanRange_dz_nBin = 50;
@@ -54,7 +54,7 @@ void MakeHist_Isolation_scan_noMuonTime(TString sampleType, TString splitNum) {
     producer->Set_DZCut(dzCut_no_muonTime); // -- not used anyway
     producer->Set_DZCut_noTrackTime(dzCut_no_muonTime); // -- not used anyway
     producer->Set_DZCut_noMuonTime(dzCut_no_muonTime); // -- will only be used
-    producer->Set_TimeMVACut(max_timeQualMVA);
+    producer->Set_TimeMVACut(min_timeQualMVA);
     producer->Set_IsoType("SimpleCut");
     vec_producer_no_muTime.push_back( producer );
   }
@@ -89,7 +89,7 @@ void MakeHist_Isolation_scan_noMuonTime(TString sampleType, TString splitNum) {
       if( !mu.isLoose ) continue;
 
       Int_t i_matchedTrack = Find_MatchedGeneralTrackIndex(mu, vec_GT);
-      Bool_t muonHasTimeInfo = (vec_GT[i_matchedTrack].timeQualMVA < max_timeQualMVA);
+      Bool_t muonHasTimeInfo = (vec_GT[i_matchedTrack].timeQualMVA > min_timeQualMVA);
 
       if( !muonHasTimeInfo ) {
         producer_default_no_muTime->Fill( mu, vec_GT );
