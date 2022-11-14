@@ -194,7 +194,7 @@ private:
 
     Int_t i_matchedTrack = Find_MatchedGeneralTrackIndex(mu, vec_GT);
     Double_t MVA_muTrack = vec_GT[i_matchedTrack].timeQualMVA;
-    Bool_t muonHasTimeInfo = MVA_muTrack < timeMVACut_;
+    Bool_t muonHasTimeInfo = MVA_muTrack > timeMVACut_;
 
     if( muonHasTimeInfo ) {
 
@@ -205,7 +205,7 @@ private:
         if( !(dRCut_inner_ < dR && dR < dRCut_outer_) )
           continue;
 
-        Bool_t trackHasTimeInfo = track.timeQualMVA < timeMVACut_;
+        Bool_t trackHasTimeInfo = track.timeQualMVA > timeMVACut_;
 
         Double_t dz = std::abs(vec_GT[i_matchedTrack].dz - track.dz);
         if( trackHasTimeInfo ) {
@@ -286,7 +286,7 @@ private:
 
     Int_t i_matchedTrack = Find_MatchedGeneralTrackIndex(mu, vec_GT);
     Double_t MVA_muTrack = vec_GT[i_matchedTrack].timeQualMVA;
-    Bool_t muonHasTimeInfo = MVA_muTrack < timeMVACut_;
+    Bool_t muonHasTimeInfo = MVA_muTrack > timeMVACut_;
 
     if( muonHasTimeInfo ) {
 
@@ -297,7 +297,7 @@ private:
         if( !(dRCut_inner_ < dR && dR < dRCut_outer_) )
           continue;
 
-        Bool_t trackHasTimeInfo = track.timeQualMVA < timeMVACut_;
+        Bool_t trackHasTimeInfo = track.timeQualMVA > timeMVACut_;
 
         Double_t dz = std::abs(vec_GT[i_matchedTrack].dz - track.dz);
         if( trackHasTimeInfo ) {
@@ -401,7 +401,7 @@ private:
       Double_t pt_track = track.pt;
       Double_t theScanVar = ScanVariable(vec_GT[i_matchedTrack], track);
 
-      if( track.timeQualMVA > timeMVACut_ ) // -- if it fails to pass MVA cut:
+      if( track.timeQualMVA < timeMVACut_ ) // -- if it fails to pass MVA cut:
         theScanVar = 0; // -- set it to the smallest value: it will always be added in the isolation
 
       // -- loop over each scan point & calc. pt sum for each case
