@@ -32,20 +32,20 @@ void MakeHist_Isolation(TString sampleType, TString splitNum) {
   Double_t dRCut_inner = 0.01;
   Double_t dRCut_outer = 0.3;
 
-  Double_t dzCut_noMuonTime = 0.3;
+  Double_t dzCut_noMuonTime = 0.35;
   Double_t dzCut_noTrackTime = dzCut_noMuonTime; // -- same with the optimized dzCut_noMuonTime
-  Double_t dzCut = 0.23;
-  Double_t dtCut = 0.24;
+  Double_t dzCut = 0.28;
+  Double_t dtCut = 0.76;
 
   // -- TimeQualMVA cut
-  Double_t max_timeQualMVA = 0.5;
+  Double_t min_timeQualMVA = 0.5;
 
   IsoHistProducer_1DScan* producer = new IsoHistProducer_1DScan("optimized", "dt", 1, 0, 1000); // -- no scan
   producer->Set_DZCut(dzCut);
   producer->Set_DZCut_noTrackTime(dzCut_noTrackTime); // -- same with (optimized) dzCut_noMuonTime
   producer->Set_DZCut_noMuonTime(dzCut_noMuonTime);
   producer->Set_DefaultCut_dt(dtCut);
-  producer->Set_TimeMVACut(max_timeQualMVA);
+  producer->Set_TimeMVACut(min_timeQualMVA);
   producer->Set_IsoType("SimpleCut");
 
   // -- default algorithm for comparison:
