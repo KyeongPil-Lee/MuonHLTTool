@@ -32,10 +32,10 @@ void MakeHist_Isolation(TString sampleType, TString splitNum) {
   Double_t dRCut_inner = 0.01;
   Double_t dRCut_outer = 0.3;
 
-  Double_t dzCut_noMuonTime = 0.25;
+  Double_t dzCut_noMuonTime = 0.3;
   Double_t dzCut_noTrackTime = dzCut_noMuonTime; // -- same with the optimized dzCut_noMuonTime
-  Double_t dzCut = 0.29;
-  Double_t dtCut = 0.04;
+  Double_t dzCut = 0.26;
+  Double_t dtCut = 0.76;
 
   // -- TimeQualMVA cut
   Double_t min_timeQualMVA = 0.5;
