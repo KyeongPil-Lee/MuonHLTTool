@@ -32,10 +32,10 @@ void MakeHist_Isolation(TString sampleType, TString splitNum) {
   Double_t dRCut_inner = 0.01;
   Double_t dRCut_outer = 0.3;
 
-  Double_t dzCut_noMuonTime = 0.25;
+  Double_t dzCut_noMuonTime = 0.3;
   Double_t dzCut_noTrackTime = dzCut_noMuonTime; // -- same with the optimized dzCut_noMuonTime
-  Double_t dzCut = -1.0;
-  Double_t dtCut = -1.0;
+  Double_t dzCut = 0.23;
+  Double_t dtCut = 0.12;
 
   // -- TimeQualMVA cut
   Double_t max_timeQualMVA = 0.5;
@@ -75,7 +75,7 @@ void MakeHist_Isolation(TString sampleType, TString splitNum) {
     vector<MuonHLT::GeneralTrack> vec_GT = GetAll_GeneralTrack(GTHandle);
 
     for(auto mu : vec_muon ) {
-      if( mu.pt < 24.0 ) continue; // -- exclude too low muons (to have same pt phase space between prompt and nonprompt & realistic range in phase-2 muon HLT)
+      if( mu.pt < 8.0 ) continue; // -- exclude too low muons (to have same pt phase space between prompt and nonprompt & realistic range in phase-2 muon HLT)
 
       // -- to ensure the muon has the inner track (and corresponding time information)
       if( !mu.isLoose ) continue;
