@@ -89,7 +89,7 @@ void MakeHist_Isolation_scan_noMuonTime(TString sampleType, TString splitNum) {
       if( !mu.isLoose ) continue;
 
       Int_t i_matchedTrack = Find_MatchedGeneralTrackIndex(mu, vec_GT);
-      Bool_t muonHasTimeInfo = (vec_GT[i_matchedTrack].timeQualMVA < max_timeQualMVA);
+      Bool_t muonHasTimeInfo = (vec_GT[i_matchedTrack].timeQualMVA > min_timeQualMVA);
 
       if( !muonHasTimeInfo ) {
         producer_default_no_muTime->Fill( mu, vec_GT );
