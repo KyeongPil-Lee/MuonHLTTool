@@ -103,6 +103,22 @@ void MakeHist_Muon(TString sampleType, TString splitNum) {
           else           histSet_nonprompt->Fill("frac_Iso0_noTime", 0.5);
         }
       } // -- end of else(relTrkIso==0)
+
+      histSet_all->Fill("relTrkIso", relTrkIso);
+      if( isPrompt ) histSet_prompt->Fill("relTrkIso", relTrkIso);
+      else           histSet_nonprompt->Fill("relTrkIso", relTrkIso);
+
+      if( hasTime ) {
+        histSet_all->Fill("relTrkIso_time", relTrkIso);
+        if( isPrompt ) histSet_prompt->Fill("relTrkIso_time", relTrkIso);
+        else           histSet_nonprompt->Fill("relTrkIso_time", relTrkIso);
+      }
+      else { // -- no time
+        histSet_all->Fill("relTrkIso_noTime", relTrkIso);
+        if( isPrompt ) histSet_prompt->Fill("relTrkIso_noTime", relTrkIso);
+        else           histSet_nonprompt->Fill("relTrkIso_noTime", relTrkIso);
+      }
+
     } // -- end of muon iteration
   } // -- end of event iteration
 
@@ -130,6 +146,11 @@ void Setup_HistSet(MuonHLT::HistSet* histSet) {
   histSet->Register("frac_Iso0", 2, 0, 2);
   histSet->Register("frac_Iso0_noTime", 2, 0, 2);
   histSet->Register("frac_Iso0_time", 2, 0, 2);
+
+  histSet->Register("relTrkIso", 500, 0, 0.5);
+  histSet->Register("relTrkIso_noTime", 500, 0, 0.5);
+  histSet->Register("relTrkIso_time", 500, 0, 0.5);
+
 }
 
 Double_t RelTrkIso(Double_t pt_mu, Int_t i_matchedTrack, vector<MuonHLT::GeneralTrack>& vec_GT, Double_t dRCut_inner, Double_t dRCut_outer, Double_t dzCut) {
