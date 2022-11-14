@@ -1,6 +1,9 @@
 #pragma once
 
+#include <TString.h>
+#include <TH1D.h>
 #include <map>
+#include <iostream>
 
 namespace MuonHLT {
 
@@ -45,7 +48,7 @@ public:
 
     auto it_pair = map_var_hist_.find(var);
     if( it_pair == map_var_hist_.end() )
-      cout << "no histogram corresponding to " << var << endl;
+      std::cout << "no histogram corresponding to " << var << std::endl;
     else
       it_pair->second->Fill( value, weight );
   }
