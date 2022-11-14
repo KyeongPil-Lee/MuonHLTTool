@@ -147,9 +147,9 @@ void Setup_HistSet(MuonHLT::HistSet* histSet) {
   histSet->Register("frac_Iso0_noTime", 2, 0, 2);
   histSet->Register("frac_Iso0_time", 2, 0, 2);
 
-  histSet->Register("relTrkIso", 500, 0, 0.5);
-  histSet->Register("relTrkIso_noTime", 500, 0, 0.5);
-  histSet->Register("relTrkIso_time", 500, 0, 0.5);
+  histSet->Register("relTrkIso", 5000, 0, 0.5);
+  histSet->Register("relTrkIso_noTime", 5000, 0, 0.5);
+  histSet->Register("relTrkIso_time", 5000, 0, 0.5);
 
 }
 
