@@ -3,47 +3,47 @@
 
 #include "MuonHLTTool/MuonHLTNtupler/interface/MuonHLTNtupler.h"
 
-#include "FWCore/Framework/interface/EDAnalyzer.h"
-#include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Framework/interface/MakerMacros.h"
-#include "FWCore/ServiceRegistry/interface/Service.h"
-#include "FWCore/Common/interface/TriggerNames.h"
-#include "FWCore/Common/interface/TriggerResultsByName.h"
-#include "FWCore/Framework/interface/ConsumesCollector.h"
-#include "FWCore/Framework/interface/ESHandle.h"
-#include "FWCore/Framework/interface/EventSetup.h"
+// #include "FWCore/Framework/interface/stream/EDAnalyzer.h"
+// #include "FWCore/Framework/interface/Frameworkfwd.h"
+// #include "FWCore/Framework/interface/MakerMacros.h"
+// #include "FWCore/ServiceRegistry/interface/Service.h"
+// #include "FWCore/Common/interface/TriggerNames.h"
+// #include "FWCore/Common/interface/TriggerResultsByName.h"
+// #include "FWCore/Framework/interface/ConsumesCollector.h"
+// #include "FWCore/Framework/interface/ESHandle.h"
+// #include "FWCore/Framework/interface/EventSetup.h"
 
-#include "DataFormats/Common/interface/Handle.h"
-#include "DataFormats/Common/interface/View.h"
-#include "DataFormats/Common/interface/TriggerResults.h"
-#include "DataFormats/HLTReco/interface/TriggerEvent.h"
-#include "DataFormats/HLTReco/interface/TriggerObject.h"
-#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
-#include "DataFormats/L1Trigger/interface/Muon.h"
-#include "DataFormats/Luminosity/interface/LumiDetails.h"
-#include "DataFormats/Math/interface/deltaR.h"
-#include "DataFormats/MuonReco/interface/Muon.h"
-#include "DataFormats/MuonReco/interface/MuonSelectors.h"
-#include "DataFormats/MuonReco/interface/MuonTrackLinks.h"
-#include "DataFormats/PatCandidates/interface/Muon.h"
-#include "DataFormats/RecoCandidate/interface/IsoDeposit.h"
-#include "DataFormats/RecoCandidate/interface/IsoDepositFwd.h"
-#include "DataFormats/RecoCandidate/interface/RecoChargedCandidate.h"
-#include "DataFormats/RecoCandidate/interface/RecoChargedCandidateFwd.h"
-#include "DataFormats/RecoCandidate/interface/RecoChargedCandidateIsolation.h"
-#include "DataFormats/TrackReco/interface/Track.h"
-#include "DataFormats/VertexReco/interface/Vertex.h"
-#include "DataFormats/VertexReco/interface/VertexFwd.h"
-#include "DataFormats/Scalers/interface/LumiScalers.h"
+// #include "DataFormats/Common/interface/Handle.h"
+// #include "DataFormats/Common/interface/View.h"
+// #include "DataFormats/Common/interface/TriggerResults.h"
+// #include "DataFormats/HLTReco/interface/TriggerEvent.h"
+// #include "DataFormats/HLTReco/interface/TriggerObject.h"
+// #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
+// #include "DataFormats/L1Trigger/interface/Muon.h"
+// #include "DataFormats/Luminosity/interface/LumiDetails.h"
+// #include "DataFormats/Math/interface/deltaR.h"
+// #include "DataFormats/MuonReco/interface/Muon.h"
+// #include "DataFormats/MuonReco/interface/MuonSelectors.h"
+// #include "DataFormats/MuonReco/interface/MuonTrackLinks.h"
+// #include "DataFormats/PatCandidates/interface/Muon.h"
+// #include "DataFormats/RecoCandidate/interface/IsoDeposit.h"
+// #include "DataFormats/RecoCandidate/interface/IsoDepositFwd.h"
+// #include "DataFormats/RecoCandidate/interface/RecoChargedCandidate.h"
+// #include "DataFormats/RecoCandidate/interface/RecoChargedCandidateFwd.h"
+// #include "DataFormats/RecoCandidate/interface/RecoChargedCandidateIsolation.h"
+// #include "DataFormats/TrackReco/interface/Track.h"
+// #include "DataFormats/VertexReco/interface/Vertex.h"
+// #include "DataFormats/VertexReco/interface/VertexFwd.h"
+// #include "DataFormats/Scalers/interface/LumiScalers.h"
 
-#include "CommonTools/UtilAlgos/interface/TFileService.h"
-#include "HLTrigger/HLTcore/interface/HLTPrescaleProvider.h"
-#include "HLTrigger/HLTcore/interface/HLTEventAnalyzerAOD.h"
-#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
+// #include "CommonTools/UtilAlgos/interface/TFileService.h"
+// #include "HLTrigger/HLTcore/interface/HLTPrescaleProvider.h"
+// #include "HLTrigger/HLTcore/interface/HLTEventAnalyzerAOD.h"
+// #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
-#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
-#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
-#include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
+// #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+// #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+// #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 
 
 #include <map>
@@ -97,15 +97,13 @@ isMiniAOD_               ( iConfig.existsAs<bool>("isMiniAOD")         ? iConfig
 rerunHLT_                ( iConfig.existsAs<bool>("rerunHLT")          ? iConfig.getParameter<bool>("rerunHLT")          : false),
 doSaveRerunObject_       ( iConfig.existsAs<bool>("doSaveRerunObject") ? iConfig.getParameter<bool>("doSaveRerunObject") : false),
 t_triggerObject_miniAOD_ ( mayConsume< std::vector<pat::TriggerObjectStandAlone> > (iConfig.getUntrackedParameter<edm::InputTag>("triggerObject_miniAOD")) ), // -- not used in AOD case
-propSetup_(iConfig, consumesCollector())
-{
+propSetup_(iConfig, consumesCollector()) {
   cout << "isMiniAOD_ = "         << isMiniAOD_         << endl;
   cout << "rerunHLT_ = "          << rerunHLT_          << endl;
   cout << "doSaveRerunObject_ = " << doSaveRerunObject_ << endl;
 }
 
-void MuonHLTNtupler::analyze(const edm::Event &iEvent, const edm::EventSetup &iSetup)
-{
+void MuonHLTNtupler::analyze(const edm::Event &iEvent, const edm::EventSetup &iSetup) {
   Init();
 
   propagatorToMuon_ = propSetup_.init(iSetup);
@@ -119,8 +117,7 @@ void MuonHLTNtupler::analyze(const edm::Event &iEvent, const edm::EventSetup &iS
 
   // -- vertex
   edm::Handle<reco::VertexCollection> h_offlineVertex;
-  if( iEvent.getByToken(t_offlineVertex_, h_offlineVertex) )
-  {
+  if( iEvent.getByToken(t_offlineVertex_, h_offlineVertex) ) {
     // -- count # vertex
     bool isPVFound = false;
     int nGoodVtx = 0;
@@ -139,8 +136,7 @@ void MuonHLTNtupler::analyze(const edm::Event &iEvent, const edm::EventSetup &iS
     nVertex_ = nGoodVtx;
   }
 
-  if( isRealData_ )
-  {
+  if( isRealData_ ) {
     bunchID_ = iEvent.bunchCrossing();
 
     // -- lumi scaler @ HLT
@@ -165,8 +161,7 @@ void MuonHLTNtupler::analyze(const edm::Event &iEvent, const edm::EventSetup &iS
   }
 
   // -- True PU info: only for MC -- //
-  if( !isRealData_ )
-  {
+  if( !isRealData_ ) {
     edm::Handle<std::vector< PileupSummaryInfo > > h_PUSummaryInfo;
 
     if( iEvent.getByToken(t_PUSummaryInfo_,h_PUSummaryInfo) )
@@ -208,9 +203,9 @@ void MuonHLTNtupler::analyze(const edm::Event &iEvent, const edm::EventSetup &iS
 
 void MuonHLTNtupler::beginJob()
 {
+  ntuple_ = nullptr;
   edm::Service<TFileService> fs;
-  ntuple_ = fs->make<TTree>("ntuple","ntuple");
-
+  ntuple_ = fs->make<TTree>("ntuple", "ntuple");
   Make_Branch();
 }
 
@@ -314,6 +309,7 @@ void MuonHLTNtupler::Init()
     muon_isLoose_[i] = 0;
     muon_isHighPt_[i] = 0;
     muon_isHighPtNew_[i] = 0;
+    muon_isLooseTrigger_[i] = 0;
     muon_isSoft_[i] = 0;
 
     muon_iso03_sumPt_[i] = -999;
@@ -513,7 +509,7 @@ void MuonHLTNtupler::Init()
 void MuonHLTNtupler::Make_Branch()
 {
   ntuple_->Branch("isRealData", &isRealData_, "isRealData/O"); // -- O: boolean -- //
-  ntuple_->Branch("runNum",&runNum_,"runNum/I");
+  ntuple_->Branch("runNum", &runNum_, "runNum/I");
   ntuple_->Branch("lumiBlockNum",&lumiBlockNum_,"lumiBlockNum/I");
   ntuple_->Branch("eventNum",&eventNum_,"eventNum/l"); // -- unsigned long long -- //
   ntuple_->Branch("nVertex", &nVertex_, "nVertex/I");
@@ -594,6 +590,7 @@ void MuonHLTNtupler::Make_Branch()
   ntuple_->Branch("muon_isLoose", &muon_isLoose_, "muon_isLoose[nMuon]/I");
   ntuple_->Branch("muon_isHighPt", &muon_isHighPt_, "muon_isHighPt[nMuon]/I");
   ntuple_->Branch("muon_isHighPtNew", &muon_isHighPtNew_, "muon_isHighPtNew[nMuon]/I");
+  ntuple_->Branch("muon_isLooseTrigger", &muon_isLooseTrigger_, "muon_isLooseTrigger[nMuon]/I");
   ntuple_->Branch("muon_isSoft", &muon_isSoft_, "muon_isSoft[nMuon]/I");
 
   ntuple_->Branch("muon_iso03_sumPt", &muon_iso03_sumPt_, "muon_iso03_sumPt[nMuon]/D");
@@ -781,17 +778,18 @@ void MuonHLTNtupler::Fill_Muon(const edm::Event &iEvent)
       if( mu->isTrackerMuon() )    muon_isTRK_[_nMuon] = 1;
       if( mu->isPFMuon() )         muon_isPF_[_nMuon] = 1;
 
-      // -- defintion of ID functions: http://cmsdoxygen.web.cern.ch/cmsdoxygen/CMSSW_9_4_0/doc/html/da/d18/namespacemuon.html#ac122b2516e5711ce206256d7945473d2 -- //
-      if( muon::isTightMuon( (*mu), pv ) )  muon_isTight_[_nMuon] = 1;
-      if( muon::isMediumMuon( (*mu) ) )     muon_isMedium_[_nMuon] = 1;
-      if( muon::isLooseMuon( (*mu) ) )      muon_isLoose_[_nMuon] = 1;
-      if( muon::isHighPtMuon( (*mu), pv ) ) muon_isHighPt_[_nMuon] = 1;
-      if( isNewHighPtMuon( (*mu), pv ) )    muon_isHighPtNew_[_nMuon] = 1;
+      // -- https://github.com/cms-sw/cmssw/blob/master/DataFormats/MuonReco/src/MuonSelectors.cc
+      if( muon::isTightMuon( (*mu), pv ) )   muon_isTight_[_nMuon] = 1;
+      if( muon::isMediumMuon( (*mu) ) )      muon_isMedium_[_nMuon] = 1;
+      if( muon::isLooseMuon( (*mu) ) )       muon_isLoose_[_nMuon] = 1;
+      if( muon::isHighPtMuon( (*mu), pv ) )  muon_isHighPt_[_nMuon] = 1;
+      if( isNewHighPtMuon( (*mu), pv ) )     muon_isHighPtNew_[_nMuon] = 1;
+      if( muon::isLooseTriggerMuon( (*mu)) ) muon_isLooseTrigger_[_nMuon] = 1;
 
       // -- bool muon::isSoftMuon(const reco::Muon& muon, const reco::Vertex& vtx, bool run2016_hip_mitigation)
       // -- it is different under CMSSW_8_0_29: bool muon::isSoftMuon(const reco::Muon& muon, const reco::Vertex& vtx)
       // -- Remove this part to avoid compile error (and soft muon would not be used for now) - need to be fixed at some point
-      // if( muon::isSoftMuon( (*mu), pv, 0) ) muon_isSoft_[_nMuon] = 1;
+      if( muon::isSoftMuon( (*mu), pv, 0) ) muon_isSoft_[_nMuon] = 1;
 
       muon_iso03_sumPt_[_nMuon] = mu->isolationR03().sumPt;
       muon_iso03_hadEt_[_nMuon] = mu->isolationR03().hadEt;
@@ -920,12 +918,14 @@ void MuonHLTNtupler::Fill_HLT(const edm::Event &iEvent, const edm::EventSetup &i
         if( isMYHLT )
         {
           vec_myFiredTrigger_.push_back( pathName );
-          vec_myPrescale_.push_back( myHLTPreConfig_.prescaleValue(iEvent, iSetup, pathName) );
+          // myHLTPreConfig_.prescaleSet(iEvent, iSetup);
+          vec_myPrescale_.push_back( myHLTPreConfig_.prescaleValue<double>(iEvent, iSetup, pathName) );
         }
         else
         {
           vec_firedTrigger_.push_back( pathName );
-          vec_prescale_.push_back( hltPreConfig_.prescaleValue(iEvent, iSetup, pathName) );
+          // hltPreConfig_.prescaleSet(iEvent, iSetup);
+          vec_prescale_.push_back( hltPreConfig_.prescaleValue<double>(iEvent, iSetup, pathName) );
         }
       }
     } // -- end of if fired -- //
@@ -1514,23 +1514,19 @@ void MuonHLTNtupler::Fill_Muon_TrackMTDTime(const edm::Event& iEvent, const reco
   }
 }
 
-void MuonHLTNtupler::beginRun(const edm::Run &iRun, const edm::EventSetup &iSetup)
-{
+void MuonHLTNtupler::beginRun(const edm::Run &iRun, const edm::EventSetup &iSetup) {
   bool changedConfig;
-  if(!hltPreConfig_.init(iRun, iSetup, "HLT", changedConfig))
-  {
+  if(!hltPreConfig_.init(iRun, iSetup, "HLT", changedConfig)) {
     cout << "Initialization of HLTPrescaleProvider (processName = HLT) failed!!" << endl;
     return;
   }
 
-  if( doSaveRerunObject_ )
-  {
+  if( doSaveRerunObject_ ) {
     bool myChangedConfig;
-    if(!myHLTPreConfig_.init(iRun, iSetup, "MYHLT", myChangedConfig))
-    {
+    if(!myHLTPreConfig_.init(iRun, iSetup, "MYHLT", myChangedConfig)) {
       cout << "Initialization of HLTPrescaleProvider (processName = MYHLT) failed: in case there was no rerunning HLT" << endl;
     }
-  }
+  } // -- if( doSaveRerunObject_ )
 }
 
 void MuonHLTNtupler::endJob() {}

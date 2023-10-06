@@ -1,7 +1,8 @@
 // -- ntuple maker for Muon HLT study
 // -- author: Kyeongpil Lee (Seoul National University, kplee@cern.ch)
 
-#include "FWCore/Framework/interface/EDAnalyzer.h"
+// #include "FWCore/Framework/interface/stream/EDAnalyzer.h"
+#include "FWCore/Framework/interface/one/EDAnalyzer.h"
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
@@ -16,6 +17,7 @@
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
 #include "DataFormats/HLTReco/interface/TriggerObject.h"
+#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 #include "DataFormats/L1Trigger/interface/Muon.h"
 #include "DataFormats/Luminosity/interface/LumiDetails.h"
 #include "DataFormats/Math/interface/deltaR.h"
@@ -42,8 +44,6 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 
-#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
-
 // -- for the extrapolation of the offline muon to 2nd muon station
 // #include "MuonAnalysis/MuonAssociators/interface/PropagateToMuon.h"
 #include "MuonAnalysis/MuonAssociators/interface/PropagateToMuonSetup.h"
@@ -54,17 +54,26 @@ using namespace std;
 using namespace reco;
 using namespace edm;
 
-class MuonHLTNtupler : public edm::EDAnalyzer
-{
+// -- to use beginRun:
+// -- edm::one::WatchRuns is needed
+// -- e.g. https://github.com/cms-sw/cmssw/blob/master/HLTrigger/HLTcore/plugins/HLTPrescaleExample.cc#L10
+
+class MuonHLTNtupler : public edm::one::EDAnalyzer<edm::one::WatchRuns> {
 public:
   MuonHLTNtupler(const edm::ParameterSet &iConfig);
-  virtual ~MuonHLTNtupler() {};
+  ~MuonHLTNtupler() {};
 
-  virtual void analyze(const edm::Event &iEvent, const edm::EventSetup &iSetup);
-  virtual void beginJob();
-  virtual void endJob();
-  virtual void beginRun(const edm::Run &iRun, const edm::EventSetup &iSetup);
-  virtual void endRun(const edm::Run &iRun, const edm::EventSetup &iSetup);
+  // void analyze(const edm::Event &iEvent, const edm::EventSetup &iSetup) override;
+  // void beginJob() override;
+  // void endJob() override;
+  // void beginRun(const edm::Run &iRun, const edm::EventSetup &iSetup) override;
+  // void endRun(const edm::Run &iRun, const edm::EventSetup &iSetup) override;
+
+  void analyze(const edm::Event &iEvent, const edm::EventSetup &iSetup);
+  void beginJob();
+  void endJob();
+  void beginRun(const edm::Run &iRun, const edm::EventSetup &iSetup);
+  void endRun(const edm::Run &iRun, const edm::EventSetup &iSetup);
 
 private:
   void Init();
@@ -130,8 +139,6 @@ private:
 
   PropagateToMuon propagatorToMuon_;
   PropagateToMuonSetup propSetup_;
-
-
 
   TTree *ntuple_;
   static const int arrSize_ = 20000;
@@ -226,6 +233,7 @@ private:
   int muon_isLoose_[arrSize_];
   int muon_isHighPt_[arrSize_];
   int muon_isHighPtNew_[arrSize_];
+  int muon_isLooseTrigger_[arrSize_];
   int muon_isSoft_[arrSize_];
 
   double muon_iso03_sumPt_[arrSize_];
