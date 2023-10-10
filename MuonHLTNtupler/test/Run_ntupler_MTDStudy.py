@@ -1,6 +1,6 @@
 # ----------------------#
 flag_HLTRerun = False
-flag_miniAOD = False
+flag_miniAOD = True # -- to use simInfo (available only in pat::muon)
 # ----------------------#
 
 import FWCore.ParameterSet.Config as cms

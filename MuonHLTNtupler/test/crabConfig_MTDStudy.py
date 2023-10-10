@@ -3,7 +3,6 @@ config = config()
 
 config.General.requestName = ''
 
-
 config.JobType.pluginName = 'Analysis'
 config.JobType.numCores = 1
 # config.JobType.maxMemoryMB = 2500
@@ -20,7 +19,7 @@ config.Data.publication = False
 # config.Data.splitting = 'FileBased'
 # config.Data.unitsPerJob = 1
 config.Data.splitting = 'EventAwareLumiBased'
-config.Data.unitsPerJob = 3000
+config.Data.unitsPerJob = 1000
 
 config.Site.storageSite = 'T2_BE_IIHE'
 
@@ -29,7 +28,7 @@ config.Site.storageSite = 'T2_BE_IIHE'
 # config.JobType.allowUndistributedCMSSW = True
 
 config.JobType.psetName = 'Run_ntupler_MTDStudy.py' # -- should be filled
-version = 'v1'
+version = 'v2'
 
 config.General.workArea = 'CRABDir_%s' % version
 config.Data.outLFNDirBase = '/store/user/kplee/MuonHLTTree_phase2MTD_131X_%s' % version
@@ -41,14 +40,17 @@ if __name__ == '__main__':
     from CRABAPI.RawCommand import crabCommand
 
     config.General.requestName = 'RelValZMM'
-    config.Data.inputDataset = '/RelValZMM_14/CMSSW_13_1_0-PU_131X_mcRun4_realistic_v5_2026D95PU200-v1/GEN-SIM-RECO'
+    config.Data.inputDataset = '/RelValZMM_14/CMSSW_13_1_0-PU_131X_mcRun4_realistic_v5_2026D95PU200-v1/MINIAODSIM'
+    config.Data.secondaryInputDataset = '/RelValZMM_14/CMSSW_13_1_0-PU_131X_mcRun4_realistic_v5_2026D95PU200-v1/GEN-SIM-RECO'
     crabCommand('submit', config = config)
 
     config.General.requestName = 'RelValTTbar'
-    config.Data.inputDataset = '/RelValTTbar_14TeV/CMSSW_13_1_0-PU_131X_mcRun4_realistic_v5_2026D95PU200-v1/GEN-SIM-RECO'
+    config.Data.inputDataset = '/RelValTTbar_14TeV/CMSSW_13_1_0-PU_131X_mcRun4_realistic_v5_2026D95PU200-v1/MINIAODSIM'
+    config.Data.secondaryInputDataset = '/RelValTTbar_14TeV/CMSSW_13_1_0-PU_131X_mcRun4_realistic_v5_2026D95PU200-v1/GEN-SIM-RECO'
     crabCommand('submit', config = config)
 
     config.General.requestName = 'RelValQCD_Pt20toInfMuEnrichPt15'
-    config.Data.inputDataset = '/RelValQCD_Pt20toInfMuEnrichPt15_14/CMSSW_13_1_0-PU_131X_mcRun4_realistic_v5_2026D95PU200-v1/GEN-SIM-RECO'
+    config.Data.inputDataset = '/RelValQCD_Pt20toInfMuEnrichPt15_14/CMSSW_13_1_0-PU_131X_mcRun4_realistic_v5_2026D95PU200-v1/MINIAODSIM'
+    config.Data.secondaryInputDataset = '/RelValQCD_Pt20toInfMuEnrichPt15_14/CMSSW_13_1_0-PU_131X_mcRun4_realistic_v5_2026D95PU200-v1/GEN-SIM-RECO'
     crabCommand('submit', config = config)
 
