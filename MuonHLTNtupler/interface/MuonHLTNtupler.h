@@ -135,6 +135,7 @@ private:
   bool isMiniAOD_ = false;
   bool rerunHLT_ = false;
   bool doSaveRerunObject_ = false;
+  bool isMTDAvailable_ = false;
   edm::EDGetTokenT< std::vector<pat::TriggerObjectStandAlone> > t_triggerObject_miniAOD_;
 
   PropagateToMuon propagatorToMuon_;

@@ -23,7 +23,7 @@ def addNtupleModuleToProcess(process, newProcessName = "MYHLT", isMiniAOD=False)
     process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAlong_cfi")
     process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorOpposite_cfi")
     
-    from MuonHLTTool.MuonHLTNtupler.ntupler_cfi import ntuplerBase
+    from MuonHLTTool.MuonHLTNtupler.ntupler_cfi import ntuplerBase,ntuplerBaseRerunHLT
     # process.ntupler = ntuplerBase.clone()
     process.ntupler = ntuplerBaseRerunHLT.clone()
 
@@ -39,7 +39,7 @@ def addNtupleModuleToProcess(process, newProcessName = "MYHLT", isMiniAOD=False)
 
     process.ntupler.ECALIsoMap = cms.untracked.InputTag("hltMuonEcalMFPFClusterIsoForMuons",  "",               newProcessName)
     process.ntupler.HCALIsoMap = cms.untracked.InputTag("hltMuonHcalRegPFClusterIsoForMuons", "",               newProcessName)
-    process.ntupler.trkIsoMap  = cms.untracked.InputTag("hltMuonTkRelIsolationCut0p07Map",    "trkIsoDeposits", newProcessName)
+    process.ntupler.trkIsoMap  = cms.untracked.InputTag("hltMuonTkRelIsolationCut0p08Map",    "trkIsoDeposits", newProcessName)
 
     process.ntupler.iterL3MuonNoID.iterL3OI        = cms.untracked.InputTag("hltL3MuonsIterL3OI",                   "", newProcessName)
     process.ntupler.iterL3MuonNoID.iterL3IOFromL2  = cms.untracked.InputTag("hltL3MuonsIterL3IO",                   "", newProcessName)
@@ -48,7 +48,7 @@ def addNtupleModuleToProcess(process, newProcessName = "MYHLT", isMiniAOD=False)
     process.ntupler.iterL3MuonNoID                 = cms.untracked.InputTag("hltIterL3MuonsNoID",                   "", newProcessName)
 
     if isMiniAOD:
-        customize_miniAOD(process.ntupler)
+        customizeModule_miniAOD(process.ntupler)
 
 
     process.TFileService = cms.Service("TFileService",
