@@ -6,6 +6,10 @@
 #include <iostream>
 #include <fstream>
 
+#include <TChain.h>
+#include <Math/Vector4D.h>
+#include <Math/VectorUtil.h>
+
 namespace MuonHLT {
 
 /*
