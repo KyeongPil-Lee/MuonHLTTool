@@ -18,13 +18,15 @@ g_dic_datasetName = {
   "QCD_Pt30to50" : "QCD_PT-30to50_MuEnrichedPT5_TuneCP5_13p6TeV_pythia8",
   "QCD_Pt50to80" : "QCD_PT-50to80_MuEnrichedPT5_TuneCP5_13p6TeV_pythia8",
   "QCD_Pt80to120" : "QCD_PT-80to120_MuEnrichedPT5_TuneCP5_13p6TeV_pythia8",
+  "QCD_Pt120to170" : "QCD_PT-120to170_MuEnrichedPT5_TuneCP5_13p6TeV_pythia8",
 }
 g_dic_nJob = {
-  "DY" : 50,
+  "DY" : 30,
   "QCD_Pt20to30" : 5,
   "QCD_Pt30to50" : 5,
   "QCD_Pt50to80" : 5,
   "QCD_Pt80to120" : 5,
+  "QCD_Pt120to170" : 5,
 }
 # g_cppCode = "MakeHist_Isolation.cxx"
 
@@ -99,9 +101,9 @@ class SingleJob:
     self.Make_CondorScript()
 
   def Submit(self):
-    cmd = "condor_submit %s/%s" % (self.dirPath, self.condorScriptName)
-    print cmd
-    # os.system(cmd)
+    cmd = "condor_submit %s" % (self.condorScriptName)
+    # print(cmd)
+    os.system(cmd)
 
   def Make_Dir(self):
     self.dirPath = "%s/Job_%03d" % (self.motherDir, self.i_job)
@@ -125,7 +127,7 @@ class SingleJob:
 #!/bin/bash
 
 cd {cwd_}
-cp {cppCode_} ./
+cp {cppCodePath_} ./
 
 root -l -b -q '{cppCode_}++("{tag_}", "{i_job_}")'
 
@@ -133,7 +135,7 @@ echo "done"
 
 mv *.root ../
 
-      """.format(cwd_=self.dirPath, cppCode_=self.cppCode, tag_=self.sampleTag, i_job_ = self.i_job))
+""".format(cwd_=self.dirPath, cppCodePath_=self.cppCode, cppCode_=self.cppCode.split("/")[-1], tag_=self.sampleTag, i_job_ = self.i_job))
 
     f.close()
 
@@ -150,8 +152,9 @@ error       = {cwd_}/error.txt
 log         = {cwd_}/log.txt
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
+queue
 
-    """.format(shellScriptName_=self.shellScriptName, cwd_=self.dirPath))
+""".format(shellScriptName_=self.shellScriptName, cwd_=self.dirPath))
 
     f.close()
 
@@ -187,7 +190,7 @@ class SampleJob:
       self.nJob = nFile
 
     self.nFilePerJob = int( float(nFile) / float(self.nJob) )
-    print "nJob = %d, nFile = %d -> nFilePerJob = %d\n" % (self.nJob, nFile, self.nFilePerJob)
+    print("nJob = %d, nFile = %d -> nFilePerJob = %d\n" % (self.nJob, nFile, self.nFilePerJob))
 
   def SetupAndSubmit_SingleJob(self, i_job):
     list_rootFile_iJob = self.Get_ROOTFileList_iJob(i_job)
@@ -221,6 +224,7 @@ class JobSubTool:
 
   def Submit(self):
     self.Make_MotherDir()
+    self.Make_HaddScript()
 
     for i_sample in range(0, len(self.list_sampleInfo)):
       print("Start submitting the sample (%s) ..." % self.list_sampleInfo[i_sample].tag)
@@ -233,6 +237,21 @@ class JobSubTool:
 
       sampleJob.SetupAndSubmit()
       print("Submission of the sample (%s): done" % list_sampleInfo[i_sample].tag)
+
+  def Make_HaddScript(self):
+    scriptName = "script_hadd.sh"
+    scriptPath = "%s/%s" % (self.motherDirPath, scriptName)
+
+    f = open(scriptPath, "w")
+    f.write("#!bin/bash\n\n")
+
+    for sampleInfo in self.list_sampleInfo:
+      mergedFile = "%s.root" % sampleInfo.tag
+      cmd_hadd = "hadd %s %s/*.root" % (mergedFile, sampleInfo.tag)
+      f.write(cmd_hadd+"\n")
+      f.write('echo "hadd for %s sample: done"\n\n' % sampleInfo.tag)
+
+    f.close()
 
   def Make_MotherDir(self):
     cwd = os.getcwd()
