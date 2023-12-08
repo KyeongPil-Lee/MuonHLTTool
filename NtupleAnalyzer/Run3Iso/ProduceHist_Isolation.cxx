@@ -60,6 +60,11 @@ void ProduceHist_Isolation(TString sampleType, TString i_job = "") {
   HistContainer hist_last_prompt("last_prompt");
   HistContainer hist_last_nonprompt("last_nonprompt");
 
+  // -- sumWeight
+  TH1D* h_sumWeight = new TH1D("h_sumWeight", "", 3, 0, 3);
+  h_sumWeight->GetXaxis()->SetBinLabel(1, "sumWeight");
+  h_sumWeight->GetXaxis()->SetBinLabel(2, "sumWeight_pos");
+  h_sumWeight->GetXaxis()->SetBinLabel(3, "sumWeight_neg");
 
 
   TChain* chain = new TChain("ntupler/ntuple");
@@ -83,6 +88,9 @@ void ProduceHist_Isolation(TString sampleType, TString i_job = "") {
     reader->SetEntry(i_ev);
 
     Double_t genWeight = (*genEventWeight < 0 ) ? -1.0 : 1.0; // -- just take sign
+    h_sumWeight->Fill("sumWeight", genWeight);
+    if( genWeight > 0 ) h_sumWeight->Fill("sumWeight_pos", genWeight);
+    else                h_sumWeight->Fill("sumWeight_neg", genWeight);
 
     // vector<MuonHLT::MYHLTObject> vec_myHLTObj = GetAll_MYHLTObject(myHLTObjHandle);
     // for(const auto& myHLTObj : vec_myHLTObj) {
@@ -148,6 +156,7 @@ void ProduceHist_Isolation(TString sampleType, TString i_job = "") {
   TFile *f_output = TFile::Open(outputFileName, "RECREATE");
   f_output->cd();
 
+  h_sumWeight->Write();
   hist_prompt.Save();
   hist_nonprompt.Save();
   hist_last_prompt.Save();
