@@ -21,7 +21,7 @@ g_dic_datasetName = {
   "QCD_Pt120to170" : "QCD_PT-120to170_MuEnrichedPT5_TuneCP5_13p6TeV_pythia8",
 }
 g_dic_nJob = {
-  "DY" : 30,
+  "DY" : 50,
   "QCD_Pt20to30" : 5,
   "QCD_Pt30to50" : 5,
   "QCD_Pt50to80" : 5,
