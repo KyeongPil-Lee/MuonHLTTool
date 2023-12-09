@@ -58,6 +58,32 @@ private:
 
 };
 
+vector<MuonHLT::L3Muon> Get_MatchedL3Muons(vector<MuonHLT::L3Muon> vec_l3Muon, vector<MuonHLT::MYHLTObject> vec_obj, Double_t minDR) {
+  vector<MuonHLT::L3Muon> vec_matched;
+  vec_matched.clear();
+
+  Int_t nL3Muon = (Int_t)vec_l3Muon.size();
+
+  for(const auto& obj : vec_obj ) {
+    Double_t dR_best = 1e10;
+    Int_t index_best = -1;
+
+    for(Int_t i_l3=0; i_l3<nL3Muon; ++i_l3) {
+      Double_t dR = ROOT::Math::VectorUtil::DeltaR(obj.vecP, vec_l3Muon[i_l3].vecP);
+
+      if( dR < minDR && dR < dR_best ) {
+        dR_best = dR;
+        index_best = i_l3;
+      }
+    } // -- iteration over L3
+
+    if( index_best > 0 )
+      vec_matched.push_back( vec_l3Muon[index_best] );
+  } // -- iteration over objects
+
+  return vec_matched;
+}
+
 void ProduceHist_Isolation(TString sampleType, TString i_job = "") {  
   // -- isolation setting
   // Double_t dRCut_inner = 0.01;
@@ -123,35 +149,56 @@ void ProduceHist_Isolation(TString sampleType, TString i_job = "") {
         vec_vecP_offMu_prompt.push_back( mu.vecP );
     }
 
-    vector<ROOT::Math::PtEtaPhiMVector> vec_vecP_passHCAL;
-    for(const auto& myHLTObj : vec_myHLTObj_passHCAL) {
-      // printf("  [passHCAL] (pt, eta, phi) = (%.3lf, %.3lf, %.3lf)\n", myHLTObj.pt, myHLTObj.eta, myHLTObj.phi);
-      vec_vecP_passHCAL.push_back( myHLTObj.vecP );
-    }
+    // vector<ROOT::Math::PtEtaPhiMVector> vec_vecP_passHCAL;
+    // for(const auto& myHLTObj : vec_myHLTObj_passHCAL) {
+    //   // printf("  [passHCAL] (pt, eta, phi) = (%.3lf, %.3lf, %.3lf)\n", myHLTObj.pt, myHLTObj.eta, myHLTObj.phi);
+    //   vec_vecP_passHCAL.push_back( myHLTObj.vecP );
+    // }
 
-    vector<ROOT::Math::PtEtaPhiMVector> vec_vecP_passLast;
-    for(const auto& myHLTObj : vec_myHLTObj_passLast) {
-      // printf("  [passLast] (pt, eta, phi) = (%.3lf, %.3lf, %.3lf)\n", myHLTObj.pt, myHLTObj.eta, myHLTObj.phi);
-      vec_vecP_passLast.push_back( myHLTObj.vecP );
-    }
+    // vector<ROOT::Math::PtEtaPhiMVector> vec_vecP_passLast;
+    // for(const auto& myHLTObj : vec_myHLTObj_passLast) {
+    //   // printf("  [passLast] (pt, eta, phi) = (%.3lf, %.3lf, %.3lf)\n", myHLTObj.pt, myHLTObj.eta, myHLTObj.phi);
+    //   vec_vecP_passLast.push_back( myHLTObj.vecP );
+    // }
 
-
-    for(const auto& l3Mu : vec_l3Muon) {
-      // if( !MuonHLT::dRMatching(l3Mu.vecP, vec_vecP_passHCAL, 0.1) ) continue;
-
-      Bool_t matched_passHCAL = MuonHLT::dRMatching(l3Mu.vecP, vec_vecP_passHCAL,     0.1);
-      if( !matched_passHCAL ) continue;
-
+    vector<MuonHLT::L3Muon> vec_l3Muon_passHCAL = Get_MatchedL3Muons(vec_l3Muon, vec_myHLTObj_passHCAL, 0.1);
+    for(const auto& l3Mu : vec_l3Muon_passHCAL) {
       Bool_t matched_prompt = MuonHLT::dRMatching(l3Mu.vecP, vec_vecP_offMu_prompt, 0.1);
       if( matched_prompt ) hist_prompt.Fill(l3Mu, genWeight);
       else                 hist_nonprompt.Fill(l3Mu, genWeight);
 
+      // if( l3Mu.pt < 24.0 ) {
+      //   printf("  [L3 muon] (pt, eta, phi, relECALIso, relHCALIso, relTrkIso) = (%.3lf, %.3lf, %.3lf, %.3lf, %.3lf, %.3lf)", 
+      //          l3Mu.pt, l3Mu.eta, l3Mu.phi, l3Mu.relECALIso, l3Mu.relHCALIso, l3Mu.relTrkIso);
+      // }
+    }
 
-      Bool_t matched_passLast = MuonHLT::dRMatching(l3Mu.vecP, vec_vecP_passLast, 0.1);
-      if( matched_passLast ) {
-        if( matched_prompt ) hist_last_prompt.Fill(l3Mu, genWeight);
-        else                 hist_last_nonprompt.Fill(l3Mu, genWeight);
-      }
+    vector<MuonHLT::L3Muon> vec_l3Muon_passLast = Get_MatchedL3Muons(vec_l3Muon, vec_myHLTObj_passLast, 0.1);
+    for(const auto& l3Mu : vec_l3Muon_passLast) {
+      Bool_t matched_prompt = MuonHLT::dRMatching(l3Mu.vecP, vec_vecP_offMu_prompt, 0.1);
+      if( matched_prompt ) hist_last_prompt.Fill(l3Mu, genWeight);
+      else                 hist_last_nonprompt.Fill(l3Mu, genWeight);
+    }
+
+
+
+    // Bool_t strangeEvent = kFALSE;
+    // for(const auto& l3Mu : vec_l3Muon) {
+      
+      // Bool_t matched_passHCAL = MuonHLT::dRMatching(l3Mu.vecP, vec_vecP_passHCAL, 0.1);
+      // if( !matched_passHCAL ) continue;
+
+      // Bool_t matched_prompt = MuonHLT::dRMatching(l3Mu.vecP, vec_vecP_offMu_prompt, 0.1);
+      // if( matched_prompt ) hist_prompt.Fill(l3Mu, genWeight);
+      // else                 hist_nonprompt.Fill(l3Mu, genWeight);
+
+
+      // Bool_t matched_passLast = MuonHLT::dRMatching(l3Mu.vecP, vec_vecP_passLast, 0.1);
+      // if( matched_passLast ) {
+      //   if( matched_prompt ) hist_last_prompt.Fill(l3Mu, genWeight);
+      //   else                 hist_last_nonprompt.Fill(l3Mu, genWeight);
+      // }
+
 
       // printf("[L3 muon]");
       // if( matched_passHCAL ) printf(" *matched_passHCAL*");
@@ -159,10 +206,28 @@ void ProduceHist_Isolation(TString sampleType, TString i_job = "") {
       // if( matched_prompt )   printf(" *matched_prompt*");
       // printf("\n");
 
-      // printf("-->(pt, eta, phi, relECALIso, relHCALIso, relTrkIso) = (%.3lf, %.3lf, %.3lf, %.3lf, %.3lf, %.3lf)\n", 
-      //        l3Mu.pt, l3Mu.eta, l3Mu.phi, l3Mu.relECALIso, l3Mu.relHCALIso, l3Mu.relTrkIso);
-    }
 
+      // Bool_t matched_passHCAL = MuonHLT::dRMatching(l3Mu.vecP, vec_vecP_passHCAL, 0.1);
+      // if( matched_passHCAL && l3Mu.pt < 24.0 )
+      //   strangeEvent = kTRUE;
+
+    // }
+
+
+    // if( strangeEvent ) {
+    //   for(const auto& myHLTObj : vec_myHLTObj_passHCAL) {
+    //     printf("  [passHCAL] (pt, eta, phi) = (%.3lf, %.3lf, %.3lf)\n", myHLTObj.pt, myHLTObj.eta, myHLTObj.phi);
+    //   }
+
+    //   for(const auto& l3Mu : vec_l3Muon) {
+    //     printf("  [L3 muon] (pt, eta, phi, relECALIso, relHCALIso, relTrkIso) = (%.3lf, %.3lf, %.3lf, %.3lf, %.3lf, %.3lf)", 
+    //            l3Mu.pt, l3Mu.eta, l3Mu.phi, l3Mu.relECALIso, l3Mu.relHCALIso, l3Mu.relTrkIso);
+    //     if( MuonHLT::dRMatching(l3Mu.vecP, vec_vecP_passHCAL, 0.1) )
+    //       printf(" --> matched to passHCAL\n");
+    //     else
+    //       printf("\n");
+    //   }
+    // }
 
   }
 
