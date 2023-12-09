@@ -84,10 +84,20 @@ vector<MuonHLT::L3Muon> Get_MatchedL3Muons(vector<MuonHLT::L3Muon> vec_l3Muon, v
   return vec_matched;
 }
 
+void Fill_Hist_nEvent(TH1D* h_nEvent, Double_t weight, Int_t nMuon_pt24, Int_t nMuon_ECAL, Int_t nMuon_HCAL, Int_t nMuon_last) {
+  h_nEvent->Fill("total", weight);
+  if(nMuon_pt24 > 0 ) h_nEvent->Fill("pt>24", weight);
+  if(nMuon_ECAL > 0 ) h_nEvent->Fill("ECAL", weight);
+  if(nMuon_HCAL > 0 ) h_nEvent->Fill("HCAL", weight);
+  if(nMuon_last > 0 ) h_nEvent->Fill("Last", weight);
+}
+
 void ProduceHist_Isolation(TString sampleType, TString i_job = "") {  
   // -- isolation setting
   // Double_t dRCut_inner = 0.01;
   // Double_t dRCut_outer = 0.3;
+
+  TString filterName_pt24 = "hltL3fL1sSingleMu22L1f0L2f10QL3Filtered24Q::MYHLT";
   TString filterName_ECAL = "hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3pfecalIsoRhoFiltered::MYHLT";
   TString filterName_HCAL = "hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3pfhcalIsoRhoFiltered::MYHLT";
   TString filterName_last = "hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered::MYHLT";
@@ -105,6 +115,14 @@ void ProduceHist_Isolation(TString sampleType, TString i_job = "") {
   h_sumWeight->GetXaxis()->SetBinLabel(1, "sumWeight");
   h_sumWeight->GetXaxis()->SetBinLabel(2, "sumWeight_pos");
   h_sumWeight->GetXaxis()->SetBinLabel(3, "sumWeight_neg");
+
+  // -- count events: pass fliters
+  TH1D* h_nEvent_passFilter = new TH1D("h_nEvent_passFilter", "", 5, 0, 5);
+  h_nEvent_passFilter->GetXaxis()->SetBinLabel(1, "total");
+  h_nEvent_passFilter->GetXaxis()->SetBinLabel(2, "pt>24");
+  h_nEvent_passFilter->GetXaxis()->SetBinLabel(3, "ECAL");
+  h_nEvent_passFilter->GetXaxis()->SetBinLabel(4, "HCAL");
+  h_nEvent_passFilter->GetXaxis()->SetBinLabel(5, "Last");
 
 
   TChain* chain = new TChain("ntupler/ntuple");
@@ -139,8 +157,16 @@ void ProduceHist_Isolation(TString sampleType, TString i_job = "") {
 
     vector<MuonHLT::Muon> vec_muon = GetAll_Muon(muonHandle);
     vector<MuonHLT::L3Muon> vec_l3Muon = GetAll_L3Muon(l3MuonHandle);
+    vector<MuonHLT::MYHLTObject> vec_myHLTObj_passPt24 = GetAll_MYHLTObject(myHLTObjHandle, filterName_pt24);
+    vector<MuonHLT::MYHLTObject> vec_myHLTObj_passECAL = GetAll_MYHLTObject(myHLTObjHandle, filterName_ECAL);
     vector<MuonHLT::MYHLTObject> vec_myHLTObj_passHCAL = GetAll_MYHLTObject(myHLTObjHandle, filterName_HCAL);
     vector<MuonHLT::MYHLTObject> vec_myHLTObj_passLast = GetAll_MYHLTObject(myHLTObjHandle, filterName_last);
+
+    Fill_Hist_nEvent(h_nEvent_passFilter, genWeight, 
+                     vec_myHLTObj_passPt24.size(), 
+                     vec_myHLTObj_passECAL.size(), 
+                     vec_myHLTObj_passHCAL.size(), 
+                     vec_myHLTObj_passLast.size() );
 
     vector<ROOT::Math::PtEtaPhiMVector> vec_vecP_offMu_prompt;
     for(const auto& mu : vec_muon) {
@@ -236,6 +262,7 @@ void ProduceHist_Isolation(TString sampleType, TString i_job = "") {
   f_output->cd();
 
   h_sumWeight->Write();
+  h_nEvent_passFilter->Write();
   hist_prompt.Save();
   hist_nonprompt.Save();
   hist_last_prompt.Save();
