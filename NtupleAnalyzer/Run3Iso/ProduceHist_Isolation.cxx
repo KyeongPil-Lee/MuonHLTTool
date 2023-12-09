@@ -23,7 +23,14 @@ public:
   void Save() { histSet_->Write(); }
 
   void Fill(const MuonHLT::L3Muon& mu, Double_t weight) {
-    histSet_->Fill("relTrkIso", mu.relTrkIso, weight);
+    histSet_->Fill("pt",    mu.pt, weight);
+    histSet_->Fill("trkPt", mu.trkPt, weight);
+    histSet_->Fill("eta",   mu.eta, weight);
+    histSet_->Fill("phi",   mu.phi, weight);
+
+    histSet_->Fill("relECALIso", mu.relECALIso, weight);
+    histSet_->Fill("relHCALIso", mu.relHCALIso, weight);
+    histSet_->Fill("relTrkIso",  mu.relTrkIso, weight);
 
     Double_t combIso = mu.ECALIso + mu.HCALIso + mu.trkIso;
     Double_t relCombIso = (mu.pt == 0) ? 1e10 : combIso / mu.pt;
@@ -38,16 +45,23 @@ private:
   void Init() {
     histSet_ = new HistSet(type_);
 
-    histSet_->Register("relTrkIso", 1000, 0, 10);
-    histSet_->Register("relCombIso", 1000, 0, 10);
+    histSet_->Register("pt", 10000, 0, 10000);
+    histSet_->Register("trkPt", 10000, 0, 10000);
+    histSet_->Register("eta", 60, -3, 3);
+    histSet_->Register("phi", 80, -4, 4);
+
+    histSet_->Register("relECALIso", 2000, -1, 1);
+    histSet_->Register("relHCALIso", 2000, -1, 1);
+    histSet_->Register("relTrkIso", 2000, -1, 1);
+    histSet_->Register("relCombIso", 2000, -1, 1);
   }
 
 };
 
 void ProduceHist_Isolation(TString sampleType, TString i_job = "") {  
   // -- isolation setting
-  Double_t dRCut_inner = 0.01;
-  Double_t dRCut_outer = 0.3;
+  // Double_t dRCut_inner = 0.01;
+  // Double_t dRCut_outer = 0.3;
   TString filterName_ECAL = "hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3pfecalIsoRhoFiltered::MYHLT";
   TString filterName_HCAL = "hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3pfhcalIsoRhoFiltered::MYHLT";
   TString filterName_last = "hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered::MYHLT";
