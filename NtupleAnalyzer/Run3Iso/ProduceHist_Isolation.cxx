@@ -65,11 +65,15 @@ vector<MuonHLT::L3Muon> Get_MatchedL3Muons(vector<MuonHLT::L3Muon> vec_l3Muon, v
   Int_t nL3Muon = (Int_t)vec_l3Muon.size();
 
   for(const auto& obj : vec_obj ) {
+    // printf("[Object] (pt, eta, phi) = (%.3lf, %.3lf, %.3lf)\n", obj.pt, obj.eta, obj.phi);
+
     Double_t dR_best = 1e10;
     Int_t index_best = -1;
 
     for(Int_t i_l3=0; i_l3<nL3Muon; ++i_l3) {
       Double_t dR = ROOT::Math::VectorUtil::DeltaR(obj.vecP, vec_l3Muon[i_l3].vecP);
+
+      // printf("  [L3 muon] (pt, eta, phi) = (%.3lf, %.3lf, %.3lf) --> dR = %.3lf\n", vec_l3Muon[i_l3].pt, vec_l3Muon[i_l3].eta, vec_l3Muon[i_l3].phi, dR);
 
       if( dR < minDR && dR < dR_best ) {
         dR_best = dR;
@@ -77,8 +81,10 @@ vector<MuonHLT::L3Muon> Get_MatchedL3Muons(vector<MuonHLT::L3Muon> vec_l3Muon, v
       }
     } // -- iteration over L3
 
-    if( index_best > 0 )
+    if( index_best >= 0 ) {
+      // printf("[selected L3 muon] (pt, eta, phi) = (%.3lf, %.3lf, %.3lf)\n", vec_l3Muon[index_best].pt, vec_l3Muon[index_best].eta, vec_l3Muon[index_best].phi);
       vec_matched.push_back( vec_l3Muon[index_best] );
+    }
   } // -- iteration over objects
 
   return vec_matched;
@@ -175,10 +181,8 @@ void ProduceHist_Isolation(TString sampleType, TString i_job = "") {
         vec_vecP_offMu_prompt.push_back( mu.vecP );
     }
 
-    // vector<ROOT::Math::PtEtaPhiMVector> vec_vecP_passHCAL;
     // for(const auto& myHLTObj : vec_myHLTObj_passHCAL) {
-    //   // printf("  [passHCAL] (pt, eta, phi) = (%.3lf, %.3lf, %.3lf)\n", myHLTObj.pt, myHLTObj.eta, myHLTObj.phi);
-    //   vec_vecP_passHCAL.push_back( myHLTObj.vecP );
+    //   printf("  [passHCAL] (pt, eta, phi) = (%.3lf, %.3lf, %.3lf)\n", myHLTObj.pt, myHLTObj.eta, myHLTObj.phi);
     // }
 
     // vector<ROOT::Math::PtEtaPhiMVector> vec_vecP_passLast;
@@ -189,6 +193,9 @@ void ProduceHist_Isolation(TString sampleType, TString i_job = "") {
 
     vector<MuonHLT::L3Muon> vec_l3Muon_passHCAL = Get_MatchedL3Muons(vec_l3Muon, vec_myHLTObj_passHCAL, 0.1);
     for(const auto& l3Mu : vec_l3Muon_passHCAL) {
+        // printf("  [L3 muon pass HCAL] (pt, eta, phi, relECALIso, relHCALIso, relTrkIso) = (%.3lf, %.3lf, %.3lf, %.3lf, %.3lf, %.3lf)", 
+        //        l3Mu.pt, l3Mu.eta, l3Mu.phi, l3Mu.relECALIso, l3Mu.relHCALIso, l3Mu.relTrkIso);
+
       Bool_t matched_prompt = MuonHLT::dRMatching(l3Mu.vecP, vec_vecP_offMu_prompt, 0.1);
       if( matched_prompt ) hist_prompt.Fill(l3Mu, genWeight);
       else                 hist_nonprompt.Fill(l3Mu, genWeight);
@@ -205,6 +212,8 @@ void ProduceHist_Isolation(TString sampleType, TString i_job = "") {
       if( matched_prompt ) hist_last_prompt.Fill(l3Mu, genWeight);
       else                 hist_last_nonprompt.Fill(l3Mu, genWeight);
     }
+
+
 
 
 
